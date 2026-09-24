@@ -57,3 +57,11 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+/src/generated
+
+# Prisma AI agent skill docs (tool-specific reference material, regenerate with `prisma init`)
+/.agents/skills
+/.claude/skills
+/.windsurf/skills
+/skills-lock.json

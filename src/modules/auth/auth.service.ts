@@ -4,7 +4,7 @@ import * as bcrypt from 'bcryptjs';
 import { UserRepository } from './repositories/user.repository.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
-import { SafeUser, User } from './domain/user.entity.js';
+import { SafeUser, User } from './entities/user.entity.js';
 
 const SALT_ROUNDS = 10;
 

@@ -65,3 +65,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 /.claude/skills
 /.windsurf/skills
 /skills-lock.json
+
+# Claude Code project instructions (local reference, not shared with the team)
+/CLAUDE.md

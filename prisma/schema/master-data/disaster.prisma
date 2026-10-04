@@ -1,0 +1,22 @@
+enum DisasterStatus {
+  Active
+  On_Budgeting
+  Completed
+}
+
+model Disaster {
+  ID_Disaster       Int            @id @default(autoincrement())
+  Disaster_Code     String
+  Disaster_Name     String
+  Disaster_Category String
+  Description       String?
+  Status            DisasterStatus
+  Created_At        DateTime       @default(now())
+  Updated_At        DateTime       @updatedAt
+
+  @@map("Disaster")
+}
+
+
+
+

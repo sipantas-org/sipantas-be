@@ -33,7 +33,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const dateTime = dayjs().tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
 
     // Ambil pesan error (dukungan untuk Class-Validator array message)
-    let message = 'Terjadi kesalahan pada server';
+    let message = 'An unexpected error occurred on the server';
     let errors = null;
     if (typeof exceptionResponse === 'string') {
       message = exceptionResponse;
@@ -45,7 +45,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? 'Error Validation'
         : exceptionResponse.message;
       if (message === 'Error Validation') {
-        errors = exceptionResponse.message;
+        errors = exceptionResponse.message.map((val: string) => {
+          val = val.replace(/_/g, ' ');
+          return val;
+        });
       }
     }
 

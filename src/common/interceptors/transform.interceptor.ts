@@ -25,7 +25,7 @@ export class TransformInterceptor<T> implements NestInterceptor<
     return next.handle().pipe(
       map((data) => {
         // Jika controller mengembalikan object yang menyertakan custom message
-        const message = data?.message || 'Request diproses berhasil';
+        const message = data?.message || 'Success';
         const resultData = data?.data !== undefined ? data.data : data;
 
         return {

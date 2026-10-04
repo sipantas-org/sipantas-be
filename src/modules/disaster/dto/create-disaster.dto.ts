@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { Expose } from 'class-transformer';
 import { DisasterStatus } from '../../../generated/prisma/enums.js';
 
@@ -13,6 +19,7 @@ export class CreateDisasterDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(20)
   Disaster_Category: string;
 
   @IsString()

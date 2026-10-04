@@ -57,7 +57,7 @@ $ npm run test:e2e
 $ npm run test:cov
 
 # sync DB using prisma
-$ npx prisma migrate dev
+$ npx prisma db push
 ```
 ## Deployment
 

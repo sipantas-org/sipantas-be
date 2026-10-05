@@ -1,6 +1,13 @@
+enum PartStatus {
+  Active
+  Inactive
+}
+
 model Housing_Assessment_Part {
-  ID_Housing_Assessment_Part Int      @id @default(autoincrement())
-  Part_Name                  String
+  housingAssessmentPartId Int      @id @default(autoincrement())
+  partName                  String
+  partStatus            PartStatus
+
   createdAt DateTime @default(now()) @db.Timestamptz
   updatedAt DateTime @updatedAt @db.Timestamptz
 

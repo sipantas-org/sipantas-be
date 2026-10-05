@@ -5,6 +5,7 @@ import {
   Body,
   Patch,
   Param,
+  Query,
   Delete,
   ParseIntPipe,
   HttpCode,
@@ -13,6 +14,7 @@ import {
 import { DisasterService } from './disaster.service.js';
 import { CreateDisasterDto } from './dto/create-disaster.dto.js';
 import { UpdateDisasterDto } from './dto/update-disaster.dto.js';
+import { QueryDisasterDto } from './dto/dto.js';
 
 @Controller('disasters')
 export class DisasterController {
@@ -25,8 +27,8 @@ export class DisasterController {
   }
 
   @Get()
-  findAll() {
-    return this.disasterService.findAll();
+  findAll(@Query() query: QueryDisasterDto) {
+    return this.disasterService.findAll(query);
   }
 
   @Get(':id')

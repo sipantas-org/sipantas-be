@@ -1,9 +1,8 @@
-import { plainToInstance } from 'class-transformer';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DisasterRepository } from './repositories/disaster.repository.js';
 import { CreateDisasterDto } from './dto/create-disaster.dto.js';
 import { UpdateDisasterDto } from './dto/update-disaster.dto.js';
-import { DisasterResponseDto } from './dto/response-disaster.dto.js';
+import { QueryDisasterDto } from './dto/dto.js';
 
 @Injectable()
 export class DisasterService {
@@ -13,17 +12,17 @@ export class DisasterService {
     return this.disasterRepository.create(createDisasterDto);
   }
 
-  async findAll(): Promise<DisasterResponseDto[]> {
-    const disasters = await this.disasterRepository.findAll();
-    return plainToInstance(DisasterResponseDto, disasters);
+  async findAll(query: QueryDisasterDto) {
+    const disasters = await this.disasterRepository.findAll(query);
+    return disasters;
   }
 
-  async findOne(id: number): Promise<DisasterResponseDto> {
+  async findOne(id: number) {
     const disaster = await this.disasterRepository.findById(id);
     if (!disaster) {
       throw new NotFoundException('Data not found');
     }
-    return plainToInstance(DisasterResponseDto, disaster);
+    return disaster;
   }
 
   async update(id: number, updateDisasterDto: UpdateDisasterDto) {

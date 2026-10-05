@@ -1,7 +1,7 @@
 enum DisasterStatus {
- Active
- On Budgeting
- Completed
+  Active
+  OnBudgeting @map("On Budgeting")
+  Completed
 }
 
 model Disaster {
@@ -16,7 +16,7 @@ model Disaster {
   regencyId         String?              @db.VarChar(20)
 
   // Gunakan Restrict untuk province (karena provinceId wajib/non-nullable)
-  province          Master_Area_Province @relation(fields: [provinceId], references: [id], onDelete: SetNull)
+  province          Master_Area_Province? @relation(fields: [provinceId], references: [id], onDelete: SetNull)
   // SetNull valid untuk regency (karena regencyId opsional ?)
   regency           Master_Area_Regency? @relation(fields: [regencyId], references: [id], onDelete: SetNull)
 

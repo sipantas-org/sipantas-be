@@ -11,6 +11,10 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import timezone from 'dayjs/plugin/timezone.js';
 
+// Extend dayjs plugins ONCE outside class execution to avoid performance overhead on every request
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<
   T,
@@ -27,12 +31,19 @@ export class TransformInterceptor<T> implements NestInterceptor<
 
     return next.handle().pipe(
       map((data) => {
-        // Jika controller mengembalikan object yang menyertakan custom message
         const message = data?.message || 'Success';
-        const resultData = data?.data !== undefined ? data.data : data;
 
-        dayjs.extend(utc);
-        dayjs.extend(timezone);
+        // Detect pagination object (handles both 'meta' and 'pagination' from service/repo)
+        const pagination = data?.pagination || data?.meta;
+        const hasPagination =
+          pagination !== undefined && data?.data !== undefined;
+
+        // If paginated, extract inner data array; otherwise fall back to standard response data logic
+        const resultData = hasPagination
+          ? data.data
+          : data?.data !== undefined
+            ? data.data
+            : data;
 
         const dateTime = dayjs()
           .tz('Asia/Jakarta')
@@ -44,6 +55,7 @@ export class TransformInterceptor<T> implements NestInterceptor<
           message,
           errors: errors ?? null,
           data: resultData ?? null,
+          ...(pagination ? { pagination } : {}), // Dynamically includes 'pagination' key
           timestamp: dateTime,
         };
       }),

@@ -9,6 +9,7 @@ import { MasterAreaProvinceModule } from './modules/masterAreaProvince/master-ar
 import { MasterAreaRegencyModule } from './modules/masterAreaRegency/master-area-regency.module.js';
 import { MasterAreaDistrictModule } from './modules/masterAreaDistrict/master-area-district.module.js';
 import { MasterAreaVillageModule } from './modules/masterAreaVilage/master-area-village.module.js';
+import { HousingAssessmentPartModule } from './modules/housingAssestmentPart/housing-assessment-part.module.js';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MasterAreaVillageModule } from './modules/masterAreaVilage/master-area-
     MasterAreaRegencyModule,
     MasterAreaDistrictModule,
     MasterAreaVillageModule,
+    HousingAssessmentPartModule,
   ],
   controllers: [
     AppController, // <-- Pastikan AppController terdaftar di sini

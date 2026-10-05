@@ -1,18 +1,27 @@
 enum DisasterStatus {
-  Active
-  On_Budgeting
-  Completed
+ Active
+ On Budgeting
+ Completed
 }
 
 model Disaster {
-  ID_Disaster       Int            @id @default(autoincrement())
-  Disaster_Code     String @unique @db.VarChar(20)
-  Disaster_Name     String
-  Disaster_Category String
-  Description       String?
-  Status            DisasterStatus
-  Created_At DateTime @default(now()) @db.Timestamptz
-  Updated_At DateTime @updatedAt @db.Timestamptz
+  disasterId       Int                  @id @default(autoincrement())
+  disasterCode     String               @unique @db.VarChar(20)
+  disasterName     String
+  disasterCategory String
+  description       String?
+  disasterStatus            DisasterStatus
+
+  provinceId        String?               @db.VarChar(20)
+  regencyId         String?              @db.VarChar(20)
+
+  // Gunakan Restrict untuk province (karena provinceId wajib/non-nullable)
+  province          Master_Area_Province @relation(fields: [provinceId], references: [id], onDelete: SetNull)
+  // SetNull valid untuk regency (karena regencyId opsional ?)
+  regency           Master_Area_Regency? @relation(fields: [regencyId], references: [id], onDelete: SetNull)
+
+  createdAt        DateTime             @default(now()) @db.Timestamptz
+  updatedAt        DateTime             @updatedAt @db.Timestamptz
 
   @@map("Disaster")
 }

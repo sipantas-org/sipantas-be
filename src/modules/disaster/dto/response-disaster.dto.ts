@@ -1,5 +1,5 @@
 // disaster-response.dto.ts
-import { Transform } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import timezone from 'dayjs/plugin/timezone.js';
@@ -19,12 +19,12 @@ export class DisasterResponseDto {
       ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
       : null,
   )
-  Created_At: Date;
+  createdAt: Date;
 
   @Transform(({ value }) =>
     value
       ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
       : null,
   )
-  Updated_At: Date;
+  updatedAt: Date;
 }

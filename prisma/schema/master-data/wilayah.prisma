@@ -2,6 +2,7 @@ model Master_Area_Province {
   id        String    @id @db.VarChar(20)
   name      String    @db.VarChar(255)
   regencies Master_Area_Regency[]
+  disasters Disaster[]
 }
 
 model Master_Area_Regency {
@@ -10,6 +11,7 @@ model Master_Area_Regency {
   name       String     @db.VarChar(255)
   province   Master_Area_Province   @relation(fields: [provinceId], references: [id], onDelete: Cascade)
   districts  Master_Area_District[]
+  disasters Disaster[]
 }
 
 model Master_Area_District {

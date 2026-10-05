@@ -5,28 +5,37 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
-import { Expose } from 'class-transformer';
 import { DisasterStatus } from '../../../generated/prisma/enums.js';
 
 export class CreateDisasterDto {
   @IsString()
   @IsNotEmpty()
-  Disaster_Code: string;
+  disasterCode: string;
 
   @IsString()
   @IsNotEmpty()
-  Disaster_Name: string;
+  disasterName: string;
 
   @IsString()
-  @IsNotEmpty()
   @MaxLength(20)
-  Disaster_Category: string;
+  @IsNotEmpty()
+  disasterCategory: string;
 
   @IsString()
   @IsOptional()
-  Description?: string;
+  description?: string;
 
   @IsEnum(DisasterStatus)
   @IsNotEmpty()
-  Status: DisasterStatus;
+  disasterStatus: DisasterStatus;
+
+  @MaxLength(20)
+  @IsString()
+  @IsNotEmpty()
+  provinceId: string;
+
+  @MaxLength(20)
+  @IsString()
+  @IsNotEmpty()
+  regencyId?: string;
 }

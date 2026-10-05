@@ -14,31 +14,44 @@ export class DisasterRepository {
     });
   }
 
-  async findAll(): Promise<Disaster[]> {
+  async findAll() {
     return this.prisma.disaster.findMany({
-      orderBy: { Created_At: 'desc' },
+      orderBy: { createdAt: 'desc' },
+      omit: {
+        provinceId: true,
+        regencyId: true,
+      },
+      include: {
+        regency: true,
+        province: true,
+      },
     });
   }
 
-  async findById(ID_Disaster: number): Promise<Disaster | null> {
+  async findById(disasterId: number) {
     return this.prisma.disaster.findUnique({
-      where: { ID_Disaster },
+      where: { disasterId },
+      omit: {
+        provinceId: true,
+        regencyId: true,
+      },
+      include: {
+        regency: true,
+        province: true,
+      },
     });
   }
 
-  async update(
-    ID_Disaster: number,
-    data: UpdateDisasterDto,
-  ): Promise<Disaster> {
+  async update(disasterId: number, data: UpdateDisasterDto): Promise<Disaster> {
     return this.prisma.disaster.update({
-      where: { ID_Disaster },
+      where: { disasterId },
       data,
     });
   }
 
-  async delete(ID_Disaster: number): Promise<Disaster> {
+  async delete(disasterId: number): Promise<Disaster> {
     return this.prisma.disaster.delete({
-      where: { ID_Disaster },
+      where: { disasterId },
     });
   }
 }

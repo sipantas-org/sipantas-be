@@ -56,8 +56,14 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 
-# sync DB using prisma
+# sync DB using prisma biar ada migrasi nya
+$ npx prisma migrate dev
+
+# sync DB using prisma kalo local pakai ini aja
 $ npx prisma db push
+
+# seed data master
+$ npx prisma db seed
 ```
 ## Deployment
 

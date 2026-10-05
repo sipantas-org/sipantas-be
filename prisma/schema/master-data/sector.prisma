@@ -8,8 +8,8 @@ model Sector {
   Sector_Name String
   Description String?
   Status      SectorStatus
-  Created_At  DateTime     @default(now())
-  Updated_At  DateTime     @updatedAt
+  Created_At DateTime @default(now()) @db.Timestamptz
+  Updated_At DateTime @updatedAt @db.Timestamptz
 
   parent   Sector?  @relation("ParentChildSector", fields: [Parent_ID], references: [ID_Sector])
   children Sector[] @relation("ParentChildSector")

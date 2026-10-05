@@ -11,8 +11,8 @@ model Disaster {
   Disaster_Category String
   Description       String?
   Status            DisasterStatus
-  Created_At        DateTime       @default(now())
-  Updated_At        DateTime       @updatedAt
+  Created_At DateTime @default(now()) @db.Timestamptz
+  Updated_At DateTime @updatedAt @db.Timestamptz
 
   @@map("Disaster")
 }

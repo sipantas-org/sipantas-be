@@ -7,6 +7,9 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiResponse } from '../interfaces/api-response.interface.js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<
@@ -28,13 +31,20 @@ export class TransformInterceptor<T> implements NestInterceptor<
         const message = data?.message || 'Success';
         const resultData = data?.data !== undefined ? data.data : data;
 
+        dayjs.extend(utc);
+        dayjs.extend(timezone);
+
+        const dateTime = dayjs()
+          .tz('Asia/Jakarta')
+          .format('YYYY-MM-DD HH:mm:ss');
+
         return {
           statusCode,
           success: true,
           message,
           errors: errors ?? null,
           data: resultData ?? null,
-          timestamp: new Date().toISOString(),
+          timestamp: dateTime,
         };
       }),
     );

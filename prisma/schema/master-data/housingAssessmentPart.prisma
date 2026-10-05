@@ -1,8 +1,8 @@
 model Housing_Assessment_Part {
   ID_Housing_Assessment_Part Int      @id @default(autoincrement())
   Part_Name                  String
-  Created_At                 DateTime @default(now())
-  Updated_At                 DateTime @updatedAt
+  Created_At DateTime @default(now()) @db.Timestamptz
+  Updated_At DateTime @updatedAt @db.Timestamptz
 
    @@map("Housing_Assessment_Part")
 }

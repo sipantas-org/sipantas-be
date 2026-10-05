@@ -1,0 +1,28 @@
+model Master_Area_Province {
+  id        String    @id @db.VarChar(20)
+  name      String    @db.VarChar(255)
+  regencies Master_Area_Regency[]
+}
+
+model Master_Area_Regency {
+  id         String     @id @db.VarChar(20)
+  provinceId String     @db.VarChar(20)
+  name       String     @db.VarChar(255)
+  province   Master_Area_Province   @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+  districts  Master_Area_District[]
+}
+
+model Master_Area_District {
+  id        String    @id @db.VarChar(20)
+  regencyId String    @db.VarChar(20)
+  name      String    @db.VarChar(255)
+  regency   Master_Area_Regency   @relation(fields: [regencyId], references: [id], onDelete: Cascade)
+  villages  Master_Area_Village[]
+}
+
+model Master_Area_Village {
+  id         String   @id @db.VarChar(20)
+  districtId String   @db.VarChar(20)
+  name       String   @db.VarChar(255)
+  district   Master_Area_District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+}

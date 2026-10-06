@@ -4,6 +4,6 @@ import { Controller, Get } from '@nestjs/common';
 export class AppController {
   @Get()
   getWelcome(): string {
-    return 'welcome to API NEST';
+    return 'Welcome to API SIPANTAS';
   }
 }

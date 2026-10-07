@@ -1,0 +1,26 @@
+enum SurveyorStatus {
+  Pending
+  Active
+  Inactive
+  Rejected
+}
+
+model UserSurveyor {
+  ID_Surveyor Int            @id @default(autoincrement())
+  NIP         String         @unique
+  Nama        String
+  Nomor_HP    String
+  Email       String         @unique
+  Password    String
+  Status      SurveyorStatus
+  ID_Province String
+  ID_City     String
+  Last_Login  DateTime?      @db.Timestamptz
+  Created_At  DateTime       @default(now()) @db.Timestamptz
+  Updated_At  DateTime       @updatedAt @db.Timestamptz
+
+  loginHistories LoginHistory[]
+  approvals      ApprovalUser[]
+
+  @@map("User_Surveyor")
+}

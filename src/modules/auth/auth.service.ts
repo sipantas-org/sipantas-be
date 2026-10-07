@@ -1,68 +1,210 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ClassConstructor, plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcryptjs';
-import { UserRepository } from './repositories/user.repository.js';
-import { RegisterDto } from './dto/register.dto.js';
+import type { Prisma } from '../../generated/prisma/client.js';
+import {
+  AdminRole,
+  AdminStatus,
+  LoginStatus,
+  SurveyorStatus,
+} from '../../generated/prisma/enums.js';
+import { UserAdminRepository } from './repositories/user-admin.repository.js';
+import { UserSurveyorRepository } from './repositories/user-surveyor.repository.js';
+import { LoginHistoryRepository } from './repositories/login-history.repository.js';
+import { ApprovalUserRepository } from './repositories/approval-user.repository.js';
 import { LoginDto } from './dto/login.dto.js';
-import { SafeUser, User } from './entities/user.entity.js';
+import { RegisterSurveyorDto } from './dto/register-surveyor.dto.js';
+import { ApproveSurveyorDto } from './dto/approve-surveyor.dto.js';
+import { RegisterAdminDto } from './dto/register-admin.dto.js';
+import { ListSurveyorDto } from './dto/list-surveyor.dto.js';
+import {
+  ApprovalUserResponseDto,
+  UserAdminResponseDto,
+  UserSurveyorResponseDto,
+} from './dto/response-auth.dto.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
+
+interface LoginMeta {
+  ipAddress: string;
+  deviceInfo?: string;
+}
 
 const SALT_ROUNDS = 10;
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly userAdminRepository: UserAdminRepository,
+    private readonly userSurveyorRepository: UserSurveyorRepository,
+    private readonly loginHistoryRepository: LoginHistoryRepository,
+    private readonly approvalUserRepository: ApprovalUserRepository,
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<SafeUser> {
-    const existing = await this.userRepository.findByUsername(dto.username);
-    if (existing) {
-      throw new ConflictException('Username already taken');
+  async loginAdmin(dto: LoginDto, meta: LoginMeta) {
+    const admin = await this.userAdminRepository.findByEmail(dto.Email);
+    const isPasswordValid =
+      admin !== null && (await bcrypt.compare(dto.Password, admin.Password));
+
+    if (!admin || !isPasswordValid) {
+      await this.recordLogin(meta, LoginStatus.Failed, {
+        ID_Admin: admin?.ID_Admin ?? null,
+      });
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    const hashedPassword = await bcrypt.hash(dto.password, SALT_ROUNDS);
-    const user = await this.userRepository.create({
-      username: dto.username,
-      email: dto.email,
-      password: hashedPassword,
-      fullName: dto.fullName,
+    if (admin.Status !== AdminStatus.Active) {
+      await this.recordLogin(meta, LoginStatus.Failed, {
+        ID_Admin: admin.ID_Admin,
+      });
+      throw new ForbiddenException('Account is not active');
+    }
+
+    await this.recordLogin(meta, LoginStatus.Success, {
+      ID_Admin: admin.ID_Admin,
+    });
+    await this.userAdminRepository.updateLastLogin(admin.ID_Admin, new Date());
+
+    const accessToken = await this.jwtService.signAsync({
+      sub: admin.ID_Admin,
+      email: admin.Email,
+      userType: 'admin',
+      role: admin.Role,
     });
 
-    return this.toSafeUser(user);
+    return {
+      accessToken,
+      user: this.toResponse(UserAdminResponseDto, admin),
+    };
   }
 
-  async login(dto: LoginDto): Promise<{ accessToken: string; user: SafeUser }> {
-    const user = await this.userRepository.findByUsername(dto.username);
-    if (!user) {
+  async loginSurveyor(dto: LoginDto, meta: LoginMeta) {
+    const surveyor = await this.userSurveyorRepository.findByEmail(dto.Email);
+    const isPasswordValid =
+      surveyor !== null &&
+      (await bcrypt.compare(dto.Password, surveyor.Password));
+
+    if (!surveyor || !isPasswordValid) {
+      await this.recordLogin(meta, LoginStatus.Failed, {
+        ID_User: surveyor?.ID_Surveyor ?? null,
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+    if (surveyor.Status !== SurveyorStatus.Active) {
+      await this.recordLogin(meta, LoginStatus.Failed, {
+        ID_User: surveyor.ID_Surveyor,
+      });
+      throw new ForbiddenException('Account is not active');
     }
 
-    const payload = { sub: user.id, username: user.username, role: user.role };
-    const accessToken = await this.jwtService.signAsync(payload);
+    await this.recordLogin(meta, LoginStatus.Success, {
+      ID_User: surveyor.ID_Surveyor,
+    });
+    await this.userSurveyorRepository.updateLastLogin(
+      surveyor.ID_Surveyor,
+      new Date(),
+    );
 
-    return { accessToken, user: this.toSafeUser(user) };
+    const accessToken = await this.jwtService.signAsync({
+      sub: surveyor.ID_Surveyor,
+      email: surveyor.Email,
+      userType: 'surveyor',
+    });
+
+    return {
+      accessToken,
+      user: this.toResponse(UserSurveyorResponseDto, surveyor),
+    };
   }
 
-  async getProfile(userId: string): Promise<SafeUser> {
-    const user = await this.userRepository.findById(userId);
-    if (!user) {
-      throw new UnauthorizedException('User not found');
+  async registerSurveyor(dto: RegisterSurveyorDto) {
+    const surveyor = await this.userSurveyorRepository.create(
+      Object.assign({}, dto, {
+        Password: await bcrypt.hash(dto.Password, SALT_ROUNDS),
+        Status: SurveyorStatus.Pending,
+      }),
+    );
+
+    return this.toResponse(UserSurveyorResponseDto, surveyor);
+  }
+
+  async registerAdmin(dto: RegisterAdminDto) {
+    const admin = await this.userAdminRepository.create(
+      Object.assign({}, dto, {
+        Password: await bcrypt.hash(dto.Password, SALT_ROUNDS),
+        Status: AdminStatus.Active,
+        Role: AdminRole.Monitoring,
+      }),
+    );
+
+    return this.toResponse(UserAdminResponseDto, admin);
+  }
+
+  async listSurveyors(query: ListSurveyorDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const [items, total] = await this.userSurveyorRepository.findPage({
+      status: query.status,
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      items: items.map((item) => this.toResponse(UserSurveyorResponseDto, item)),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async approveSurveyor(
+    idSurveyor: number,
+    dto: ApproveSurveyorDto,
+    admin: JwtPayload,
+  ) {
+    const surveyor = await this.userSurveyorRepository.findById(idSurveyor);
+    if (!surveyor) {
+      throw new NotFoundException('Surveyor not found');
     }
-    return this.toSafeUser(user);
+    if (surveyor.Status !== SurveyorStatus.Pending) {
+      throw new ConflictException('Surveyor is not pending approval');
+    }
+
+    const approval = await this.approvalUserRepository.decide({
+      idSurveyor,
+      idAdmin: admin.sub,
+      status: dto.Status,
+      description: dto.Description,
+    });
+
+    return this.toResponse(ApprovalUserResponseDto, approval);
   }
 
-  private toSafeUser(user: User): SafeUser {
-    const { password: _password, ...safeUser } = user;
-    return safeUser;
+  private recordLogin(
+    meta: LoginMeta,
+    status: LoginStatus,
+    actor: Pick<Prisma.LoginHistoryUncheckedCreateInput, 'ID_Admin' | 'ID_User'>,
+  ) {
+    return this.loginHistoryRepository.create({
+      ...actor,
+      IP_Address: meta.ipAddress,
+      Device_Info: meta.deviceInfo ?? null,
+      Status_Login: status,
+    });
+  }
+
+  private toResponse<T>(cls: ClassConstructor<T>, data: object): T {
+    return plainToInstance(cls, data, { excludeExtraneousValues: true });
   }
 }

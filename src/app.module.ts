@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
 import { AppController } from './app.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { DisasterModule } from './modules/disaster/disaster.module.js';
+import { HousingDamageAssessmentModule } from './modules/housing-damage-assessment/housing-damage-assessment.module.js';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { DisasterModule } from './modules/disaster/disaster.module.js';
     PrismaModule,
     AuthModule,
     DisasterModule,
+    HousingDamageAssessmentModule,
   ],
   controllers: [
     AppController, // <-- Pastikan AppController terdaftar di sini

@@ -36,6 +36,9 @@ $ npx prisma migrate dev
 # sync DB using prisma kalo local pakai ini aja
 $ npx prisma db push
 
+# generate prisma client
+$ npx prisma generate
+
 # seed data master
 $ npx prisma db seed
 ```

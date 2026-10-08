@@ -6,6 +6,7 @@ import { AppController } from './app.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { DisasterModule } from './modules/disaster/disaster.module.js';
 import { HousingDamageAssessmentModule } from './modules/housing-damage-assessment/housing-damage-assessment.module.js';
+import { LossAssessmentModule } from './modules/loss-assessment/loss-assessment.module.js';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { HousingDamageAssessmentModule } from './modules/housing-damage-assessme
     AuthModule,
     DisasterModule,
     HousingDamageAssessmentModule,
+    LossAssessmentModule,
   ],
   controllers: [
     AppController, // <-- Pastikan AppController terdaftar di sini

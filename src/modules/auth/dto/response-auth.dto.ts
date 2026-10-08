@@ -10,66 +10,66 @@ const formatJakarta = ({ value }: { value: Date | null }) =>
   value ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss') : null;
 
 export class UserAdminResponseDto {
-  @Expose() ID_Admin!: number;
-  @Expose() NIP!: string;
-  @Expose() Nama!: string;
-  @Expose() Nomor_HP!: string;
-  @Expose() Email!: string;
-  @Expose() Status!: string;
-  @Expose() Role!: string;
+  @Expose({ name: 'ID_Admin' }) id!: number;
+  @Expose({ name: 'NIP' }) nip!: string;
+  @Expose({ name: 'Nama' }) nama!: string;
+  @Expose({ name: 'Nomor_HP' }) nomorHp!: string;
+  @Expose({ name: 'Email' }) email!: string;
+  @Expose({ name: 'Status' }) status!: string;
+  @Expose({ name: 'Role' }) role!: string;
 
-  @Expose()
+  @Expose({ name: 'Last_Login' })
   @Transform(formatJakarta)
-  Last_Login!: string | null;
+  lastLogin!: string | null;
 
-  @Expose()
+  @Expose({ name: 'Created_At' })
   @Transform(formatJakarta)
-  Created_At!: string;
+  createdAt!: string;
 
-  @Expose()
+  @Expose({ name: 'Updated_At' })
   @Transform(formatJakarta)
-  Updated_At!: string;
+  updatedAt!: string;
 }
 
 export class UserSurveyorResponseDto {
-  @Expose() ID_Surveyor!: number;
-  @Expose() NIP!: string;
-  @Expose() Nama!: string;
-  @Expose() Nomor_HP!: string;
-  @Expose() Email!: string;
-  @Expose() Status!: string;
-  @Expose() ID_Province!: string;
-  @Expose() ID_City!: string;
+  @Expose({ name: 'ID_Surveyor' }) id!: number;
+  @Expose({ name: 'NIP' }) nip!: string;
+  @Expose({ name: 'Nama' }) nama!: string;
+  @Expose({ name: 'Nomor_HP' }) nomorHp!: string;
+  @Expose({ name: 'Email' }) email!: string;
+  @Expose({ name: 'Status' }) status!: string;
+  @Expose({ name: 'ID_Province' }) idProvince!: string;
+  @Expose({ name: 'ID_City' }) idCity!: string;
 
-  @Expose()
+  @Expose({ name: 'Last_Login' })
   @Transform(formatJakarta)
-  Last_Login!: string | null;
+  lastLogin!: string | null;
 
-  @Expose()
+  @Expose({ name: 'Created_At' })
   @Transform(formatJakarta)
-  Created_At!: string;
+  createdAt!: string;
 
-  @Expose()
+  @Expose({ name: 'Updated_At' })
   @Transform(formatJakarta)
-  Updated_At!: string;
+  updatedAt!: string;
 }
 
 export class ApprovalUserResponseDto {
-  @Expose() ID_Approval!: number;
-  @Expose() ID_Surveyor!: number;
-  @Expose() ID_Admin!: number;
-  @Expose() Status_Approval!: string;
-  @Expose() Description!: string | null;
+  @Expose({ name: 'ID_Approval' }) id!: number;
+  @Expose({ name: 'ID_Surveyor' }) idSurveyor!: number;
+  @Expose({ name: 'ID_Admin' }) idAdmin!: number;
+  @Expose({ name: 'Status_Approval' }) statusApproval!: string;
+  @Expose({ name: 'Description' }) description!: string | null;
 
-  @Expose()
+  @Expose({ name: 'Approval_Date' })
   @Transform(formatJakarta)
-  Approval_Date!: string | null;
+  approvalDate!: string | null;
 
-  @Expose()
+  @Expose({ name: 'Created_At' })
   @Transform(formatJakarta)
-  Created_At!: string;
+  createdAt!: string;
 
-  @Expose()
+  @Expose({ name: 'Updated_At' })
   @Transform(formatJakarta)
-  Updated_At!: string;
+  updatedAt!: string;
 }

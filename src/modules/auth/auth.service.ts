@@ -49,9 +49,9 @@ export class AuthService {
   ) {}
 
   async loginAdmin(dto: LoginDto, meta: LoginMeta) {
-    const admin = await this.userAdminRepository.findByEmail(dto.Email);
+    const admin = await this.userAdminRepository.findByEmail(dto.email);
     const isPasswordValid =
-      admin !== null && (await bcrypt.compare(dto.Password, admin.Password));
+      admin !== null && (await bcrypt.compare(dto.password, admin.Password));
 
     if (!admin || !isPasswordValid) {
       await this.recordLogin(meta, LoginStatus.Failed, {
@@ -86,10 +86,10 @@ export class AuthService {
   }
 
   async loginSurveyor(dto: LoginDto, meta: LoginMeta) {
-    const surveyor = await this.userSurveyorRepository.findByEmail(dto.Email);
+    const surveyor = await this.userSurveyorRepository.findByEmail(dto.email);
     const isPasswordValid =
       surveyor !== null &&
-      (await bcrypt.compare(dto.Password, surveyor.Password));
+      (await bcrypt.compare(dto.password, surveyor.Password));
 
     if (!surveyor || !isPasswordValid) {
       await this.recordLogin(meta, LoginStatus.Failed, {
@@ -126,24 +126,30 @@ export class AuthService {
   }
 
   async registerSurveyor(dto: RegisterSurveyorDto) {
-    const surveyor = await this.userSurveyorRepository.create(
-      Object.assign({}, dto, {
-        Password: await bcrypt.hash(dto.Password, SALT_ROUNDS),
-        Status: SurveyorStatus.Pending,
-      }),
-    );
+    const surveyor = await this.userSurveyorRepository.create({
+      NIP: dto.nip,
+      Nama: dto.nama,
+      Nomor_HP: dto.nomorHp,
+      Email: dto.email,
+      Password: await bcrypt.hash(dto.password, SALT_ROUNDS),
+      Status: SurveyorStatus.Pending,
+      ID_Province: dto.idProvince,
+      ID_City: dto.idCity,
+    });
 
     return this.toResponse(UserSurveyorResponseDto, surveyor);
   }
 
   async registerAdmin(dto: RegisterAdminDto) {
-    const admin = await this.userAdminRepository.create(
-      Object.assign({}, dto, {
-        Password: await bcrypt.hash(dto.Password, SALT_ROUNDS),
-        Status: AdminStatus.Active,
-        Role: AdminRole.Monitoring,
-      }),
-    );
+    const admin = await this.userAdminRepository.create({
+      NIP: dto.nip,
+      Nama: dto.nama,
+      Nomor_HP: dto.nomorHp,
+      Email: dto.email,
+      Password: await bcrypt.hash(dto.password, SALT_ROUNDS),
+      Status: AdminStatus.Active,
+      Role: AdminRole.Monitoring,
+    });
 
     return this.toResponse(UserAdminResponseDto, admin);
   }
@@ -184,8 +190,8 @@ export class AuthService {
     const approval = await this.approvalUserRepository.decide({
       idSurveyor,
       idAdmin: admin.sub,
-      status: dto.Status,
-      description: dto.Description,
+      status: dto.status,
+      description: dto.description,
     });
 
     return this.toResponse(ApprovalUserResponseDto, approval);

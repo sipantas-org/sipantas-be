@@ -8,7 +8,9 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcryptjs';
+import { PrismaService } from '../../prisma/prisma.service.js';
 import type { Prisma } from '../../generated/prisma/client.js';
+import { ActivityHistoryService } from '../activity-history/activity-history.service.js';
 import {
   AdminRole,
   AdminStatus,
@@ -46,6 +48,8 @@ export class AuthService {
     private readonly loginHistoryRepository: LoginHistoryRepository,
     private readonly approvalUserRepository: ApprovalUserRepository,
     private readonly jwtService: JwtService,
+    private readonly prisma: PrismaService,
+    private readonly activityHistoryService: ActivityHistoryService,
   ) {}
 
   async loginAdmin(dto: LoginDto, meta: LoginMeta) {
@@ -187,11 +191,32 @@ export class AuthService {
       throw new ConflictException('Surveyor is not pending approval');
     }
 
-    const approval = await this.approvalUserRepository.decide({
-      idSurveyor,
-      idAdmin: admin.sub,
-      status: dto.status,
-      description: dto.description,
+    const approval = await this.prisma.$transaction(async (tx) => {
+      const created = await this.approvalUserRepository.decide(
+        {
+          idSurveyor,
+          idAdmin: admin.sub,
+          status: dto.status,
+          description: dto.description,
+        },
+        tx,
+      );
+
+      await this.activityHistoryService.record(
+        {
+          idUser: idSurveyor,
+          idAdmin: admin.sub,
+          relationId: created.ID_Approval,
+          module: 'Auth - Surveyor Approval Admin',
+          activity:
+            dto.status === 'Approved'
+              ? 'Approved surveyor registration'
+              : 'Rejected surveyor registration',
+        },
+        tx,
+      );
+
+      return created;
     });
 
     return this.toResponse(ApprovalUserResponseDto, approval);

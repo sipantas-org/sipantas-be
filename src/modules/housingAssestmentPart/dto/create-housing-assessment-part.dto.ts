@@ -12,6 +12,14 @@ export class CreateHousingAssessmentPartDto {
   partName: string;
 
   @ApiProperty({
+    example: 'Dinding',
+    description: '',
+  })
+  @IsString()
+  @IsNotEmpty()
+  partDescription: string;
+
+  @ApiProperty({
     example: 'Active',
     description: '',
   })

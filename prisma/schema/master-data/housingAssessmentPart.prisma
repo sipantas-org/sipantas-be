@@ -6,7 +6,6 @@ enum PartStatus {
 model Housing_Assessment_Part {
   housingAssessmentPartId Int      @id @default(autoincrement())
   partName                  String @unique
-  partDescription           String
   partStatus            PartStatus
 
   createdAt DateTime @default(now()) @db.Timestamptz

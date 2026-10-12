@@ -1,5 +1,5 @@
 // src/housing-assessment-part/dto/query-housing-assessment-part.dto.ts
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { QueryDefaultDto } from '../../../dto/query-default.dto.js';
 import { PartStatus } from '../../../generated/prisma/enums.js';
 import { ApiPropertyOptional } from '@nestjs/swagger';
@@ -14,11 +14,10 @@ export class QueryHousingAssessmentPartDto extends QueryDefaultDto {
   partName?: string;
 
   @ApiPropertyOptional({
-    enum: PartStatus,
-    example: PartStatus.Active,
+    example: 'FLOOD',
     description: '',
   })
   @IsOptional()
-  @IsEnum(PartStatus)
+  @IsString()
   partStatus?: PartStatus;
 }

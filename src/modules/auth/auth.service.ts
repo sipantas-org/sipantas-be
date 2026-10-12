@@ -10,7 +10,7 @@ import { ClassConstructor, plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import type { Prisma } from '../../generated/prisma/client.js';
-import { ActivityHistoryService } from '../activity-history/activity-history.service.js';
+import { ActivityHistoryService } from '../activityHistory/activity-history.service.js';
 import {
   AdminRole,
   AdminStatus,

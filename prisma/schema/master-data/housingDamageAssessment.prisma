@@ -12,8 +12,7 @@ model Housing_Damage_Assessment {
   Created_At                    DateTime                     @default(now()) @db.Timestamptz
   Updated_At                    DateTime                     @updatedAt @db.Timestamptz
 
-  // Relasi ke Housing_Assessment_Part dinonaktifkan sementara, tabel itu masih dikerjakan tim lain.
-  // housingAssessmentPart Housing_Assessment_Part @relation(fields: [ID_Housing_Assessment_Part], references: [ID_Housing_Assessment_Part])
+  housingAssessmentPart Housing_Assessment_Part @relation(fields: [ID_Housing_Assessment_Part], references: [housingAssessmentPartId])
 
   @@map("Housing_Damage_Assessment")
 }

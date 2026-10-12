@@ -1,14 +1,5 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Housing_Assessment_Part` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "HousingDamageAssessmentStatus" AS ENUM ('Active', 'Inactive');
-
--- DropTable
-DROP TABLE "Housing_Assessment_Part";
 
 -- CreateTable
 CREATE TABLE "Housing_Damage_Assessment" (

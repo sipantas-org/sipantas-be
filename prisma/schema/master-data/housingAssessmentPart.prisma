@@ -11,5 +11,7 @@ model Housing_Assessment_Part {
   createdAt DateTime @default(now()) @db.Timestamptz
   updatedAt DateTime @updatedAt @db.Timestamptz
 
+  housingDamageAssessments Housing_Damage_Assessment[]
+
    @@map("Housing_Assessment_Part")
 }

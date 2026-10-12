@@ -1,0 +1,14 @@
+model ActivityHistory {
+  ID_Activity Int      @id @default(autoincrement())
+  ID_User     Int?
+  ID_Admin    Int?
+  Relation_ID Int?
+  Module      String
+  Activity    String
+  Created_At  DateTime @default(now()) @db.Timestamptz
+
+  user  UserSurveyor? @relation(fields: [ID_User], references: [ID_Surveyor])
+  admin UserAdmin?    @relation(fields: [ID_Admin], references: [ID_Admin])
+
+  @@map("Activity_History")
+}

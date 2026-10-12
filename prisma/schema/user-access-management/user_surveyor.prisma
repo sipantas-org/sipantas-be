@@ -19,8 +19,9 @@ model UserSurveyor {
   Created_At  DateTime       @default(now()) @db.Timestamptz
   Updated_At  DateTime       @updatedAt @db.Timestamptz
 
-  loginHistories LoginHistory[]
-  approvals      ApprovalUser[]
+  loginHistories    LoginHistory[]
+  approvals         ApprovalUser[]
+  activityHistories ActivityHistory[]
 
   @@map("User_Surveyor")
 }

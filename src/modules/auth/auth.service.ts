@@ -204,7 +204,7 @@ export class AuthService {
 
       await this.activityHistoryService.record(
         {
-          idUser: idSurveyor,
+          idUser: null,
           idAdmin: admin.sub,
           relationId: created.ID_Approval,
           module: 'Auth - Surveyor Approval Admin',

@@ -10,7 +10,7 @@ model Disaster {
   disasterName     String
   disasterCategory String
   description       String?
-  disasterStatus            DisasterStatus
+  disasterStatus            DisasterStatus @map("Status")
 
   provinceId        String?               @db.VarChar(20)
   regencyId         String?              @db.VarChar(20)

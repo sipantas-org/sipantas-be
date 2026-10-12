@@ -5,19 +5,22 @@ import { PrismaModule } from './prisma/prisma.module.js';
 import { AppController } from './app.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { DisasterModule } from './modules/disaster/disaster.module.js';
+import { HousingDamageAssessmentModule } from './modules/housing-damage-assessment/housing-damage-assessment.module.js';
+import { LossAssessmentModule } from './modules/loss-assessment/loss-assessment.module.js';
 import { MasterAreaProvinceModule } from './modules/masterAreaProvince/master-area-province.module.js';
 import { MasterAreaRegencyModule } from './modules/masterAreaRegency/master-area-regency.module.js';
 import { MasterAreaDistrictModule } from './modules/masterAreaDistrict/master-area-district.module.js';
 import { MasterAreaVillageModule } from './modules/masterAreaVilage/master-area-village.module.js';
 import { HousingAssessmentPartModule } from './modules/housingAssestmentPart/housing-assessment-part.module.js';
 import { SectorModule } from './modules/sector/sector.module.js';
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     AuthModule,
     DisasterModule,
+    HousingDamageAssessmentModule,
+    LossAssessmentModule,
     MasterAreaProvinceModule,
     MasterAreaRegencyModule,
     MasterAreaDistrictModule,

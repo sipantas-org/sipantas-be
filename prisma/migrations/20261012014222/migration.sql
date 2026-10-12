@@ -44,7 +44,7 @@ CREATE TYPE "PartStatus" AS ENUM ('Active', 'Inactive');
 -- AlterEnum
 BEGIN;
 CREATE TYPE "DisasterStatus_new" AS ENUM ('Active', 'On Budgeting', 'Completed');
-ALTER TABLE "Disaster" ALTER COLUMN "disasterStatus" TYPE "DisasterStatus_new" USING ("disasterStatus"::text::"DisasterStatus_new");
+ALTER TABLE "Disaster" ALTER COLUMN "Status" TYPE "DisasterStatus_new" USING ("Status"::text::"DisasterStatus_new");
 ALTER TYPE "DisasterStatus" RENAME TO "DisasterStatus_old";
 ALTER TYPE "DisasterStatus_new" RENAME TO "DisasterStatus";
 DROP TYPE "public"."DisasterStatus_old";

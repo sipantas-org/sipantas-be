@@ -6,7 +6,7 @@ import { UserSurveyorRepository } from './repositories/user-surveyor.repository.
 import { LoginHistoryRepository } from './repositories/login-history.repository.js';
 import { ApprovalUserRepository } from './repositories/approval-user.repository.js';
 import { JwtAuthModule } from '../../common/auth/jwt-auth.module.js';
-import { ActivityHistoryModule } from '../activity-history/activity-history.module.js';
+import { ActivityHistoryModule } from '../activityHistory/activity-history.module.js';
 
 @Module({
   imports: [JwtAuthModule, ActivityHistoryModule],

@@ -5,7 +5,7 @@ enum SectorStatus {
 model Sector {
   sectorId   Int          @id @default(autoincrement())
   parentId   Int?
-  sectorName String
+  sectorName String @unique
   description String?
   status      SectorStatus
   createdAt DateTime @default(now()) @db.Timestamptz

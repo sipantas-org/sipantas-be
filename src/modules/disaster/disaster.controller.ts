@@ -14,7 +14,7 @@ import {
 import { DisasterService } from './disaster.service.js';
 import { CreateDisasterDto } from './dto/create-disaster.dto.js';
 import { UpdateDisasterDto } from './dto/update-disaster.dto.js';
-import { QueryDisasterDto } from './dto/dto.js';
+import { QueryDisasterDto } from './dto/query-disaster.dto.js';
 
 @Controller('disasters')
 export class DisasterController {

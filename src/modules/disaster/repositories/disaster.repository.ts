@@ -5,7 +5,7 @@ import { Prisma } from '../../../generated/prisma/client.js';
 import { CreateDisasterDto } from '../dto/create-disaster.dto.js';
 import { UpdateDisasterDto } from '../dto/update-disaster.dto.js';
 import { Disaster } from '../../../generated/prisma/client.js';
-import { QueryDisasterDto } from '../dto/dto.js';
+import { QueryDisasterDto } from '../dto/query-disaster.dto.js';
 import { DisasterResponseDto } from '../dto/response-disaster.dto.js';
 
 @Injectable()
@@ -23,7 +23,13 @@ export class DisasterRepository {
     const limit = Number(query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const { search, disasterStatus } = query;
+    const {
+      search,
+      disasterStatus,
+      disasterCode,
+      disasterName,
+      disasterCategory,
+    } = query;
 
     const where: Prisma.DisasterWhereInput = {};
 
@@ -33,6 +39,21 @@ export class DisasterRepository {
         { disasterCode: { contains: search, mode: 'insensitive' } },
         { disasterName: { contains: search, mode: 'insensitive' } },
       ];
+    }
+
+    if (disasterCode) {
+      where.disasterCode = { contains: disasterCode, mode: 'insensitive' };
+    }
+
+    if (disasterName) {
+      where.disasterName = { contains: disasterName, mode: 'insensitive' };
+    }
+
+    if (disasterCategory) {
+      where.disasterCategory = {
+        contains: disasterCategory,
+        mode: 'insensitive',
+      };
     }
 
     if (disasterStatus) {

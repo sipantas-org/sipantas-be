@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DisasterRepository } from './repositories/disaster.repository.js';
 import { CreateDisasterDto } from './dto/create-disaster.dto.js';
 import { UpdateDisasterDto } from './dto/update-disaster.dto.js';
-import { QueryDisasterDto } from './dto/dto.js';
+import { QueryDisasterDto } from './dto/query-disaster.dto.js';
 
 @Injectable()
 export class DisasterService {

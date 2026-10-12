@@ -1,0 +1,18 @@
+enum DurationUnit {
+  Hari
+  Bulan
+  Tahun
+}
+
+model SurveyLostDetail {
+  surveyLostDetailId   Int          @id @default(autoincrement())
+  surveyId Int
+  lostAssessmentId Int
+  totalUnit Int
+  unitPrice Decimal
+  duration Int
+  durationUnit DurationUnit
+  description String
+
+   @@map("SurveyLostDetail")
+}

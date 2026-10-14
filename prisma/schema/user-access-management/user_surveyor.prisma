@@ -7,14 +7,16 @@ enum SurveyorStatus {
 
 model UserSurveyor {
   surveyorId Int            @id @default(autoincrement())
-  NIP         String         @unique
-  Nama        String
+  nip         String         @unique
+  nama        String
   phoneNumber    String
-  Email       String         @unique
-  Password    String
-  Status      SurveyorStatus
-  provinceId String
-  regencyId     String
+  email       String         @unique
+  password    String
+  status      SurveyorStatus
+  provinceId  String             @db.VarChar(20)
+  regencyId   String             @db.VarChar(20)
+  province    MasterAreaProvince @relation(fields: [provinceId], references: [id], onDelete: Restrict)
+  regency     MasterAreaRegency  @relation(fields: [regencyId], references: [id], onDelete: Restrict)
   lastLogin  DateTime?      @db.Timestamptz
   createdAt  DateTime       @default(now()) @db.Timestamptz
   updatedAt  DateTime       @updatedAt @db.Timestamptz

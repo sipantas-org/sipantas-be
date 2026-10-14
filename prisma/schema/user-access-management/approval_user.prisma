@@ -9,7 +9,7 @@ model ApprovalUser {
   surveyorId     Int
   adminId        Int
   statusApproval ApprovalStatus
-  Description     String?
+  description     String?
   approvalDate   DateTime?      @db.Timestamptz
   createdAt      DateTime       @default(now()) @db.Timestamptz
   updatedAt      DateTime       @updatedAt @db.Timestamptz

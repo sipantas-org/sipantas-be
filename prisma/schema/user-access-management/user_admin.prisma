@@ -11,13 +11,13 @@ enum AdminRole {
 
 model UserAdmin {
   adminId   Int         @id @default(autoincrement())
-  NIP        String      @unique
-  Nama       String
+  nip        String      @unique
+  nama       String
   phoneNumber   String
-  Email      String      @unique
-  Password   String
-  Status     AdminStatus
-  Role       AdminRole
+  email      String      @unique
+  password   String
+  status     AdminStatus
+  role       AdminRole
   lastLogin DateTime?   @db.Timestamptz
   createdAt DateTime    @default(now()) @db.Timestamptz
   updatedAt DateTime    @updatedAt @db.Timestamptz

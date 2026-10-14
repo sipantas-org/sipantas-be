@@ -37,7 +37,7 @@ export class ApprovalUserRepository {
       });
       await client.userSurveyor.update({
         where: { surveyorId: params.idSurveyor },
-        data: { Status: surveyorStatus },
+        data: { status: surveyorStatus },
       });
       return approval;
     };

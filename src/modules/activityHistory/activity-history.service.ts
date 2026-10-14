@@ -23,8 +23,8 @@ export class ActivityHistoryService {
         userId: input.idUser ?? null,
         adminId: input.idAdmin ?? null,
         relationId: input.relationId ?? null,
-        Module: input.module,
-        Activity: input.activity,
+        module: input.module,
+        activity: input.activity,
       },
       tx,
     );

@@ -12,18 +12,18 @@ export class UserSurveyorRepository {
   }
 
   findPage(params: {
-    status?: UserSurveyor['Status'];
+    status?: UserSurveyor['status'];
     skip: number;
     take: number;
   }) {
-    const where = params.status ? { Status: params.status } : {};
+    const where = params.status ? { status: params.status } : {};
     const select = {
       surveyorId: true,
-      NIP: true,
-      Nama: true,
+      nip: true,
+      nama: true,
       phoneNumber: true,
-      Email: true,
-      Status: true,
+      email: true,
+      status: true,
       provinceId: true,
       regencyId: true,
       lastLogin: true,
@@ -50,7 +50,7 @@ export class UserSurveyorRepository {
   }
 
   findByEmail(email: string): Promise<UserSurveyor | null> {
-    return this.prisma.userSurveyor.findUnique({ where: { Email: email } });
+    return this.prisma.userSurveyor.findUnique({ where: { email: email } });
   }
 
   updateLastLogin(idSurveyor: number, lastLogin: Date): Promise<UserSurveyor> {

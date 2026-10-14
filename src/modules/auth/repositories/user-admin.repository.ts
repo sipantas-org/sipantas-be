@@ -12,7 +12,7 @@ export class UserAdminRepository {
   }
 
   findByEmail(email: string): Promise<UserAdmin | null> {
-    return this.prisma.userAdmin.findUnique({ where: { Email: email } });
+    return this.prisma.userAdmin.findUnique({ where: { email: email } });
   }
 
   updateLastLogin(idAdmin: number, lastLogin: Date): Promise<UserAdmin> {

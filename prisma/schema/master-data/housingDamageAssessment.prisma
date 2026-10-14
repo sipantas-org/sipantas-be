@@ -12,7 +12,7 @@ model HousingDamageAssessment {
   createdAt                    DateTime                     @default(now()) @db.Timestamptz
   updatedAt                    DateTime                     @updatedAt @db.Timestamptz
 
-  housingAssessmentPart HousingAssessmentPart @relation(fields: [housingAssessmentPartId], references: [housingAssessmentPartId])
+  HousingAssessmentPart HousingAssessmentPart @relation(fields: [housingAssessmentPartId], references: [housingAssessmentPartId])
 
   @@map("HousingDamageAssessment")
 }

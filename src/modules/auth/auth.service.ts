@@ -55,7 +55,7 @@ export class AuthService {
   async loginAdmin(dto: LoginDto, meta: LoginMeta) {
     const admin = await this.userAdminRepository.findByEmail(dto.email);
     const isPasswordValid =
-      admin !== null && (await bcrypt.compare(dto.password, admin.Password));
+      admin !== null && (await bcrypt.compare(dto.password, admin.password));
 
     if (!admin || !isPasswordValid) {
       await this.recordLogin(meta, LoginStatus.Failed, {
@@ -64,7 +64,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (admin.Status !== AdminStatus.Active) {
+    if (admin.status !== AdminStatus.Active) {
       await this.recordLogin(meta, LoginStatus.Failed, {
         adminId: admin.adminId,
       });
@@ -78,9 +78,9 @@ export class AuthService {
 
     const accessToken = await this.jwtService.signAsync({
       sub: admin.adminId,
-      email: admin.Email,
+      email: admin.email,
       userType: 'admin',
-      role: admin.Role,
+      role: admin.role,
     });
 
     return {
@@ -93,7 +93,7 @@ export class AuthService {
     const surveyor = await this.userSurveyorRepository.findByEmail(dto.email);
     const isPasswordValid =
       surveyor !== null &&
-      (await bcrypt.compare(dto.password, surveyor.Password));
+      (await bcrypt.compare(dto.password, surveyor.password));
 
     if (!surveyor || !isPasswordValid) {
       await this.recordLogin(meta, LoginStatus.Failed, {
@@ -102,7 +102,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (surveyor.Status !== SurveyorStatus.Active) {
+    if (surveyor.status !== SurveyorStatus.Active) {
       await this.recordLogin(meta, LoginStatus.Failed, {
         userId: surveyor.surveyorId,
       });
@@ -119,7 +119,7 @@ export class AuthService {
 
     const accessToken = await this.jwtService.signAsync({
       sub: surveyor.surveyorId,
-      email: surveyor.Email,
+      email: surveyor.email,
       userType: 'surveyor',
     });
 
@@ -131,12 +131,12 @@ export class AuthService {
 
   async registerSurveyor(dto: RegisterSurveyorDto) {
     const surveyor = await this.userSurveyorRepository.create({
-      NIP: dto.nip,
-      Nama: dto.nama,
+      nip: dto.nip,
+      nama: dto.nama,
       phoneNumber: dto.nomorHp,
-      Email: dto.email,
-      Password: await bcrypt.hash(dto.password, SALT_ROUNDS),
-      Status: SurveyorStatus.Pending,
+      email: dto.email,
+      password: await bcrypt.hash(dto.password, SALT_ROUNDS),
+      status: SurveyorStatus.Pending,
       provinceId: dto.idProvince,
       regencyId: dto.idCity,
     });
@@ -146,13 +146,13 @@ export class AuthService {
 
   async registerAdmin(dto: RegisterAdminDto) {
     const admin = await this.userAdminRepository.create({
-      NIP: dto.nip,
-      Nama: dto.nama,
+      nip: dto.nip,
+      nama: dto.nama,
       phoneNumber: dto.nomorHp,
-      Email: dto.email,
-      Password: await bcrypt.hash(dto.password, SALT_ROUNDS),
-      Status: AdminStatus.Active,
-      Role: AdminRole.Monitoring,
+      email: dto.email,
+      password: await bcrypt.hash(dto.password, SALT_ROUNDS),
+      status: AdminStatus.Active,
+      role: AdminRole.Monitoring,
     });
 
     return this.toResponse(UserAdminResponseDto, admin);
@@ -189,7 +189,7 @@ export class AuthService {
     if (!surveyor) {
       throw new NotFoundException('Surveyor not found');
     }
-    if (surveyor.Status !== SurveyorStatus.Pending) {
+    if (surveyor.status !== SurveyorStatus.Pending) {
       throw new ConflictException('Surveyor is not pending approval');
     }
 

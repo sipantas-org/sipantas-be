@@ -23,16 +23,16 @@ const ROOT_ADMIN = {
 
 async function seedRootAdmin() {
   await prisma.userAdmin.upsert({
-    where: { Email: ROOT_ADMIN.email },
+    where: { email: ROOT_ADMIN.email },
     update: {},
     create: {
-      NIP: ROOT_ADMIN.nip,
-      Nama: ROOT_ADMIN.nama,
+      nip: ROOT_ADMIN.nip,
+      nama: ROOT_ADMIN.nama,
       phoneNumber: ROOT_ADMIN.nomorHp,
-      Email: ROOT_ADMIN.email,
-      Password: await bcrypt.hash(ROOT_ADMIN.password, 10),
-      Status: AdminStatus.Active,
-      Role: AdminRole.Administrator,
+      email: ROOT_ADMIN.email,
+      password: await bcrypt.hash(ROOT_ADMIN.password, 10),
+      status: AdminStatus.Active,
+      role: AdminRole.Administrator,
     },
   });
   console.log(`Root admin siap: ${ROOT_ADMIN.email}`);

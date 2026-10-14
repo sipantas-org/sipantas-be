@@ -7,16 +7,16 @@ enum DamageLevel {
 enum SurveyStatus {
   Pending
   Submitted
-  OnComplain map("On Complain")
-  OnBudgeting map("On Budgeting")
+  OnComplain @map("On Complain")
+  OnBudgeting @map("On Budgeting")
   Completed
 }
 
 enum Authority {
   Pusat
   Provinsi
-  KabupatenKota map("Kabupaten / Kota")
-  MasyarakatSwasta map("Masyarakat / Swasta")
+  KabupatenKota @map("Kabupaten / Kota")
+  MasyarakatSwasta @map("Masyarakat / Swasta")
 }
 
 model Survey {
@@ -27,12 +27,8 @@ model Survey {
 
   provinceId        String?               @db.VarChar(20)
   regencyId         String?              @db.VarChar(20)  
-  provinceName       String
-  regencyName         String
   districtId        String?               @db.VarChar(20)
   villageId         String?              @db.VarChar(20)
-  districtName       String
-  villageName         String
 
   // Gunakan Restrict untuk province (karena provinceId wajib/non-nullable)
   province          MasterAreaProvince? @relation(fields: [provinceId], references: [id], onDelete: SetNull)
@@ -60,7 +56,5 @@ model Survey {
   createdAt        DateTime             @default(now()) @db.Timestamptz
   updatedAt        DateTime             @updatedAt @db.Timestamptz
 
-
-
-   @@map("Survey")
+  @@map("Survey")
 }

@@ -13,6 +13,9 @@ import { MasterAreaDistrictModule } from './modules/masterAreaDistrict/master-ar
 import { MasterAreaVillageModule } from './modules/masterAreaVilage/master-area-village.module.js';
 import { HousingAssessmentPartModule } from './modules/housingAssestmentPart/housing-assessment-part.module.js';
 import { SectorModule } from './modules/sector/sector.module.js';
+import { SurveyFurnitureDetailModule } from './modules/surveyFurnitureDetail/survey-furniture-detail.module.js';
+import { SurveyHousingDetailModule } from './modules/surveyHousingDetail/survey-housing-detail.module.js';
+import { SurveyLostDetailModule } from './modules/surveyLostDetail/survey-lost-detail.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -27,6 +30,9 @@ import { SectorModule } from './modules/sector/sector.module.js';
     MasterAreaVillageModule,
     HousingAssessmentPartModule,
     SectorModule,
+    SurveyFurnitureDetailModule,
+    SurveyHousingDetailModule,
+    SurveyLostDetailModule,
   ],
   controllers: [
     AppController, // <-- Pastikan AppController terdaftar di sini

@@ -8,13 +8,13 @@ export class MasterAreaRegencyRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateRegencyDto) {
-    return this.prisma.master_Area_Regency.create({
+    return this.prisma.masterAreaRegency.create({
       data,
     });
   }
 
   async findById(id: string) {
-    return this.prisma.master_Area_Regency.findUnique({
+    return this.prisma.masterAreaRegency.findUnique({
       where: { id },
       include: {
         districts: true,
@@ -23,26 +23,26 @@ export class MasterAreaRegencyRepository {
   }
 
   async findAll(provinceId?: string) {
-    return this.prisma.master_Area_Regency.findMany({
+    return this.prisma.masterAreaRegency.findMany({
       where: provinceId ? { provinceId } : undefined,
     });
   }
 
   async update(id: string, data: UpdateRegencyDto) {
-    return this.prisma.master_Area_Regency.update({
+    return this.prisma.masterAreaRegency.update({
       where: { id },
       data,
     });
   }
 
   async delete(id: string) {
-    return this.prisma.master_Area_Regency.delete({
+    return this.prisma.masterAreaRegency.delete({
       where: { id },
     });
   }
 
   async existsProvince(provinceId: string): Promise<boolean> {
-    const count = await this.prisma.master_Area_Province.count({
+    const count = await this.prisma.masterAreaProvince.count({
       where: { id: provinceId },
     });
     return count > 0;

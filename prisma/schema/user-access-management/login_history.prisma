@@ -4,16 +4,16 @@ enum LoginStatus {
 }
 
 model LoginHistory {
-  ID_Login     Int         @id @default(autoincrement())
-  ID_User      Int?
-  ID_Admin     Int?
-  IP_Address   String
-  Login_At     DateTime    @default(now()) @db.Timestamptz
-  Device_Info  String?
-  Status_Login LoginStatus
+  loginId     Int         @id @default(autoincrement())
+  userId      Int?
+  adminId     Int?
+  ipAddress   String
+  loginAt     DateTime    @default(now()) @db.Timestamptz
+  deviceInfo  String?
+  statusLogin LoginStatus
 
-  user  UserSurveyor? @relation(fields: [ID_User], references: [ID_Surveyor])
-  admin UserAdmin?    @relation(fields: [ID_Admin], references: [ID_Admin])
+  user  UserSurveyor? @relation(fields: [userId], references: [surveyorId])
+  admin UserAdmin?    @relation(fields: [adminId], references: [adminId])
 
-  @@map("Login_History")
+  @@map("LoginHistory")
 }

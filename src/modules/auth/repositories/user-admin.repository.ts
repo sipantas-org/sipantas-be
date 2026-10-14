@@ -17,8 +17,8 @@ export class UserAdminRepository {
 
   updateLastLogin(idAdmin: number, lastLogin: Date): Promise<UserAdmin> {
     return this.prisma.userAdmin.update({
-      where: { ID_Admin: idAdmin },
-      data: { Last_Login: lastLogin },
+      where: { adminId: idAdmin },
+      data: { lastLogin: lastLogin },
     });
   }
 }

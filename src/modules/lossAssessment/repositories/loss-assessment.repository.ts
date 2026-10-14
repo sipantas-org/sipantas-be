@@ -1,43 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
-import type { Loss_Assessment } from '../entities/loss-assessment.entity.js';
+import type { LossAssessment } from '../entities/loss-assessment.entity.js';
 
 @Injectable()
 export class LossAssessmentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   create(
-    data: Prisma.Loss_AssessmentUncheckedCreateInput,
-  ): Promise<Loss_Assessment> {
-    return this.prisma.loss_Assessment.create({ data });
+    data: Prisma.LossAssessmentUncheckedCreateInput,
+  ): Promise<LossAssessment> {
+    return this.prisma.lossAssessment.create({ data });
   }
 
-  findAll(): Promise<Loss_Assessment[]> {
-    return this.prisma.loss_Assessment.findMany({
-      orderBy: { Created_At: 'desc' },
+  findAll(): Promise<LossAssessment[]> {
+    return this.prisma.lossAssessment.findMany({
+      orderBy: { createdAt: 'desc' },
     });
   }
 
-  findById(id: number): Promise<Loss_Assessment | null> {
-    return this.prisma.loss_Assessment.findUnique({
-      where: { ID_Loss_Assessment: id },
+  findById(id: number): Promise<LossAssessment | null> {
+    return this.prisma.lossAssessment.findUnique({
+      where: { lossAssessmentId: id },
     });
   }
 
   update(
     id: number,
-    data: Prisma.Loss_AssessmentUncheckedUpdateInput,
-  ): Promise<Loss_Assessment> {
-    return this.prisma.loss_Assessment.update({
-      where: { ID_Loss_Assessment: id },
+    data: Prisma.LossAssessmentUncheckedUpdateInput,
+  ): Promise<LossAssessment> {
+    return this.prisma.lossAssessment.update({
+      where: { lossAssessmentId: id },
       data,
     });
   }
 
-  delete(id: number): Promise<Loss_Assessment> {
-    return this.prisma.loss_Assessment.delete({
-      where: { ID_Loss_Assessment: id },
+  delete(id: number): Promise<LossAssessment> {
+    return this.prisma.lossAssessment.delete({
+      where: { lossAssessmentId: id },
     });
   }
 }

@@ -5,17 +5,17 @@ enum ApprovalStatus {
 }
 
 model ApprovalUser {
-  ID_Approval     Int            @id @default(autoincrement())
-  ID_Surveyor     Int
-  ID_Admin        Int
-  Status_Approval ApprovalStatus
+  approvalId     Int            @id @default(autoincrement())
+  surveyorId     Int
+  adminId        Int
+  statusApproval ApprovalStatus
   Description     String?
-  Approval_Date   DateTime?      @db.Timestamptz
-  Created_At      DateTime       @default(now()) @db.Timestamptz
-  Updated_At      DateTime       @updatedAt @db.Timestamptz
+  approvalDate   DateTime?      @db.Timestamptz
+  createdAt      DateTime       @default(now()) @db.Timestamptz
+  updatedAt      DateTime       @updatedAt @db.Timestamptz
 
-  surveyor UserSurveyor @relation(fields: [ID_Surveyor], references: [ID_Surveyor])
-  admin    UserAdmin    @relation(fields: [ID_Admin], references: [ID_Admin])
+  surveyor UserSurveyor @relation(fields: [surveyorId], references: [surveyorId])
+  admin    UserAdmin    @relation(fields: [adminId], references: [adminId])
 
-  @@map("Approval_User")
+  @@map("ApprovalUser")
 }

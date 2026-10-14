@@ -57,7 +57,7 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
       default:
         response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'Database error occurred',
+          message: `Database error occurred ${exception.code}`,
         });
         break;
     }

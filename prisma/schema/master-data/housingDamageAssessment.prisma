@@ -3,16 +3,16 @@ enum HousingDamageAssessmentStatus {
   Inactive
 }
 
-model Housing_Damage_Assessment {
-  ID_Housing_Damage_Assessment Int                           @id @default(autoincrement())
-  ID_Housing_Assessment_Part   Int
-  Survey_Damage_Question       String
-  Survey_Scoring                Json
-  Status                        HousingDamageAssessmentStatus
-  Created_At                    DateTime                     @default(now()) @db.Timestamptz
-  Updated_At                    DateTime                     @updatedAt @db.Timestamptz
+model HousingDamageAssessment {
+  housingDamageAssessmentId Int                           @id @default(autoincrement())
+  housingAssessmentPartId   Int
+  surveyDamageQuestion       String
+  surveyScoring                Json
+  housingDamageAssessmentStatus                        HousingDamageAssessmentStatus
+  createdAt                    DateTime                     @default(now()) @db.Timestamptz
+  updatedAt                    DateTime                     @updatedAt @db.Timestamptz
 
-  housingAssessmentPart Housing_Assessment_Part @relation(fields: [ID_Housing_Assessment_Part], references: [housingAssessmentPartId])
+  housingAssessmentPart HousingAssessmentPart @relation(fields: [housingAssessmentPartId], references: [housingAssessmentPartId])
 
-  @@map("Housing_Damage_Assessment")
+  @@map("HousingDamageAssessment")
 }

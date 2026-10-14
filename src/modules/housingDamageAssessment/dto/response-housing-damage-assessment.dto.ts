@@ -12,19 +12,21 @@ const formatJakarta = ({ value }: { value: Date | null }) =>
 
 export class HousingDamageAssessmentResponseDto {
   @ApiProperty({ example: 1 })
-  @Expose({ name: 'ID_Housing_Damage_Assessment' })
+  @Expose({ name: 'housingDamageAssessmentId' })
   id!: number;
 
   @ApiProperty({ example: 1 })
-  @Expose({ name: 'ID_Housing_Assessment_Part' })
+  @Expose({ name: 'housingAssessmentPartId' })
   idHousingAssessmentPart!: number;
 
-  @ApiProperty({ example: 'Apakah dinding rumah mengalami keretakan struktural?' })
-  @Expose({ name: 'Survey_Damage_Question' })
+  @ApiProperty({
+    example: 'Apakah dinding rumah mengalami keretakan struktural?',
+  })
+  @Expose({ name: 'surveyDamageQuestion' })
   surveyDamageQuestion!: string;
 
   @ApiProperty({ example: [{ total: 10, score: 7 }] })
-  @Expose({ name: 'Survey_Scoring' })
+  @Expose({ name: 'surveyScoring' })
   surveyScoring!: unknown;
 
   @ApiProperty({ example: 'Active' })
@@ -32,12 +34,12 @@ export class HousingDamageAssessmentResponseDto {
   status!: string;
 
   @ApiProperty({ example: '2026-10-12 09:00:00' })
-  @Expose({ name: 'Created_At' })
+  @Expose({ name: 'createdAt' })
   @Transform(formatJakarta)
   createdAt!: string;
 
   @ApiProperty({ example: '2026-10-12 09:00:00' })
-  @Expose({ name: 'Updated_At' })
+  @Expose({ name: 'updatedAt' })
   @Transform(formatJakarta)
   updatedAt!: string;
 }

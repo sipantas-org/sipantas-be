@@ -59,25 +59,25 @@ export class AuthService {
 
     if (!admin || !isPasswordValid) {
       await this.recordLogin(meta, LoginStatus.Failed, {
-        ID_Admin: admin?.ID_Admin ?? null,
+        adminId: admin?.adminId ?? null,
       });
       throw new UnauthorizedException('Invalid credentials');
     }
 
     if (admin.Status !== AdminStatus.Active) {
       await this.recordLogin(meta, LoginStatus.Failed, {
-        ID_Admin: admin.ID_Admin,
+        adminId: admin.adminId,
       });
       throw new ForbiddenException('Account is not active');
     }
 
     await this.recordLogin(meta, LoginStatus.Success, {
-      ID_Admin: admin.ID_Admin,
+      adminId: admin.adminId,
     });
-    await this.userAdminRepository.updateLastLogin(admin.ID_Admin, new Date());
+    await this.userAdminRepository.updateLastLogin(admin.adminId, new Date());
 
     const accessToken = await this.jwtService.signAsync({
-      sub: admin.ID_Admin,
+      sub: admin.adminId,
       email: admin.Email,
       userType: 'admin',
       role: admin.Role,
@@ -97,28 +97,28 @@ export class AuthService {
 
     if (!surveyor || !isPasswordValid) {
       await this.recordLogin(meta, LoginStatus.Failed, {
-        ID_User: surveyor?.ID_Surveyor ?? null,
+        userId: surveyor?.surveyorId ?? null,
       });
       throw new UnauthorizedException('Invalid credentials');
     }
 
     if (surveyor.Status !== SurveyorStatus.Active) {
       await this.recordLogin(meta, LoginStatus.Failed, {
-        ID_User: surveyor.ID_Surveyor,
+        userId: surveyor.surveyorId,
       });
       throw new ForbiddenException('Account is not active');
     }
 
     await this.recordLogin(meta, LoginStatus.Success, {
-      ID_User: surveyor.ID_Surveyor,
+      userId: surveyor.surveyorId,
     });
     await this.userSurveyorRepository.updateLastLogin(
-      surveyor.ID_Surveyor,
+      surveyor.surveyorId,
       new Date(),
     );
 
     const accessToken = await this.jwtService.signAsync({
-      sub: surveyor.ID_Surveyor,
+      sub: surveyor.surveyorId,
       email: surveyor.Email,
       userType: 'surveyor',
     });
@@ -133,12 +133,12 @@ export class AuthService {
     const surveyor = await this.userSurveyorRepository.create({
       NIP: dto.nip,
       Nama: dto.nama,
-      Nomor_HP: dto.nomorHp,
+      phoneNumber: dto.nomorHp,
       Email: dto.email,
       Password: await bcrypt.hash(dto.password, SALT_ROUNDS),
       Status: SurveyorStatus.Pending,
-      ID_Province: dto.idProvince,
-      ID_City: dto.idCity,
+      provinceId: dto.idProvince,
+      regencyId: dto.idCity,
     });
 
     return this.toResponse(UserSurveyorResponseDto, surveyor);
@@ -148,7 +148,7 @@ export class AuthService {
     const admin = await this.userAdminRepository.create({
       NIP: dto.nip,
       Nama: dto.nama,
-      Nomor_HP: dto.nomorHp,
+      phoneNumber: dto.nomorHp,
       Email: dto.email,
       Password: await bcrypt.hash(dto.password, SALT_ROUNDS),
       Status: AdminStatus.Active,
@@ -168,7 +168,9 @@ export class AuthService {
     });
 
     return {
-      items: items.map((item) => this.toResponse(UserSurveyorResponseDto, item)),
+      items: items.map((item) =>
+        this.toResponse(UserSurveyorResponseDto, item),
+      ),
       meta: {
         page,
         limit,
@@ -206,7 +208,7 @@ export class AuthService {
         {
           idUser: null,
           idAdmin: admin.sub,
-          relationId: created.ID_Approval,
+          relationId: created.approvalId,
           module: 'Auth - Surveyor Approval Admin',
           activity:
             dto.status === 'Approved'
@@ -225,13 +227,13 @@ export class AuthService {
   private recordLogin(
     meta: LoginMeta,
     status: LoginStatus,
-    actor: Pick<Prisma.LoginHistoryUncheckedCreateInput, 'ID_Admin' | 'ID_User'>,
+    actor: Pick<Prisma.LoginHistoryUncheckedCreateInput, 'adminId' | 'userId'>,
   ) {
     return this.loginHistoryRepository.create({
       ...actor,
-      IP_Address: meta.ipAddress,
-      Device_Info: meta.deviceInfo ?? null,
-      Status_Login: status,
+      ipAddress: meta.ipAddress,
+      deviceInfo: meta.deviceInfo ?? null,
+      statusLogin: status,
     });
   }
 

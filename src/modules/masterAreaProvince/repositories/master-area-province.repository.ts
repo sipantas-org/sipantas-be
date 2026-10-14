@@ -8,11 +8,11 @@ export class MasterAreaProvinceRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateProvinceDto) {
-    return this.prisma.master_Area_Province.create({ data });
+    return this.prisma.masterAreaProvince.create({ data });
   }
 
   async findById(id: string) {
-    return this.prisma.master_Area_Province.findUnique({
+    return this.prisma.masterAreaProvince.findUnique({
       where: { id },
       include: {
         regencies: true,
@@ -21,20 +21,20 @@ export class MasterAreaProvinceRepository {
   }
 
   async findAll() {
-    return this.prisma.master_Area_Province.findMany({
+    return this.prisma.masterAreaProvince.findMany({
       include: {},
     });
   }
 
   async update(id: string, data: UpdateProvinceDto) {
-    return this.prisma.master_Area_Province.update({
+    return this.prisma.masterAreaProvince.update({
       where: { id },
       data,
     });
   }
 
   async delete(id: string) {
-    return this.prisma.master_Area_Province.delete({
+    return this.prisma.masterAreaProvince.delete({
       where: { id },
     });
   }

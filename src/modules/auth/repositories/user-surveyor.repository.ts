@@ -7,9 +7,7 @@ import type { UserSurveyor } from '../entities/auth.entity.js';
 export class UserSurveyorRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(
-    data: Prisma.UserSurveyorUncheckedCreateInput,
-  ): Promise<UserSurveyor> {
+  create(data: Prisma.UserSurveyorUncheckedCreateInput): Promise<UserSurveyor> {
     return this.prisma.userSurveyor.create({ data });
   }
 
@@ -20,24 +18,24 @@ export class UserSurveyorRepository {
   }) {
     const where = params.status ? { Status: params.status } : {};
     const select = {
-      ID_Surveyor: true,
+      surveyorId: true,
       NIP: true,
       Nama: true,
-      Nomor_HP: true,
+      phoneNumber: true,
       Email: true,
       Status: true,
-      ID_Province: true,
-      ID_City: true,
-      Last_Login: true,
-      Created_At: true,
-      Updated_At: true,
+      provinceId: true,
+      regencyId: true,
+      lastLogin: true,
+      createdAt: true,
+      updatedAt: true,
     } as const;
 
     return this.prisma.$transaction([
       this.prisma.userSurveyor.findMany({
         where,
         select,
-        orderBy: { Created_At: 'desc' },
+        orderBy: { createdAt: 'desc' },
         skip: params.skip,
         take: params.take,
       }),
@@ -47,7 +45,7 @@ export class UserSurveyorRepository {
 
   findById(idSurveyor: number): Promise<UserSurveyor | null> {
     return this.prisma.userSurveyor.findUnique({
-      where: { ID_Surveyor: idSurveyor },
+      where: { surveyorId: idSurveyor },
     });
   }
 
@@ -57,8 +55,8 @@ export class UserSurveyorRepository {
 
   updateLastLogin(idSurveyor: number, lastLogin: Date): Promise<UserSurveyor> {
     return this.prisma.userSurveyor.update({
-      where: { ID_Surveyor: idSurveyor },
-      data: { Last_Login: lastLogin },
+      where: { surveyorId: idSurveyor },
+      data: { lastLogin: lastLogin },
     });
   }
 }

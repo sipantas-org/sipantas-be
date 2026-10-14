@@ -4,23 +4,21 @@ import { HousingDamageAssessmentRepository } from './repositories/housing-damage
 import { CreateHousingDamageAssessmentDto } from './dto/create-housing-damage-assessment.dto.js';
 import { UpdateHousingDamageAssessmentDto } from './dto/update-housing-damage-assessment.dto.js';
 import { HousingDamageAssessmentResponseDto } from './dto/response-housing-damage-assessment.dto.js';
-import type { Housing_Damage_Assessment } from './entities/housing-damage-assessment.entity.js';
+import type { HousingDamageAssessment } from './entities/housing-damage-assessment.entity.js';
 
 @Injectable()
 export class HousingDamageAssessmentService {
-  constructor(
-    private readonly repository: HousingDamageAssessmentRepository,
-  ) {}
+  constructor(private readonly repository: HousingDamageAssessmentRepository) {}
 
   async create(dto: CreateHousingDamageAssessmentDto) {
     const row = await this.repository.create({
-      ID_Housing_Assessment_Part: dto.idHousingAssessmentPart,
-      Survey_Damage_Question: dto.surveyDamageQuestion,
-      Survey_Scoring: dto.surveyScoring.map((item) => ({
+      housingAssessmentPartId: dto.idHousingAssessmentPart,
+      surveyDamageQuestion: dto.surveyDamageQuestion,
+      surveyScoring: dto.surveyScoring.map((item) => ({
         total: item.total,
         score: item.score,
       })),
-      Status: dto.status,
+      housingDamageAssessmentStatus: dto.status,
     });
 
     return this.toResponse(row);
@@ -43,13 +41,13 @@ export class HousingDamageAssessmentService {
     await this.findOne(id);
 
     const row = await this.repository.update(id, {
-      ID_Housing_Assessment_Part: dto.idHousingAssessmentPart,
-      Survey_Damage_Question: dto.surveyDamageQuestion,
-      Survey_Scoring: dto.surveyScoring?.map((item) => ({
+      housingAssessmentPartId: dto.idHousingAssessmentPart,
+      surveyDamageQuestion: dto.surveyDamageQuestion,
+      surveyScoring: dto.surveyScoring?.map((item) => ({
         total: item.total,
         score: item.score,
       })),
-      Status: dto.status,
+      housingDamageAssessmentStatus: dto.status,
     });
 
     return this.toResponse(row);
@@ -61,7 +59,7 @@ export class HousingDamageAssessmentService {
     return this.toResponse(row);
   }
 
-  private toResponse(row: Housing_Damage_Assessment) {
+  private toResponse(row: HousingDamageAssessment) {
     return plainToInstance(HousingDamageAssessmentResponseDto, row, {
       excludeExtraneousValues: true,
     });

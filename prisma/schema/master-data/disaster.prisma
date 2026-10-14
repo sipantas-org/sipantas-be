@@ -16,9 +16,9 @@ model Disaster {
   regencyId         String?              @db.VarChar(20)
 
   // Gunakan Restrict untuk province (karena provinceId wajib/non-nullable)
-  province          Master_Area_Province? @relation(fields: [provinceId], references: [id], onDelete: SetNull)
+  province          MasterAreaProvince? @relation(fields: [provinceId], references: [id], onDelete: SetNull)
   // SetNull valid untuk regency (karena regencyId opsional ?)
-  regency           Master_Area_Regency? @relation(fields: [regencyId], references: [id], onDelete: SetNull)
+  regency           MasterAreaRegency? @relation(fields: [regencyId], references: [id], onDelete: SetNull)
 
   createdAt        DateTime             @default(now()) @db.Timestamptz
   updatedAt        DateTime             @updatedAt @db.Timestamptz

@@ -12,15 +12,15 @@ const formatJakarta = ({ value }: { value: Date | null }) =>
 
 export class LossAssessmentResponseDto {
   @ApiProperty({ example: 1 })
-  @Expose({ name: 'ID_Loss_Assessment' })
+  @Expose({ name: 'lossAssessmentId' })
   id!: number;
 
   @ApiProperty({ example: 'additional_cost' })
-  @Expose({ name: 'Type_of_Loss' })
+  @Expose({ name: 'typeOfLoss' })
   typeOfLoss!: string;
 
   @ApiProperty({ example: 'Berapa estimasi kerugian material akibat bencana?' })
-  @Expose({ name: 'Survey_Loss_Question' })
+  @Expose({ name: 'surveyLossQuestion' })
   surveyLossQuestion!: string;
 
   @ApiProperty({ example: 'Active' })
@@ -28,12 +28,12 @@ export class LossAssessmentResponseDto {
   status!: string;
 
   @ApiProperty({ example: '2026-10-12 09:00:00' })
-  @Expose({ name: 'Created_At' })
+  @Expose({ name: 'createdAt' })
   @Transform(formatJakarta)
   createdAt!: string;
 
   @ApiProperty({ example: '2026-10-12 09:00:00' })
-  @Expose({ name: 'Updated_At' })
+  @Expose({ name: 'updatedAt' })
   @Transform(formatJakarta)
   updatedAt!: string;
 }

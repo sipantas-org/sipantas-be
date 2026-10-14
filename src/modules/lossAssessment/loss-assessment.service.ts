@@ -4,7 +4,7 @@ import { LossAssessmentRepository } from './repositories/loss-assessment.reposit
 import { CreateLossAssessmentDto } from './dto/create-loss-assessment.dto.js';
 import { UpdateLossAssessmentDto } from './dto/update-loss-assessment.dto.js';
 import { LossAssessmentResponseDto } from './dto/response-loss-assessment.dto.js';
-import type { Loss_Assessment } from './entities/loss-assessment.entity.js';
+import type { LossAssessment } from './entities/loss-assessment.entity.js';
 
 @Injectable()
 export class LossAssessmentService {
@@ -12,9 +12,9 @@ export class LossAssessmentService {
 
   async create(dto: CreateLossAssessmentDto) {
     const row = await this.repository.create({
-      Type_of_Loss: dto.typeOfLoss,
-      Survey_Loss_Question: dto.surveyLossQuestion,
-      Status: dto.status,
+      typeOfLoss: dto.typeOfLoss,
+      surveyLossQuestion: dto.surveyLossQuestion,
+      lossAssessmentStatus: dto.status,
     });
 
     return this.toResponse(row);
@@ -37,9 +37,9 @@ export class LossAssessmentService {
     await this.findOne(id);
 
     const row = await this.repository.update(id, {
-      Type_of_Loss: dto.typeOfLoss,
-      Survey_Loss_Question: dto.surveyLossQuestion,
-      Status: dto.status,
+      typeOfLoss: dto.typeOfLoss,
+      surveyLossQuestion: dto.surveyLossQuestion,
+      lossAssessmentStatus: dto.status,
     });
 
     return this.toResponse(row);
@@ -51,7 +51,7 @@ export class LossAssessmentService {
     return this.toResponse(row);
   }
 
-  private toResponse(row: Loss_Assessment) {
+  private toResponse(row: LossAssessment) {
     return plainToInstance(LossAssessmentResponseDto, row, {
       excludeExtraneousValues: true,
     });

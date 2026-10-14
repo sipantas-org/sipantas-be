@@ -6,22 +6,22 @@ enum SurveyorStatus {
 }
 
 model UserSurveyor {
-  ID_Surveyor Int            @id @default(autoincrement())
+  surveyorId Int            @id @default(autoincrement())
   NIP         String         @unique
   Nama        String
-  Nomor_HP    String
+  phoneNumber    String
   Email       String         @unique
   Password    String
   Status      SurveyorStatus
-  ID_Province String
-  ID_City     String
-  Last_Login  DateTime?      @db.Timestamptz
-  Created_At  DateTime       @default(now()) @db.Timestamptz
-  Updated_At  DateTime       @updatedAt @db.Timestamptz
+  provinceId String
+  regencyId     String
+  lastLogin  DateTime?      @db.Timestamptz
+  createdAt  DateTime       @default(now()) @db.Timestamptz
+  updatedAt  DateTime       @updatedAt @db.Timestamptz
 
   loginHistories    LoginHistory[]
   approvals         ApprovalUser[]
   activityHistories ActivityHistory[]
 
-  @@map("User_Surveyor")
+  @@map("UserSurveyor")
 }

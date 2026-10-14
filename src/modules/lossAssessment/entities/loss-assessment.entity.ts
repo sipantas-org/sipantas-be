@@ -1,1 +1,1 @@
-export type { Loss_Assessment } from '../../../generated/prisma/client.js';
+export type { LossAssessment } from '../../../generated/prisma/client.js';

@@ -20,9 +20,9 @@ export class ActivityHistoryService {
   ): Promise<void> {
     await this.repository.create(
       {
-        ID_User: input.idUser ?? null,
-        ID_Admin: input.idAdmin ?? null,
-        Relation_ID: input.relationId ?? null,
+        userId: input.idUser ?? null,
+        adminId: input.idAdmin ?? null,
+        relationId: input.relationId ?? null,
         Module: input.module,
         Activity: input.activity,
       },

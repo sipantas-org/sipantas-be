@@ -1,1 +1,1 @@
-export type { Housing_Damage_Assessment } from '../../../generated/prisma/client.js';
+export type { HousingDamageAssessment } from '../../../generated/prisma/client.js';

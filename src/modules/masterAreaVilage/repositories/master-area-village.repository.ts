@@ -8,7 +8,7 @@ export class MasterAreaVillageRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateVillageDto) {
-    return this.prisma.master_Area_Village.create({
+    return this.prisma.masterAreaVillage.create({
       data,
       include: {
         district: true,
@@ -17,7 +17,7 @@ export class MasterAreaVillageRepository {
   }
 
   async findById(id: string) {
-    return this.prisma.master_Area_Village.findUnique({
+    return this.prisma.masterAreaVillage.findUnique({
       where: { id },
       // include: {
       //   district: {
@@ -34,13 +34,13 @@ export class MasterAreaVillageRepository {
   }
 
   async findAll(districtId?: string) {
-    return this.prisma.master_Area_Village.findMany({
+    return this.prisma.masterAreaVillage.findMany({
       where: districtId ? { districtId } : undefined,
     });
   }
 
   async update(id: string, data: UpdateVillageDto) {
-    return this.prisma.master_Area_Village.update({
+    return this.prisma.masterAreaVillage.update({
       where: { id },
       data,
       include: {
@@ -50,13 +50,13 @@ export class MasterAreaVillageRepository {
   }
 
   async delete(id: string) {
-    return this.prisma.master_Area_Village.delete({
+    return this.prisma.masterAreaVillage.delete({
       where: { id },
     });
   }
 
   async existsDistrict(districtId: string): Promise<boolean> {
-    const count = await this.prisma.master_Area_District.count({
+    const count = await this.prisma.masterAreaDistrict.count({
       where: { id: districtId },
     });
     return count > 0;

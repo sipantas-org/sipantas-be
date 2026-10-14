@@ -28,7 +28,7 @@ async function seedRootAdmin() {
     create: {
       NIP: ROOT_ADMIN.nip,
       Nama: ROOT_ADMIN.nama,
-      Nomor_HP: ROOT_ADMIN.nomorHp,
+      phoneNumber: ROOT_ADMIN.nomorHp,
       Email: ROOT_ADMIN.email,
       Password: await bcrypt.hash(ROOT_ADMIN.password, 10),
       Status: AdminStatus.Active,

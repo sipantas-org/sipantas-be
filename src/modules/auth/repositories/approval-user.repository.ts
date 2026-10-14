@@ -28,15 +28,15 @@ export class ApprovalUserRepository {
     const run = async (client: Prisma.TransactionClient) => {
       const approval = await client.approvalUser.create({
         data: {
-          ID_Surveyor: params.idSurveyor,
-          ID_Admin: params.idAdmin,
-          Status_Approval: params.status,
+          surveyorId: params.idSurveyor,
+          adminId: params.idAdmin,
+          statusApproval: params.status,
           Description: params.description ?? null,
-          Approval_Date: new Date(),
+          approvalDate: new Date(),
         },
       });
       await client.userSurveyor.update({
-        where: { ID_Surveyor: params.idSurveyor },
+        where: { surveyorId: params.idSurveyor },
         data: { Status: surveyorStatus },
       });
       return approval;

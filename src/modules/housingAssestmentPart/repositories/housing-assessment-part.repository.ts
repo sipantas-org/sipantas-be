@@ -2,7 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import {
-  Housing_Assessment_Part as HousingAssessmentPart,
+  HousingAssessmentPart as HousingAssessmentPart,
   Prisma,
 } from '../../../generated/prisma/client.js';
 import { CreateHousingAssessmentPartDto } from '../dto/create-housing-assessment-part.dto.js';
@@ -17,7 +17,7 @@ export class HousingAssessmentPartRepository {
   async create(
     data: CreateHousingAssessmentPartDto,
   ): Promise<HousingAssessmentPart> {
-    return this.prisma.housing_Assessment_Part.create({
+    return this.prisma.housingAssessmentPart.create({
       data,
     });
   }
@@ -29,7 +29,7 @@ export class HousingAssessmentPartRepository {
 
     const { search, partStatus, partName } = query;
 
-    const where: Prisma.Housing_Assessment_PartWhereInput = {};
+    const where: Prisma.HousingAssessmentPartWhereInput = {};
 
     if (search) {
       where.OR = [{ partName: { contains: search, mode: 'insensitive' } }];
@@ -44,13 +44,13 @@ export class HousingAssessmentPartRepository {
     }
 
     const [data, total] = await Promise.all([
-      this.prisma.housing_Assessment_Part.findMany({
+      this.prisma.housingAssessmentPart.findMany({
         where,
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      this.prisma.housing_Assessment_Part.count({ where }),
+      this.prisma.housingAssessmentPart.count({ where }),
     ]);
 
     const formattedData = plainToInstance(
@@ -74,7 +74,7 @@ export class HousingAssessmentPartRepository {
   }
 
   async findById(housingAssessmentPartId: number) {
-    const data = await this.prisma.housing_Assessment_Part.findUnique({
+    const data = await this.prisma.housingAssessmentPart.findUnique({
       where: { housingAssessmentPartId },
     });
 
@@ -85,7 +85,7 @@ export class HousingAssessmentPartRepository {
     housingAssessmentPartId: number,
     data: UpdateHousingAssessmentPartDto,
   ): Promise<HousingAssessmentPart> {
-    return this.prisma.housing_Assessment_Part.update({
+    return this.prisma.housingAssessmentPart.update({
       where: { housingAssessmentPartId },
       data,
     });
@@ -94,7 +94,7 @@ export class HousingAssessmentPartRepository {
   async delete(
     housingAssessmentPartId: number,
   ): Promise<HousingAssessmentPart> {
-    return this.prisma.housing_Assessment_Part.delete({
+    return this.prisma.housingAssessmentPart.delete({
       where: { housingAssessmentPartId },
     });
   }

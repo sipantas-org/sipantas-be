@@ -12,9 +12,9 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
--- Dumping data for table public.Master_Area_Province: 38 rows
-/*!40000 ALTER TABLE "Master_Area_Province" DISABLE KEYS */;
-INSERT INTO "Master_Area_Province" ("id", "name") VALUES
+-- Dumping data for table public.MasterAreaProvince: 38 rows
+/*!40000 ALTER TABLE "MasterAreaProvince" DISABLE KEYS */;
+INSERT INTO "MasterAreaProvince" ("id", "name") VALUES
 	('11', 'Aceh'),
 	('12', 'Sumatera Utara'),
 	('13', 'Sumatera Barat'),
@@ -53,12 +53,12 @@ INSERT INTO "Master_Area_Province" ("id", "name") VALUES
 	('94', 'Papua Tengah'),
 	('95', 'Papua Pegunungan'),
 	('96', 'Papua Barat Daya') ON CONFLICT ("id") DO NOTHING;;
-/*!40000 ALTER TABLE "Master_Area_Province" ENABLE KEYS */;
+/*!40000 ALTER TABLE "MasterAreaProvince" ENABLE KEYS */;
 
 
--- Dumping data for table public.Master_Area_Regency: 514 rows
-/*!40000 ALTER TABLE "Master_Area_Regency" DISABLE KEYS */;
-INSERT INTO "Master_Area_Regency" ("id", "provinceId", "name") VALUES
+-- Dumping data for table public.MasterAreaRegency: 514 rows
+/*!40000 ALTER TABLE "MasterAreaRegency" DISABLE KEYS */;
+INSERT INTO "MasterAreaRegency" ("id", "provinceId", "name") VALUES
 	('11.01', '11', 'Kabupaten Aceh Selatan'),
 	('11.02', '11', 'Kabupaten Aceh Tenggara'),
 	('11.03', '11', 'Kabupaten Aceh Timur'),
@@ -573,12 +573,12 @@ INSERT INTO "Master_Area_Regency" ("id", "provinceId", "name") VALUES
 	('96.04', '96', 'Kabupaten Tambrauw'),
 	('96.05', '96', 'Kabupaten Maybrat'),
 	('96.71', '96', 'Kota Sorong') ON CONFLICT ("id") DO NOTHING;;
-/*!40000 ALTER TABLE "Master_Area_Regency" ENABLE KEYS */;
+/*!40000 ALTER TABLE "MasterAreaRegency" ENABLE KEYS */;
 
 
--- Dumping data for table public.Master_Area_District: 7.285 rows
-/*!40000 ALTER TABLE "Master_Area_District" DISABLE KEYS */;
-INSERT INTO "Master_Area_District" ("id", "regencyId", "name") VALUES
+-- Dumping data for table public.MasterAreaDistrict: 7.285 rows
+/*!40000 ALTER TABLE "MasterAreaDistrict" DISABLE KEYS */;
+INSERT INTO "MasterAreaDistrict" ("id", "regencyId", "name") VALUES
 	('11.01.01', '11.01', 'Bakongan'),
 	('11.01.02', '11.01', 'Kluet Utara'),
 	('11.01.03', '11.01', 'Kluet Selatan'),
@@ -7864,12 +7864,12 @@ INSERT INTO "Master_Area_District" ("id", "regencyId", "name") VALUES
 	('96.71.08', '96.71', 'Klaurung'),
 	('96.71.09', '96.71', 'Malaimsimsa'),
 	('96.71.10', '96.71', 'Maladum Mes') ON CONFLICT ("id") DO NOTHING;;
-/*!40000 ALTER TABLE "Master_Area_District" ENABLE KEYS */;
+/*!40000 ALTER TABLE "MasterAreaDistrict" ENABLE KEYS */;
 
 
--- Dumping data for table public.Master_Area_Village: 83.762 rows
-/*!40000 ALTER TABLE "Master_Area_Village" DISABLE KEYS */;
-INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
+-- Dumping data for table public.MasterAreaVillage: 83.762 rows
+/*!40000 ALTER TABLE "MasterAreaVillage" DISABLE KEYS */;
+INSERT INTO "MasterAreaVillage" ("id", "districtId", "name") VALUES
 	('11.01.01.2001', '11.01.01', 'Keude Bakongan'),
 	('11.01.01.2002', '11.01.01', 'Ujong Mangki'),
 	('11.01.01.2003', '11.01.01', 'Ujong Padang'),
@@ -17870,7 +17870,7 @@ INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
 	('12.14.09.2003', '12.14.09', 'Hiliana''a Susua'),
 	('12.14.09.2004', '12.14.09', 'Hiliorahua'),
 	('12.14.09.2005', '12.14.09', 'Hilimboe') ON CONFLICT ("id") DO NOTHING;;
-INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
+INSERT INTO "MasterAreaVillage" ("id", "districtId", "name") VALUES
 	('12.14.09.2006', '12.14.09', 'Hilimboho'),
 	('12.14.09.2008', '12.14.09', 'Hiliwaebu'),
 	('12.14.09.2009', '12.14.09', 'Hilidanayao'),
@@ -27871,7 +27871,7 @@ INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
 	('16.10.16.2003', '16.10.16', 'Talang Seleman'),
 	('16.10.16.2004', '16.10.16', 'Tebedak II'),
 	('16.10.16.2005', '16.10.16', 'Tanjung lalang') ON CONFLICT ("id") DO NOTHING;;
-INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
+INSERT INTO "MasterAreaVillage" ("id", "districtId", "name") VALUES
 	('16.10.16.2006', '16.10.16', 'Seri Kembang I'),
 	('16.10.16.2007', '16.10.16', 'Rengas I'),
 	('16.10.16.2008', '16.10.16', 'Paya Besar'),
@@ -37872,7 +37872,7 @@ INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
 	('32.12.22.2004', '32.12.22', 'Kertajaya'),
 	('32.12.22.2005', '32.12.22', 'Bongas'),
 	('32.12.22.2006', '32.12.22', 'Cipaat') ON CONFLICT ("id") DO NOTHING;;
-INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
+INSERT INTO "MasterAreaVillage" ("id", "districtId", "name") VALUES
 	('32.12.22.2007', '32.12.22', 'Kertamulya'),
 	('32.12.22.2008', '32.12.22', 'Plawangan'),
 	('32.12.23.2001', '32.12.23', 'Anjatan'),
@@ -47873,7 +47873,7 @@ INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
 	('33.29.17.2004', '33.29.17', 'Blandongan'),
 	('33.29.17.2005', '33.29.17', 'Ciawi'),
 	('33.29.17.2006', '33.29.17', 'Cibendung') ON CONFLICT ("id") DO NOTHING;;
-INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
+INSERT INTO "MasterAreaVillage" ("id", "districtId", "name") VALUES
 	('33.29.17.2007', '33.29.17', 'Cibuniwangi'),
 	('33.29.17.2008', '33.29.17', 'Cigadung'),
 	('33.29.17.2009', '33.29.17', 'Cihaur'),
@@ -57874,7 +57874,7 @@ INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
 	('36.03.04.2007', '36.03.04', 'Ranca Buaya'),
 	('36.03.04.2008', '36.03.04', 'Mekarsari'),
 	('36.03.04.2009', '36.03.04', 'Ancol Pasir') ON CONFLICT ("id") DO NOTHING;;
-INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
+INSERT INTO "MasterAreaVillage" ("id", "districtId", "name") VALUES
 	('36.03.04.2010', '36.03.04', 'Pasir Barat'),
 	('36.03.05.2001', '36.03.05', 'Cisoka'),
 	('36.03.05.2002', '36.03.05', 'Caringin'),
@@ -67875,7 +67875,7 @@ INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
 	('63.01.11.2006', '63.01.11', 'Handil Suruk'),
 	('63.01.11.2007', '63.01.11', 'Handil Gayam'),
 	('63.01.11.2008', '63.01.11', 'Handil Birayang Atas') ON CONFLICT ("id") DO NOTHING;;
-INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
+INSERT INTO "MasterAreaVillage" ("id", "districtId", "name") VALUES
 	('63.01.11.2009', '63.01.11', 'Handil Birayang Bawah'),
 	('63.01.11.2010', '63.01.11', 'Handil Maluka'),
 	('63.01.11.2011', '63.01.11', 'Handil Labuan Amas'),
@@ -77876,7 +77876,7 @@ INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
 	('73.26.06.2009', '73.26.06', 'Sa''dan Pesondongan'),
 	('73.26.06.2010', '73.26.06', 'Sa''dan Liku Lambe'''),
 	('73.26.07.1006', '73.26.07', 'Paepalean') ON CONFLICT ("id") DO NOTHING;;
-INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
+INSERT INTO "MasterAreaVillage" ("id", "districtId", "name") VALUES
 	('73.26.07.2001', '73.26.07', 'La''bo'''),
 	('73.26.07.2002', '73.26.07', 'Buntu La''bo'''),
 	('73.26.07.2003', '73.26.07', 'Tallung Penanian'),
@@ -87877,7 +87877,7 @@ INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
 	('94.07.03.2002', '94.07.03', 'Dubandoga'),
 	('94.07.03.2003', '94.07.03', 'Debasiga I'),
 	('94.07.03.2004', '94.07.03', 'Debasiga II') ON CONFLICT ("id") DO NOTHING;;
-INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
+INSERT INTO "MasterAreaVillage" ("id", "districtId", "name") VALUES
 	('94.07.03.2005', '94.07.03', 'Isandoga'),
 	('94.07.03.2006', '94.07.03', 'Mogalo'),
 	('94.07.03.2007', '94.07.03', 'Jae'),
@@ -91641,7 +91641,7 @@ INSERT INTO "Master_Area_Village" ("id", "districtId", "name") VALUES
 	('96.71.10.1003', '96.71.10', 'Saoka'),
 	('96.71.10.1004', '96.71.10', 'Tanjung Kasuari') ON CONFLICT ("id") DO NOTHING;;
 
-/*!40000 ALTER TABLE "Master_Area_Village" ENABLE KEYS */;
+/*!40000 ALTER TABLE "MasterAreaVillage" ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;

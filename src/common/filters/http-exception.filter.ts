@@ -27,6 +27,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getResponse()
         : 'Internal server error';
 
+    console.log(exception);
+
     dayjs.extend(utc);
     dayjs.extend(timezone);
 

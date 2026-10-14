@@ -26,7 +26,7 @@ export class SurveyScoringItemDto {
 export class CreateHousingDamageAssessmentDto {
   @ApiProperty({
     example: 1,
-    description: 'ID Housing_Assessment_Part yang disurvei',
+    description: 'ID HousingAssessmentPart yang disurvei',
   })
   @IsInt()
   idHousingAssessmentPart!: number;

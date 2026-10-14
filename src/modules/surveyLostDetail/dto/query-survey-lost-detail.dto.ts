@@ -21,7 +21,7 @@ export class QuerySurveyLostDetailDto extends QueryDefaultDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  lostAssessmentId?: number;
+  lossAssessmentId?: number;
 
   @ApiPropertyOptional({
     enum: DurationUnit,

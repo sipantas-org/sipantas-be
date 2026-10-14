@@ -38,12 +38,8 @@ async function seedRootAdmin() {
   console.log(`Root admin siap: ${ROOT_ADMIN.email}`);
 }
 
-async function main() {
-  await seedRootAdmin();
-
-  console.log('Memulai seeding dari file SQL mentah...\n');
-
-  const sqlPath = path.join('src/prisma/data', 'wilayah.sql');
+async function executeSqlFile(fileName: string) {
+  const sqlPath = path.join('src/prisma/data', fileName);
 
   if (!fs.existsSync(sqlPath)) {
     throw new Error(`File SQL tidak ditemukan di path: ${sqlPath}`);
@@ -53,17 +49,33 @@ async function main() {
   const sqlContent = fs.readFileSync(sqlPath, 'utf-8');
 
   if (!sqlContent.trim()) {
-    console.warn('File SQL kosong, tidak ada query yang dieksekusi.');
+    console.warn(
+      `File SQL ${fileName} kosong, tidak ada query yang dieksekusi.`,
+    );
     return;
   }
 
-  console.log('Mengirim query SQL ke PostgreSQL...');
+  console.log(`Mengirim query SQL (${fileName}) ke PostgreSQL...`);
   const startTime = Date.now();
 
   await prisma.$executeRawUnsafe(sqlContent);
 
   const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-  console.log(`\nSeeding berhasil diselesaikan dalam ${duration} detik!`);
+  console.log(`Seeding ${fileName} selesai dalam ${duration} detik!\n`);
+}
+
+async function main() {
+  const totalStartTime = Date.now();
+
+  await seedRootAdmin();
+
+  console.log('Memulai seeding dari file SQL mentah...\n');
+  await executeSqlFile('wilayah.sql');
+  await executeSqlFile('master-data.sql');
+
+  const totalDuration = ((Date.now() - totalStartTime) / 1000).toFixed(2);
+  console.log('Semua proses seeding berhasil diselesaikan!');
+  console.log(`Total durasi seeding: ${totalDuration} detik.`);
 }
 
 main()

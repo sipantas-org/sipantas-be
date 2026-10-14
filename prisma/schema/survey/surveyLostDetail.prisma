@@ -7,12 +7,14 @@ enum DurationUnit {
 model SurveyLostDetail {
   surveyLostDetailId   Int          @id @default(autoincrement())
   surveyId Int
-  lostAssessmentId Int
+  lossAssessmentId Int
   totalUnit Int
-  unitPrice Decimal
+  unitPrice Decimal @db.Decimal(15, 2)
   duration Int
   durationUnit DurationUnit
   description String
+
+  LossAssessment LossAssessment @relation(fields: [lossAssessmentId], references: [lossAssessmentId])
 
    @@map("SurveyLostDetail")
 }

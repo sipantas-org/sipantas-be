@@ -5,6 +5,7 @@ model SurveyHousingDetail {
   totalUnit Int
   score Int
 
+  HousingDamageAssessment HousingDamageAssessment @relation(fields: [housingDamageAssessmentId], references: [housingDamageAssessmentId])
 
    @@map("SurveyHousingDetail")
 }

@@ -1,4 +1,5 @@
 enum DamageLevel {
+  TMK @map("Tidak Masuk Kategori")
   Ringan
   Sedang
   Berat
@@ -49,9 +50,9 @@ model Survey {
   volume String
   volumeUnit String
   volumeUnitOther String
-  totalPriceUnit Decimal
-  totalPriceFurniture Decimal
-  totalScore Decimal
+  totalPriceUnit Decimal @db.Decimal(15, 2)
+  totalPriceFurniture Decimal @db.Decimal(15, 2)
+  totalScore Decimal @db.Decimal(15, 2)
 
   createdAt        DateTime             @default(now()) @db.Timestamptz
   updatedAt        DateTime             @updatedAt @db.Timestamptz

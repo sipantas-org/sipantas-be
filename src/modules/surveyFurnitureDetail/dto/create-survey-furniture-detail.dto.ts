@@ -3,11 +3,6 @@ import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { DamageCategory } from '../../../generated/prisma/enums.js';
 
 export class CreateSurveyFurnitureDetailDto {
-  @ApiProperty({ description: 'Survey ID' })
-  @IsInt()
-  @IsNotEmpty()
-  surveyId: number;
-
   @ApiProperty({ description: 'Name of the furniture item' })
   @IsString()
   @IsNotEmpty()

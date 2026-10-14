@@ -3,15 +3,10 @@ import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { DurationUnit } from '../../../generated/prisma/enums.js';
 
 export class CreateSurveyLostDetailDto {
-  @ApiProperty({ description: 'Survey ID', example: 1 })
-  @IsInt()
-  @IsNotEmpty()
-  surveyId: number;
-
   @ApiProperty({ description: 'Lost Assessment ID', example: 1 })
   @IsInt()
   @IsNotEmpty()
-  lostAssessmentId: number;
+  lossAssessmentId: number;
 
   @ApiProperty({ description: 'Total units', example: 2 })
   @IsInt()

@@ -15,6 +15,8 @@ model LossAssessment {
   lossAssessmentStatus  LossAssessmentStatus
   createdAt           DateTime                 @default(now()) @db.Timestamptz
   updatedAt           DateTime                 @updatedAt @db.Timestamptz
+  SurveyLostDetail SurveyLostDetail[]
+
 
   @@map("LossAssessment")
 }

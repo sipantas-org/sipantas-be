@@ -10,8 +10,8 @@ model SurveyFurnitureDetail {
   furnitureName String
   damageCategory DamageCategory
   quantity Int
-  unitPrice Decimal
-  totalPrice Decimal
+  unitPrice Decimal @db.Decimal(15, 2)
+  totalPrice Decimal @db.Decimal(15, 2)
   description String
 
 

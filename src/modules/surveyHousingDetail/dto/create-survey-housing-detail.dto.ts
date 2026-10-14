@@ -2,11 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsNotEmpty } from 'class-validator';
 
 export class CreateSurveyHousingDetailDto {
-  @ApiProperty({ description: 'Survey ID', example: 1 })
-  @IsInt()
-  @IsNotEmpty()
-  surveyId: number;
-
   @ApiProperty({ description: 'Housing Damage Assessment ID', example: 1 })
   @IsInt()
   @IsNotEmpty()

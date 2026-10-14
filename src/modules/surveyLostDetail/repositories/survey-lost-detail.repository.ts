@@ -20,7 +20,7 @@ export class SurveyLostDetailRepository {
     const limit = Number(query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const { search, surveyId, lostAssessmentId, durationUnit } = query;
+    const { search, surveyId, lossAssessmentId, durationUnit } = query;
 
     const where: Prisma.SurveyLostDetailWhereInput = {};
 
@@ -32,8 +32,8 @@ export class SurveyLostDetailRepository {
       where.surveyId = surveyId;
     }
 
-    if (lostAssessmentId) {
-      where.lostAssessmentId = lostAssessmentId;
+    if (lossAssessmentId) {
+      where.lossAssessmentId = lossAssessmentId;
     }
 
     if (durationUnit) {

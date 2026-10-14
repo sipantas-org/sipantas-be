@@ -16,6 +16,8 @@ import { SectorModule } from './modules/sector/sector.module.js';
 import { SurveyFurnitureDetailModule } from './modules/surveyFurnitureDetail/survey-furniture-detail.module.js';
 import { SurveyHousingDetailModule } from './modules/surveyHousingDetail/survey-housing-detail.module.js';
 import { SurveyLostDetailModule } from './modules/surveyLostDetail/survey-lost-detail.module.js';
+import { SurveyModule } from './modules/survey/survey.module.js';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -33,6 +35,7 @@ import { SurveyLostDetailModule } from './modules/surveyLostDetail/survey-lost-d
     SurveyFurnitureDetailModule,
     SurveyHousingDetailModule,
     SurveyLostDetailModule,
+    SurveyModule,
   ],
   controllers: [
     AppController, // <-- Pastikan AppController terdaftar di sini

@@ -26,6 +26,9 @@ import { RegisterSurveyorDto } from './dto/register-surveyor.dto.js';
 import { ApproveSurveyorDto } from './dto/approve-surveyor.dto.js';
 import { RegisterAdminDto } from './dto/register-admin.dto.js';
 import { ListSurveyorDto } from './dto/list-surveyor.dto.js';
+import { UpdateSurveyorProfileDto } from './dto/update-surveyor-profile.dto.js';
+import { UpdateAdminProfileDto } from './dto/update-admin-profile.dto.js';
+import { UpdateSurveyorStatusDto } from './dto/update-surveyor-status.dto.js';
 import {
   ApprovalUserResponseDto,
   UserAdminResponseDto,
@@ -222,6 +225,128 @@ export class AuthService {
     });
 
     return this.toResponse(ApprovalUserResponseDto, approval);
+  }
+
+  async getSurveyorById(id: number) {
+    const surveyor = await this.userSurveyorRepository.findById(id);
+    if (!surveyor) {
+      throw new NotFoundException('Surveyor not found');
+    }
+    return this.toResponse(UserSurveyorResponseDto, surveyor);
+  }
+
+  async getProfile(user: JwtPayload) {
+    if (user.userType === 'admin') {
+      const admin = await this.prisma.userAdmin.findUnique({
+        where: { adminId: user.sub },
+      });
+      if (!admin) {
+        throw new NotFoundException('Admin not found');
+      }
+      return this.toResponse(UserAdminResponseDto, admin);
+    }
+
+    if (user.userType === 'surveyor') {
+      const surveyor = await this.userSurveyorRepository.findById(user.sub);
+      if (!surveyor) {
+        throw new NotFoundException('Surveyor not found');
+      }
+      return this.toResponse(UserSurveyorResponseDto, surveyor);
+    }
+
+    throw new UnauthorizedException('Unknown user type');
+  }
+
+  async updateSurveyorProfile(user: JwtPayload, dto: UpdateSurveyorProfileDto) {
+    if (user.userType !== 'surveyor') {
+      throw new ForbiddenException(
+        'Only surveyors can update surveyor profile',
+      );
+    }
+
+    const surveyor = await this.userSurveyorRepository.findById(user.sub);
+    if (!surveyor) {
+      throw new NotFoundException('Surveyor not found');
+    }
+
+    if (dto.email && dto.email !== surveyor.email) {
+      const existing = await this.prisma.userSurveyor.findUnique({
+        where: { email: dto.email },
+      });
+      if (existing) {
+        throw new ConflictException('Email already in use');
+      }
+    }
+
+    const passwordHash = dto.password
+      ? await bcrypt.hash(dto.password, SALT_ROUNDS)
+      : undefined;
+
+    const updated = await this.prisma.userSurveyor.update({
+      where: { surveyorId: user.sub },
+      data: {
+        ...(dto.nomorHp !== undefined ? { phoneNumber: dto.nomorHp } : {}),
+        ...(dto.email !== undefined ? { email: dto.email } : {}),
+        ...(passwordHash !== undefined ? { password: passwordHash } : {}),
+        ...(dto.idProvince !== undefined
+          ? { provinceId: String(dto.idProvince) }
+          : {}),
+        ...(dto.idCity !== undefined ? { regencyId: String(dto.idCity) } : {}),
+      },
+    });
+
+    return this.toResponse(UserSurveyorResponseDto, updated);
+  }
+
+  async updateSurveyorStatus(id: number, dto: UpdateSurveyorStatusDto) {
+    const surveyor = await this.userSurveyorRepository.findById(id);
+    if (!surveyor) {
+      throw new NotFoundException('Surveyor not found');
+    }
+
+    const updated = await this.prisma.userSurveyor.update({
+      where: { surveyorId: id },
+      data: { status: dto.status },
+    });
+
+    return this.toResponse(UserSurveyorResponseDto, updated);
+  }
+
+  async updateAdminProfile(user: JwtPayload, dto: UpdateAdminProfileDto) {
+    if (user.userType !== 'admin') {
+      throw new ForbiddenException('Only admins can update admin profile');
+    }
+
+    const admin = await this.prisma.userAdmin.findUnique({
+      where: { adminId: user.sub },
+    });
+    if (!admin) {
+      throw new NotFoundException('Admin not found');
+    }
+
+    if (dto.email && dto.email !== admin.email) {
+      const existing = await this.prisma.userAdmin.findUnique({
+        where: { email: dto.email },
+      });
+      if (existing) {
+        throw new ConflictException('Email already in use');
+      }
+    }
+
+    const passwordHash = dto.password
+      ? await bcrypt.hash(dto.password, SALT_ROUNDS)
+      : undefined;
+
+    const updated = await this.prisma.userAdmin.update({
+      where: { adminId: user.sub },
+      data: {
+        ...(dto.nomorHp !== undefined ? { phoneNumber: dto.nomorHp } : {}),
+        ...(dto.email !== undefined ? { email: dto.email } : {}),
+        ...(passwordHash !== undefined ? { password: passwordHash } : {}),
+      },
+    });
+
+    return this.toResponse(UserAdminResponseDto, updated);
   }
 
   private recordLogin(

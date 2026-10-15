@@ -17,6 +17,9 @@ import { RegisterSurveyorDto } from './dto/register-surveyor.dto.js';
 import { ApproveSurveyorDto } from './dto/approve-surveyor.dto.js';
 import { RegisterAdminDto } from './dto/register-admin.dto.js';
 import { ListSurveyorDto } from './dto/list-surveyor.dto.js';
+import { UpdateSurveyorProfileDto } from './dto/update-surveyor-profile.dto.js';
+import { UpdateAdminProfileDto } from './dto/update-admin-profile.dto.js';
+import { UpdateSurveyorStatusDto } from './dto/update-surveyor-status.dto.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
@@ -55,6 +58,47 @@ export class AuthController {
   @AdminRoles(AdminRole.Administrator)
   listSurveyors(@Query() query: ListSurveyorDto) {
     return this.authService.listSurveyors(query);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getProfile(@CurrentUser() user: JwtPayload) {
+    return this.authService.getProfile(user);
+  }
+
+  @Patch('admin/profile')
+  @UseGuards(JwtAuthGuard)
+  updateAdminProfile(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: UpdateAdminProfileDto,
+  ) {
+    return this.authService.updateAdminProfile(user, dto);
+  }
+
+  @Patch('surveyor/profile')
+  @UseGuards(JwtAuthGuard)
+  updateSurveyorProfile(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: UpdateSurveyorProfileDto,
+  ) {
+    return this.authService.updateSurveyorProfile(user, dto);
+  }
+
+  @Get('surveyor/:id')
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
+  getSurveyorById(@Param('id', ParseIntPipe) id: number) {
+    return this.authService.getSurveyorById(id);
+  }
+
+  @Patch('surveyor/:id/status')
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
+  updateSurveyorStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateSurveyorStatusDto,
+  ) {
+    return this.authService.updateSurveyorStatus(id, dto);
   }
 
   @Post('surveyor/login')

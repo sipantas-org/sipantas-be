@@ -26,7 +26,7 @@ import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('auth')
 @ApiBearerAuth('access-token')
@@ -35,6 +35,11 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('admin/login')
+  @ApiOperation({
+    summary: 'Login Admin',
+    description:
+      'Endpoint untuk melakukan autentikasi dan login akun administrator',
+  })
   loginAdmin(
     @Body() dto: LoginDto,
     @Ip() ip: string,
@@ -49,6 +54,11 @@ export class AuthController {
   @Post('admin/register')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
+  @ApiOperation({
+    summary: 'Registrasi Admin Baru',
+    description:
+      'Endpoint untuk mendaftarkan akun admin baru oleh administrator',
+  })
   registerAdmin(@Body() dto: RegisterAdminDto) {
     return this.authService.registerAdmin(dto);
   }
@@ -56,18 +66,32 @@ export class AuthController {
   @Get('surveyor')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
+  @ApiOperation({
+    summary: 'Daftar Surveyor',
+    description:
+      'Mengambil daftar surveyor secara terpaginasi dengan filter status untuk administrator',
+  })
   listSurveyors(@Query() query: ListSurveyorDto) {
     return this.authService.listSurveyors(query);
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Profil User Login',
+    description: 'Mengambil data profil pengguna yang sedang login',
+  })
   getProfile(@CurrentUser() user: JwtPayload) {
     return this.authService.getProfile(user);
   }
 
   @Patch('admin/profile')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Perbarui Profil Admin',
+    description:
+      'Memperbarui nomor telepon, email, atau password untuk akun admin yang sedang login',
+  })
   updateAdminProfile(
     @CurrentUser() user: JwtPayload,
     @Body() dto: UpdateAdminProfileDto,
@@ -77,6 +101,11 @@ export class AuthController {
 
   @Patch('surveyor/profile')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Perbarui Profil Surveyor',
+    description:
+      'Memperbarui nomor telepon, email, password, provinsi, atau kabupaten/kota untuk akun surveyor yang sedang login',
+  })
   updateSurveyorProfile(
     @CurrentUser() user: JwtPayload,
     @Body() dto: UpdateSurveyorProfileDto,
@@ -87,6 +116,11 @@ export class AuthController {
   @Get('surveyor/:id')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
+  @ApiOperation({
+    summary: 'Detail Surveyor',
+    description:
+      'Mengambil data detail akun surveyor berdasarkan ID surveyor (khusus administrator)',
+  })
   getSurveyorById(@Param('id', ParseIntPipe) id: number) {
     return this.authService.getSurveyorById(id);
   }
@@ -94,6 +128,11 @@ export class AuthController {
   @Patch('surveyor/:id/status')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
+  @ApiOperation({
+    summary: 'Perbarui Status Akun Surveyor',
+    description:
+      'Mengubah status akun surveyor (Active atau Inactive) oleh administrator',
+  })
   updateSurveyorStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateSurveyorStatusDto,
@@ -102,6 +141,10 @@ export class AuthController {
   }
 
   @Post('surveyor/login')
+  @ApiOperation({
+    summary: 'Login Surveyor',
+    description: 'Endpoint untuk melakukan autentikasi dan login akun surveyor',
+  })
   loginSurveyor(
     @Body() dto: LoginDto,
     @Ip() ip: string,
@@ -114,6 +157,11 @@ export class AuthController {
   }
 
   @Post('surveyor/register')
+  @ApiOperation({
+    summary: 'Registrasi Surveyor Baru',
+    description:
+      'Endpoint publik untuk pendaftaran akun surveyor baru dengan status pending',
+  })
   registerSurveyor(@Body() dto: RegisterSurveyorDto) {
     return this.authService.registerSurveyor(dto);
   }
@@ -121,6 +169,11 @@ export class AuthController {
   @Patch('surveyor/:id/approval')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
+  @ApiOperation({
+    summary: 'Persetujuan Registrasi Surveyor',
+    description:
+      'Menyetujui (Approved) atau menolak (Rejected) pendaftaran surveyor oleh administrator',
+  })
   approveSurveyor(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ApproveSurveyorDto,

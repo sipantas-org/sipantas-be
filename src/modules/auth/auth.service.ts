@@ -74,17 +74,22 @@ export class AuthService {
       throw new ForbiddenException('Account is not active');
     }
 
-    await this.recordLogin(meta, LoginStatus.Success, {
-      adminId: admin.adminId,
-    });
-    await this.userAdminRepository.updateLastLogin(admin.adminId, new Date());
-
     const accessToken = await this.jwtService.signAsync({
       sub: admin.adminId,
       email: admin.email,
       userType: 'admin',
       role: admin.role,
     });
+
+    await this.recordLogin(
+      meta,
+      LoginStatus.Success,
+      {
+        adminId: admin.adminId,
+      },
+      await bcrypt.hash(accessToken, SALT_ROUNDS),
+    );
+    await this.userAdminRepository.updateLastLogin(admin.adminId, new Date());
 
     return {
       accessToken,
@@ -112,19 +117,24 @@ export class AuthService {
       throw new ForbiddenException('Account is not active');
     }
 
-    await this.recordLogin(meta, LoginStatus.Success, {
-      userId: surveyor.surveyorId,
-    });
-    await this.userSurveyorRepository.updateLastLogin(
-      surveyor.surveyorId,
-      new Date(),
-    );
-
     const accessToken = await this.jwtService.signAsync({
       sub: surveyor.surveyorId,
       email: surveyor.email,
       userType: 'surveyor',
     });
+
+    await this.recordLogin(
+      meta,
+      LoginStatus.Success,
+      {
+        userId: surveyor.surveyorId,
+      },
+      await bcrypt.hash(accessToken, SALT_ROUNDS),
+    );
+    await this.userSurveyorRepository.updateLastLogin(
+      surveyor.surveyorId,
+      new Date(),
+    );
 
     return {
       accessToken,
@@ -353,12 +363,14 @@ export class AuthService {
     meta: LoginMeta,
     status: LoginStatus,
     actor: Pick<Prisma.LoginHistoryUncheckedCreateInput, 'adminId' | 'userId'>,
+    token?: string | null,
   ) {
     return this.loginHistoryRepository.create({
       ...actor,
       ipAddress: meta.ipAddress,
       deviceInfo: meta.deviceInfo ?? null,
       statusLogin: status,
+      token: token ?? '',
     });
   }
 

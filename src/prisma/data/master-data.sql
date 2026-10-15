@@ -32,30 +32,61 @@ SET "sectorName" = EXCLUDED."sectorName",
     "updatedAt" = NOW();
 
 -- 2. HOUSING ASSESSMENT PART (Komponen Rumah yang Dinilai)
-INSERT INTO "HousingAssessmentPart" ("housingAssessmentPartId", "partName", "partStatus", "createdAt", "updatedAt")
+INSERT INTO "HousingAssessmentPart" (
+    "housingAssessmentPartId", 
+    "partName", 
+    "partStatus", 
+    "createdAt", 
+    "updatedAt"
+)
 VALUES
-  (1, 'Pondasi', 'Active', NOW(), NOW()),
-  (2, 'Struktur (Kolom dan Balok)', 'Active', NOW(), NOW()),
-  (3, 'Dinding Pengisi', 'Active', NOW(), NOW()),
-  (4, 'Rangka Atap (Kuda-Kuda dan Gording)', 'Active', NOW(), NOW()),
-  (5, 'Penutup Atap', 'Active', NOW(), NOW()),
-  (6, 'Lantai', 'Active', NOW(), NOW()),
-  (7, 'Pintu, Jendela, dan Ventilasi', 'Active', NOW(), NOW())
+    (1, 'Pondasi/Sloof', 'Active', NOW(), NOW()),
+    (2, 'Kolom/Balok', 'Active', NOW(), NOW()),
+    (3, 'Rangka Atap/Kuda-Kuda', 'Active', NOW(), NOW()),
+    (4, 'Penutup Atap', 'Active', NOW(), NOW()),
+    (5, 'Dinding', 'Active', NOW(), NOW()),
+    (6, 'Lantai', 'Active', NOW(), NOW())
 ON CONFLICT ("housingAssessmentPartId") DO UPDATE 
 SET "partName" = EXCLUDED."partName",
     "partStatus" = EXCLUDED."partStatus",
     "updatedAt" = NOW();
 
 -- 3. HOUSING DAMAGE ASSESSMENT (Parameter & Pertanyaan Kerusakan Perumahan)
-INSERT INTO "HousingDamageAssessment" ("housingDamageAssessmentId", "housingAssessmentPartId", "surveyDamageQuestion", "surveyScoring", "housingDamageAssessmentStatus", "createdAt", "updatedAt")
+INSERT INTO "HousingDamageAssessment" (
+  "housingDamageAssessmentId",
+  "housingAssessmentPartId",
+  "surveyDamageQuestion",
+  "surveyScoring",
+  "housingDamageAssessmentStatus",
+  "createdAt",
+  "updatedAt"
+)
 VALUES
-  (1, 1, 'Apakah pondasi bangunan mengalami keretakan struktural, amblas, atau pergeseran posisi tanah?', '[{"total": 10, "score": 10}, {"total": 10, "score": 6}, {"total": 10, "score": 3}]'::jsonb, 'Active', NOW(), NOW()),
-  (2, 2, 'Bagaimana kondisi fisik kolom utama dan balok penopang struktur bangunan?', '[{"total": 15, "score": 15}, {"total": 15, "score": 8}, {"total": 15, "score": 4}]'::jsonb, 'Active', NOW(), NOW()),
-  (3, 3, 'Apakah dinding pengisi mengalami keretakan tembus, miring, atau roboh sebagian?', '[{"total": 15, "score": 15}, {"total": 15, "score": 9}, {"total": 15, "score": 3}]'::jsonb, 'Active', NOW(), NOW()),
-  (4, 4, 'Apakah struktur rangka atap / kuda-kuda kayu/baja ringan patah atau lepas dari tumpuannya?', '[{"total": 15, "score": 15}, {"total": 15, "score": 8}, {"total": 15, "score": 4}]'::jsonb, 'Active', NOW(), NOW()),
-  (5, 5, 'Berapa persen penutup atap (genteng, asbes, seng) yang terlepas atau hancur?', '[{"total": 10, "score": 10}, {"total": 10, "score": 5}, {"total": 10, "score": 2}]'::jsonb, 'Active', NOW(), NOW()),
-  (6, 6, 'Apakah permukaan lantai retak parah, amblas, atau tertutup material sedimentasi tebal?', '[{"total": 10, "score": 10}, {"total": 10, "score": 6}, {"total": 10, "score": 2}]'::jsonb, 'Active', NOW(), NOW()),
-  (7, 7, 'Bagaimana kondisi fungsional daun pintu, jendela, dan kusen penutup akses ruangan?', '[{"total": 10, "score": 10}, {"total": 10, "score": 5}, {"total": 10, "score": 2}]'::jsonb, 'Active', NOW(), NOW())
+  -- 1. Pondasi/Sloof (housingAssessmentPartId: 1)
+  (1, 1, 'Retak terlihat jelas pada permukaan beton (lebar retakan kira-kira 1 - 2 mm)', '[{"total": "1", "score": 3}, {"total": "2", "score": 4}, {"total": "≥ 3", "score": 5}]'::jsonb, 'Active', NOW(), NOW()),
+  (2, 1, 'Kehancuran beton yang sangat nyata dengan tulangan beton terlihat', '[{"total": "1", "score": 5}, {"total": "2", "score": 8}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (3, 1, 'Penurunan dan atau Pondasi hancur', '[{"total": "1", "score": 11}, {"total": "2", "score": 14}, {"total": "≥ 3", "score": 15}]'::jsonb, 'Active', NOW(), NOW()),
+
+  -- 2. Kolom/Balok (housingAssessmentPartId: 2)
+  (4, 2, 'Retak rambut terlihat jelas pada permukaan beton (lebar retakan kira-kira 0,2 - 1 mm)', '[{"total": "1", "score": 7}, {"total": "2", "score": 9}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (5, 2, 'Retakan yang sangat jelas (lebar retakan kira-kira 1 - 2 mm)', '[{"total": "1", "score": 7}, {"total": "2", "score": 9}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (6, 2, 'Kehancuran beton, tulangan tertekuk dan atau deformasi pada kolom dapat terlihat', '[{"total": "1", "score": 12}, {"total": "2", "score": 26}, {"total": "≥ 3", "score": 35}]'::jsonb, 'Active', NOW(), NOW()),
+
+  -- 3. Rangka Atap/Kuda-Kuda (housingAssessmentPartId: 3)
+  (7, 3, 'Reng dan atau usuk hancur sebagian atau seluruh', '[{"total": "1", "score": 3}, {"total": "2", "score": 5}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (8, 3, 'Kuda-kuda roboh sebagian atau seluruh', '[{"total": "1", "score": 11}, {"total": "2", "score": 14}, {"total": "≥ 3", "score": 15}]'::jsonb, 'Active', NOW(), NOW()),
+
+  -- 4. Penutup Atap (housingAssessmentPartId: 4)
+  (9, 4, 'Berjatuhan menyebar sebagian atau seluruh', '[{"total": "1", "score": 5}, {"total": "≥ 2", "score": 10}]'::jsonb, 'Active', NOW(), NOW()),
+
+  -- 5. Dinding (housingAssessmentPartId: 5)
+  (10, 5, 'Plesteran dan atau terkelupas', '[{"total": "1", "score": 3}, {"total": "2", "score": 4}, {"total": "≥ 3", "score": 5}]'::jsonb, 'Active', NOW(), NOW()),
+  (11, 5, 'Retakan dapat terlihat jelas, tembus pada pasangan batu', '[{"total": "1", "score": 5}, {"total": "2", "score": 8}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (12, 5, 'Dinding jatuh sebagian atau menyeluruh', '[{"total": "1", "score": 11}, {"total": "2", "score": 14}, {"total": "≥ 3", "score": 15}]'::jsonb, 'Active', NOW(), NOW()),
+
+  -- 6. Lantai (housingAssessmentPartId: 6)
+  (13, 6, 'Retak rambut menyebar sebagian atau seluruh', '[{"total": "1", "score": 2}, {"total": "≥ 3", "score": 3}]'::jsonb, 'Active', NOW(), NOW()),
+  (14, 6, 'Retak besar/terbelah/hancur menyebar sebagian atau seluruh', '[{"total": "1", "score": 8}, {"total": "2", "score": 9}, {"total": "≥ 3", "score": 10}]'::jsonb, 'Active', NOW(), NOW())
 ON CONFLICT ("housingDamageAssessmentId") DO UPDATE 
 SET "surveyDamageQuestion" = EXCLUDED."surveyDamageQuestion",
     "surveyScoring" = EXCLUDED."surveyScoring",
@@ -63,13 +94,27 @@ SET "surveyDamageQuestion" = EXCLUDED."surveyDamageQuestion",
     "updatedAt" = NOW();
 
 -- 4. LOSS ASSESSMENT (Parameter Penilaian Kerugian Dampak Bencana)
-INSERT INTO "LossAssessment" ("lossAssessmentId", "typeOfLoss", "surveyLossQuestion", "lossAssessmentStatus", "createdAt", "updatedAt")
+INSERT INTO "LossAssessment" (
+  "lossAssessmentId", 
+  "typeOfLoss", 
+  "surveyLossQuestion", 
+  "lossAssessmentStatus", 
+  "createdAt", 
+  "updatedAt"
+)
 VALUES
-  (1, 'additional_cost', 'Berapa perkiraan biaya pengeluaran tambahan untuk sewa hunian sementara bagi keluarga korban?', 'Active', NOW(), NOW()),
-  (2, 'additional_cost', 'Berapa estimasi biaya operasional pembersihan material lumpur, puing-puing, dan sanitasi darurat?', 'Active', NOW(), NOW()),
-  (3, 'additional_cost', 'Berapa biaya pengadaan suplai air bersih, penerangan darurat/genset selama masa tanggap darurat?', 'Active', NOW(), NOW()),
-  (4, 'income_lost', 'Berapa taksiran hilangnya potensi pendapatan harian usaha UMKM / perdagangan selama lokasi belum beroperasi?', 'Active', NOW(), NOW()),
-  (5, 'income_lost', 'Berapa estimasi nilai kerugian ekonomi atas gagal panen lahan pertanian / tambak perikanan?', 'Active', NOW(), NOW())
+  -- Penambahan biaya yang terjadi akibat bencana (additional_cost)
+  (1, 'additional_cost', 'Sewa alat untuk pembersihan puing', 'Active', NOW(), NOW()), 
+  (2, 'additional_cost', 'Tenaga kerja untuk pembersihan puing', 'Active', NOW(), NOW()), 
+  (3, 'additional_cost', 'Biaya penanganan sementara', 'Active', NOW(), NOW()), 
+  (4, 'additional_cost', 'Biaya peningkatan bahan bakar', 'Active', NOW(), NOW()), 
+  (5, 'additional_cost', 'Biaya lainnya', 'Active', NOW(), NOW()), 
+
+  -- Kehilangan pendapatan/potensi pendapatan yang terjadi akibat bencana (income_lost)
+  (6, 'income_lost', 'Pendapatan individu atau rumah tangga', 'Active', NOW(), NOW()), 
+  (7, 'income_lost', 'Pendapatan usaha perorangan', 'Active', NOW(), NOW()), 
+  (8, 'income_lost', 'Pendapatan badan usaha atau organisasi', 'Active', NOW(), NOW()), 
+  (9, 'income_lost', 'Pendapatan lainnya', 'Active', NOW(), NOW())
 ON CONFLICT ("lossAssessmentId") DO UPDATE 
 SET "typeOfLoss" = EXCLUDED."typeOfLoss",
     "surveyLossQuestion" = EXCLUDED."surveyLossQuestion",

@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SurveyRepository } from './repositories/survey.repository.js';
+import { PrismaService } from '../../prisma/prisma.service.js';
 import { CreateSurveyDto } from './dto/create-survey.dto.js';
 import { UpdateSurveyDto } from './dto/update-survey.dto.js';
 import type { Prisma } from '../../generated/prisma/client.js';
@@ -8,7 +13,10 @@ import { DamageLevel } from '../../generated/prisma/enums.js';
 
 @Injectable()
 export class SurveyService {
-  constructor(private readonly surveyRepository: SurveyRepository) {}
+  constructor(
+    private readonly surveyRepository: SurveyRepository,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async create(dto: CreateSurveyDto) {
     const {
@@ -22,6 +30,8 @@ export class SurveyService {
       lostDetails,
       ...rest
     } = dto;
+
+    await this.validateUniqueHousingAssessmentParts(housingDetails);
 
     const totalHousingScore =
       housingDetails && housingDetails.length > 0
@@ -118,6 +128,10 @@ export class SurveyService {
       ...rest
     } = dto;
 
+    if (housingDetails !== undefined) {
+      await this.validateUniqueHousingAssessmentParts(housingDetails);
+    }
+
     const data: Prisma.SurveyUpdateInput = {
       ...rest,
       ...(volumeUnitOther !== undefined
@@ -155,5 +169,40 @@ export class SurveyService {
   async remove(id: number) {
     await this.findOne(id);
     return this.surveyRepository.delete(id);
+  }
+
+  private async validateUniqueHousingAssessmentParts(
+    housingDetails?: Array<{
+      housingDamageAssessmentId?: number;
+      housingAssessmentPartId?: number;
+    }>,
+  ) {
+    if (!housingDetails || housingDetails.length === 0) return;
+
+    const partIds: number[] = [];
+
+    for (const item of housingDetails) {
+      if (item.housingAssessmentPartId) {
+        partIds.push(item.housingAssessmentPartId);
+      } else if (item.housingDamageAssessmentId) {
+        const damageAssessment =
+          await this.prisma.housingDamageAssessment.findUnique({
+            where: {
+              housingDamageAssessmentId: item.housingDamageAssessmentId,
+            },
+            select: { housingAssessmentPartId: true },
+          });
+        if (damageAssessment?.housingAssessmentPartId) {
+          partIds.push(damageAssessment.housingAssessmentPartId);
+        }
+      }
+    }
+
+    const uniquePartIds = new Set(partIds);
+    if (uniquePartIds.size !== partIds.length) {
+      throw new BadRequestException(
+        'Setiap HousingAssessmentPart hanya boleh dinilai maksimal 1 kali dalam satu survei.',
+      );
+    }
   }
 }

@@ -23,7 +23,10 @@ import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
+@ApiBearerAuth('access-token')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

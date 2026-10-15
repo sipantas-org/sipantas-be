@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import {
   ConflictException,
   ForbiddenException,
@@ -87,7 +88,7 @@ export class AuthService {
       {
         adminId: admin.adminId,
       },
-      await bcrypt.hash(accessToken, SALT_ROUNDS),
+      this.hashToken(accessToken),
     );
     await this.userAdminRepository.updateLastLogin(admin.adminId, new Date());
 
@@ -129,7 +130,7 @@ export class AuthService {
       {
         userId: surveyor.surveyorId,
       },
-      await bcrypt.hash(accessToken, SALT_ROUNDS),
+      this.hashToken(accessToken),
     );
     await this.userSurveyorRepository.updateLastLogin(
       surveyor.surveyorId,
@@ -376,5 +377,51 @@ export class AuthService {
 
   private toResponse<T>(cls: ClassConstructor<T>, data: object): T {
     return plainToInstance(cls, data, { excludeExtraneousValues: true });
+  }
+
+  async isTokenActiveInHistory(
+    token: string,
+    payload: JwtPayload,
+  ): Promise<boolean> {
+    const hashedToken = this.hashToken(token);
+    const history = await this.prisma.loginHistory.findFirst({
+      where: {
+        token: hashedToken,
+        statusLogin: LoginStatus.Success,
+        ...(payload.userType === 'admin'
+          ? { adminId: payload.sub }
+          : { userId: payload.sub }),
+      },
+    });
+
+    if (history) {
+      return true;
+    }
+
+    // Backward compatibility fallback for logins saved with bcrypt
+    const recentLogins = await this.prisma.loginHistory.findMany({
+      where: {
+        statusLogin: LoginStatus.Success,
+        ...(payload.userType === 'admin'
+          ? { adminId: payload.sub }
+          : { userId: payload.sub }),
+      },
+      take: 5,
+    });
+
+    for (const record of recentLogins) {
+      if (
+        record.token.startsWith('$2') &&
+        (await bcrypt.compare(token, record.token))
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private hashToken(token: string): string {
+    return crypto.createHash('sha256').update(token).digest('hex');
   }
 }

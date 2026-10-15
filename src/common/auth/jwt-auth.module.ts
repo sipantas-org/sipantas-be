@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy.js';
+import { AuthModule } from '../../modules/auth/auth.module.js';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { JwtStrategy } from './jwt.strategy.js';
         },
       }),
     }),
+    forwardRef(() => AuthModule),
   ],
   providers: [JwtStrategy],
   exports: [PassportModule, JwtModule],

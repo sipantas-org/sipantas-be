@@ -11,12 +11,12 @@ const formatJakarta = ({ value }: { value: Date | null }) =>
 
 export class UserAdminResponseDto {
   @Expose({ name: 'adminId' }) id!: number;
-  @Expose({ name: 'NIP' }) nip!: string;
-  @Expose({ name: 'Nama' }) nama!: string;
+  @Expose({ name: 'nip' }) nip!: string;
+  @Expose({ name: 'nama' }) nama!: string;
   @Expose({ name: 'phoneNumber' }) nomorHp!: string;
-  @Expose({ name: 'Email' }) email!: string;
-  @Expose({ name: 'Status' }) status!: string;
-  @Expose({ name: 'Role' }) role!: string;
+  @Expose({ name: 'email' }) email!: string;
+  @Expose({ name: 'status' }) status!: string;
+  @Expose({ name: 'role' }) role!: string;
 
   @Expose({ name: 'lastLogin' })
   @Transform(formatJakarta)
@@ -33,11 +33,11 @@ export class UserAdminResponseDto {
 
 export class UserSurveyorResponseDto {
   @Expose({ name: 'surveyorId' }) id!: number;
-  @Expose({ name: 'NIP' }) nip!: string;
-  @Expose({ name: 'Nama' }) nama!: string;
+  @Expose({ name: 'nip' }) nip!: string;
+  @Expose({ name: 'nama' }) nama!: string;
   @Expose({ name: 'phoneNumber' }) nomorHp!: string;
-  @Expose({ name: 'Email' }) email!: string;
-  @Expose({ name: 'Status' }) status!: string;
+  @Expose({ name: 'email' }) email!: string;
+  @Expose({ name: 'status' }) status!: string;
   @Expose({ name: 'provinceId' }) idProvince!: string;
   @Expose({ name: 'regencyId' }) idCity!: string;
 

@@ -31,7 +31,7 @@ export class ApprovalUserRepository {
           surveyorId: params.idSurveyor,
           adminId: params.idAdmin,
           statusApproval: params.status,
-          Description: params.description ?? null,
+          description: params.description ?? null,
           approvalDate: new Date(),
         },
       });

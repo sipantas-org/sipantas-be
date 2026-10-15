@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { UserAdminRepository } from './repositories/user-admin.repository.js';
@@ -9,7 +9,7 @@ import { JwtAuthModule } from '../../common/auth/jwt-auth.module.js';
 import { ActivityHistoryModule } from '../activityHistory/activity-history.module.js';
 
 @Module({
-  imports: [JwtAuthModule, ActivityHistoryModule],
+  imports: [forwardRef(() => JwtAuthModule), ActivityHistoryModule],
   controllers: [AuthController],
   providers: [
     AuthService,
@@ -18,5 +18,6 @@ import { ActivityHistoryModule } from '../activityHistory/activity-history.modul
     LoginHistoryRepository,
     ApprovalUserRepository,
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}

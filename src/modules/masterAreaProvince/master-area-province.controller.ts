@@ -12,12 +12,19 @@ import {
 import { MasterAreaProvinceService } from './master-area-province.service.js';
 import { CreateProvinceDto } from './dto/create-province.dto.js';
 import { UpdateProvinceDto } from './dto/update-province.dto.js';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
+import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
+import { AdminRole } from '../../generated/prisma/enums.js';
+import { UseGuards } from '@nestjs/common';
 
 @Controller('provinces')
 export class MasterAreaProvinceController {
   constructor(private readonly provinceService: MasterAreaProvinceService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createDto: CreateProvinceDto) {
     return this.provinceService.create(createDto);
@@ -34,11 +41,15 @@ export class MasterAreaProvinceController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   update(@Param('id') id: string, @Body() updateDto: UpdateProvinceDto) {
     return this.provinceService.update(id, updateDto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.provinceService.remove(id);

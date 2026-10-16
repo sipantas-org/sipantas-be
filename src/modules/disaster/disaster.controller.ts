@@ -16,11 +16,19 @@ import { CreateDisasterDto } from './dto/create-disaster.dto.js';
 import { UpdateDisasterDto } from './dto/update-disaster.dto.js';
 import { QueryDisasterDto } from './dto/query-disaster.dto.js';
 
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
+import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
+import { AdminRole } from '../../generated/prisma/enums.js';
+
 @Controller('disasters')
 export class DisasterController {
   constructor(private readonly disasterService: DisasterService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createDisasterDto: CreateDisasterDto) {
     return this.disasterService.create(createDisasterDto);
@@ -37,6 +45,7 @@ export class DisasterController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDisasterDto: UpdateDisasterDto,
@@ -45,6 +54,8 @@ export class DisasterController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.disasterService.remove(id);
   }

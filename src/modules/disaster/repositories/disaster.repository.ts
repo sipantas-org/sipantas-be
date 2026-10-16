@@ -7,6 +7,8 @@ import { UpdateDisasterDto } from '../dto/update-disaster.dto.js';
 import { Disaster } from '../../../generated/prisma/client.js';
 import { QueryDisasterDto } from '../dto/query-disaster.dto.js';
 import { DisasterResponseDto } from '../dto/response-disaster.dto.js';
+import { findPage } from '../../../common/utils/pagination.util.js';
+import { buildPrismaWhere } from '../../../common/utils/filter-data.util.js';
 
 @Injectable()
 export class DisasterRepository {
@@ -19,21 +21,19 @@ export class DisasterRepository {
   }
 
   async findAll(query: QueryDisasterDto) {
-    const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 10;
+    const page = Number(query.page ?? 1);
+    const limit = Number(query.limit ?? 10);
     const skip = (page - 1) * limit;
 
-    const {
-      search,
-      disasterStatus,
-      disasterCode,
-      disasterName,
-      disasterCategory,
-    } = query;
+    const { search, ...filterQuery } = query;
 
-    const where: Prisma.DisasterWhereInput = {};
+    const where = buildPrismaWhere<
+      typeof filterQuery,
+      Prisma.DisasterWhereInput
+    >(filterQuery, {
+      containsFields: ['disasterCode', 'disasterName', 'disasterCategory'],
+    });
 
-    // 2. Multi-field search using OR
     if (search) {
       where.OR = [
         { disasterCode: { contains: search, mode: 'insensitive' } },
@@ -41,50 +41,19 @@ export class DisasterRepository {
       ];
     }
 
-    if (disasterCode) {
-      where.disasterCode = { contains: disasterCode, mode: 'insensitive' };
-    }
+    const sortBy = query.sortBy ?? 'createdAt';
+    const sortOrder = query.sortOrder ?? 'desc';
 
-    if (disasterName) {
-      where.disasterName = { contains: disasterName, mode: 'insensitive' };
-    }
-
-    if (disasterCategory) {
-      where.disasterCategory = {
-        contains: disasterCategory,
-        mode: 'insensitive',
-      };
-    }
-
-    if (disasterStatus) {
-      where.disasterStatus = disasterStatus;
-    }
-
-    // 3. Query the 'disaster' delegate using the 'where' key
-    const [data, total] = await Promise.all([
-      this.prisma.disaster.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.prisma.disaster.count({ where }),
-    ]);
-
-    const formattedData = plainToInstance(DisasterResponseDto, data);
-
-    const totalPages = Math.ceil(total / limit);
+    const result = await findPage(this.prisma.disaster, {
+      where,
+      skip,
+      take: limit,
+      orderBy: { [sortBy]: sortOrder },
+    });
 
     return {
-      data: formattedData,
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-      },
+      data: plainToInstance(DisasterResponseDto, result.data),
+      pagination: result.pagination,
     };
   }
 

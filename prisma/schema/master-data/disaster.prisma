@@ -1,7 +1,6 @@
 enum DisasterStatus {
   Active
-  OnBudgeting @map("On Budgeting")
-  Completed
+  Inactive
 }
 
 model Disaster {

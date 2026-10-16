@@ -23,6 +23,7 @@ import { UpdateSurveyorStatusDto } from './dto/update-surveyor-status.dto.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
+import { SurveyorGuard } from '../../common/guards/surveyor.guard.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
@@ -65,7 +66,6 @@ export class AuthController {
 
   @Get('surveyor')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
-  @AdminRoles(AdminRole.Administrator)
   @ApiOperation({
     summary: 'Daftar Surveyor',
     description:
@@ -86,7 +86,7 @@ export class AuthController {
   }
 
   @Patch('admin/profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @ApiOperation({
     summary: 'Perbarui Profil Admin',
     description:
@@ -100,7 +100,7 @@ export class AuthController {
   }
 
   @Patch('surveyor/profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, SurveyorGuard)
   @ApiOperation({
     summary: 'Perbarui Profil Surveyor',
     description:
@@ -115,11 +115,10 @@ export class AuthController {
 
   @Get('surveyor/:id')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
-  @AdminRoles(AdminRole.Administrator)
   @ApiOperation({
     summary: 'Detail Surveyor',
     description:
-      'Mengambil data detail akun surveyor berdasarkan ID surveyor (khusus administrator)',
+      'Mengambil data detail akun surveyor berdasarkan ID surveyor (khusus admin)',
   })
   getSurveyorById(@Param('id', ParseIntPipe) id: number) {
     return this.authService.getSurveyorById(id);
@@ -127,7 +126,6 @@ export class AuthController {
 
   @Patch('surveyor/:id/status')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
-  @AdminRoles(AdminRole.Administrator)
   @ApiOperation({
     summary: 'Perbarui Status Akun Surveyor',
     description:
@@ -168,11 +166,10 @@ export class AuthController {
 
   @Patch('surveyor/:id/approval')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
-  @AdminRoles(AdminRole.Administrator)
   @ApiOperation({
     summary: 'Persetujuan Registrasi Surveyor',
     description:
-      'Menyetujui (Approved) atau menolak (Rejected) pendaftaran surveyor oleh administrator',
+      'Menyetujui (Approved) atau menolak (Rejected) pendaftaran surveyor oleh admin',
   })
   approveSurveyor(
     @Param('id', ParseIntPipe) id: number,

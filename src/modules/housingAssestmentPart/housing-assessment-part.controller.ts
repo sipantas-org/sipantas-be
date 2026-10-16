@@ -14,6 +14,12 @@ import { CreateHousingAssessmentPartDto } from './dto/create-housing-assessment-
 import { UpdateHousingAssessmentPartDto } from './dto/update-housing-assessment-part.dto.js';
 import { QueryHousingAssessmentPartDto } from './dto/query-housing-assessment-part.dto.js';
 
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
+import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
+import { AdminRole } from '../../generated/prisma/enums.js';
+import { UseGuards } from '@nestjs/common';
+
 @Controller('housing-assessment-part')
 export class HousingAssessmentPartController {
   constructor(
@@ -21,6 +27,8 @@ export class HousingAssessmentPartController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   create(@Body() createDto: CreateHousingAssessmentPartDto) {
     return this.housingAssessmentPartService.create(createDto);
   }
@@ -35,6 +43,8 @@ export class HousingAssessmentPartController {
     return this.housingAssessmentPartService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -43,6 +53,8 @@ export class HousingAssessmentPartController {
     return this.housingAssessmentPartService.update(id, updateDto);
   }
 
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.housingAssessmentPartService.remove(id);

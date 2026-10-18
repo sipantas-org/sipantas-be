@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '../../generated/prisma/client.js';
 import { ActivityHistoryRepository } from './repositories/activity-history.repository.js';
+import { RequestListActivityDto } from './dto/query-activity-history.dto.js';
 
 export interface RecordActivityInput {
   idUser?: number | null;
@@ -28,5 +29,11 @@ export class ActivityHistoryService {
       },
       tx,
     );
+  }
+
+  async findAll(query: RequestListActivityDto) {
+    const activityHistory = await this.repository.findAll(query);
+
+    return activityHistory;
   }
 }

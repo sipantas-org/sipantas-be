@@ -6,7 +6,6 @@ enum AdminStatus {
 enum AdminRole {
   Administrator
   Monitoring
-  Surveyor
 }
 
 model UserAdmin {

@@ -128,10 +128,10 @@ INSERT INTO "Disaster" (
 )
 VALUES
   (1, 'DIS-2024-CJR-001', 'Gempa Bumi Tektonik Cianjur', 'Gempa Bumi', 
-   'Gempa bumi dangkal M 5.6 yang memicu kerusakan permukiman dan tanah longsor di beberapa kecamatan.', 'Completed', NULL, NULL, NOW(), NOW()),
+   'Gempa bumi dangkal M 5.6 yang memicu kerusakan permukiman dan tanah longsor di beberapa kecamatan.', 'Inactive', NULL, NULL, NOW(), NOW()),
   
   (2, 'DIS-2024-SKB-002', 'Banjir Bandang Cicurug Sukabumi', 'Banjir Bandang', 
-   'Luapan air sungai akibat curah hujan ekstrem merusak jembatan antardesa dan puluhan rumah warga.', 'On Budgeting', NULL, NULL, NOW(), NOW()),
+   'Luapan air sungai akibat curah hujan ekstrem merusak jembatan antardesa dan puluhan rumah warga.', 'Active', NULL, NULL, NOW(), NOW()),
   
   (3, 'DIS-2024-BGR-003', 'Tanah Longsor Perbukitan Puncak', 'Tanah Longsor', 
    'Pergerakan tanah pada tebing lereng curam yang menimbun akses jalan utama dan fasilitas publik.', 'Active', NULL, NULL, NOW(), NOW()),

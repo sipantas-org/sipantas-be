@@ -1,8 +1,9 @@
 // src/housing-assessment-part/dto/query-housing-assessment-part.dto.ts
-import { IsOptional, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { Prisma } from '../../../generated/prisma/client.js';
 import { QueryDefaultDto } from '../../../dto/query-default.dto.js';
 import { PartStatus } from '../../../generated/prisma/enums.js';
-import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class QueryHousingAssessmentPartDto extends QueryDefaultDto {
   @ApiPropertyOptional({
@@ -20,4 +21,22 @@ export class QueryHousingAssessmentPartDto extends QueryDefaultDto {
   @IsOptional()
   @IsString()
   partStatus?: PartStatus;
+
+  @ApiPropertyOptional({
+    description: 'Nama field/kolom yang digunakan untuk pengurutan data',
+    enum: Prisma.HousingAssessmentPartScalarFieldEnum,
+    example: 'createdAt',
+  })
+  @IsOptional()
+  @IsEnum(Prisma.HousingAssessmentPartScalarFieldEnum)
+  sortBy?: Prisma.HousingAssessmentPartScalarFieldEnum;
+
+  @ApiPropertyOptional({
+    description: 'Arah pengurutan data',
+    enum: ['asc', 'desc'],
+    example: 'desc',
+  })
+  @IsOptional()
+  @IsString()
+  sortOrder?: 'asc' | 'desc';
 }

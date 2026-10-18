@@ -7,9 +7,9 @@ enum DamageLevel {
 
 enum SurveyStatus {
   Pending
-  Submitted
   OnComplain @map("On Complain")
   OnBudgeting @map("On Budgeting")
+  OnConstruction @map("On Construction")
   Completed
 }
 
@@ -53,6 +53,7 @@ model Survey {
   totalPriceUnit Decimal @db.Decimal(15, 2)
   totalPriceFurniture Decimal @db.Decimal(15, 2)
   totalScore Decimal @db.Decimal(15, 2)
+  sourceOfBudgetting String?
 
   createdAt        DateTime             @default(now()) @db.Timestamptz
   updatedAt        DateTime             @updatedAt @db.Timestamptz

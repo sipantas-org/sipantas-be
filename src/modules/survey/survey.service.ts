@@ -7,9 +7,10 @@ import { SurveyRepository } from './repositories/survey.repository.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { CreateSurveyDto } from './dto/create-survey.dto.js';
 import { UpdateSurveyDto } from './dto/update-survey.dto.js';
+import { UpdateSurveyStatusDto } from './dto/update-survey-status.dto.js';
 import type { Prisma } from '../../generated/prisma/client.js';
-import type { SurveyStatus } from '../../generated/prisma/enums.js';
-import { DamageLevel } from '../../generated/prisma/enums.js';
+import { DamageLevel, SurveyStatus } from '../../generated/prisma/enums.js';
+import { QuerySurveyDto } from './dto/query-survey.dto.js';
 
 @Injectable()
 export class SurveyService {
@@ -74,35 +75,9 @@ export class SurveyService {
     });
   }
 
-  async findAll(params: {
-    page?: number;
-    limit?: number;
-    status?: SurveyStatus;
-    disasterId?: number;
-  }) {
-    const page = Math.max(Number(params.page) || 1, 1);
-    const limit = Math.max(Number(params.limit) || 10, 1);
-    const skip = (page - 1) * limit;
-
-    const where: Prisma.SurveyWhereInput = {};
-    if (params.status) where.surveyStatus = params.status;
-    if (params.disasterId) where.disasterId = Number(params.disasterId);
-
-    const [data, total] = await this.surveyRepository.findPage({
-      skip,
-      take: limit,
-      where,
-    });
-
-    return {
-      data,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+  async findAll(query: QuerySurveyDto) {
+    const surveys = await this.surveyRepository.findAll(query);
+    return surveys;
   }
 
   async findOne(id: number) {
@@ -114,7 +89,12 @@ export class SurveyService {
   }
 
   async update(id: number, dto: UpdateSurveyDto) {
-    await this.findOne(id);
+    const survey = await this.findOne(id);
+    if (survey.surveyStatus !== SurveyStatus.Pending) {
+      throw new BadRequestException(
+        `Hanya survei dengan status ${SurveyStatus.Pending} yang dapat diupdate`,
+      );
+    }
 
     const {
       provinceId,
@@ -166,8 +146,67 @@ export class SurveyService {
     });
   }
 
+  async updateStatus(id: number, dto: UpdateSurveyStatusDto) {
+    const survey = await this.findOne(id);
+    const currentStatus = survey.surveyStatus;
+    const targetStatus = dto.surveyStatus;
+
+    if (
+      targetStatus === SurveyStatus.OnBudgeting &&
+      (!dto.sourceOfBudgetting || !dto.sourceOfBudgetting.trim())
+    ) {
+      throw new BadRequestException(
+        `Source of Budgetting wajib diisi ketika status diubah ke ${SurveyStatus.OnBudgeting}`,
+      );
+    }
+
+    switch (targetStatus) {
+      case SurveyStatus.OnComplain:
+      case SurveyStatus.OnBudgeting:
+        if (currentStatus !== SurveyStatus.Pending) {
+          throw new BadRequestException(
+            `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.Pending}`,
+          );
+        }
+        break;
+      case SurveyStatus.Pending:
+        if (currentStatus !== SurveyStatus.OnComplain) {
+          throw new BadRequestException(
+            `Status hanya dapat diubah ke ${SurveyStatus.Pending} jika status saat ini adalah ${SurveyStatus.OnComplain}`,
+          );
+        }
+        break;
+      case SurveyStatus.OnConstruction:
+        if (currentStatus !== SurveyStatus.OnBudgeting) {
+          throw new BadRequestException(
+            `Status hanya dapat diubah ke ${SurveyStatus.OnConstruction} jika status saat ini adalah ${SurveyStatus.OnBudgeting}`,
+          );
+        }
+        break;
+      case SurveyStatus.Completed:
+        if (currentStatus !== SurveyStatus.OnConstruction) {
+          throw new BadRequestException(
+            `Status hanya dapat diubah ke ${SurveyStatus.Completed} jika status saat ini adalah ${SurveyStatus.OnConstruction}`,
+          );
+        }
+        break;
+    }
+
+    return this.surveyRepository.update(id, {
+      surveyStatus: dto.surveyStatus,
+      ...(dto.sourceOfBudgetting !== undefined
+        ? { sourceOfBudgetting: dto.sourceOfBudgetting }
+        : {}),
+    });
+  }
+
   async remove(id: number) {
-    await this.findOne(id);
+    const survey = await this.findOne(id);
+    if (survey.surveyStatus !== SurveyStatus.Pending) {
+      throw new BadRequestException(
+        `Hanya survei dengan status ${SurveyStatus.Pending} yang dapat dihapus`,
+      );
+    }
     return this.surveyRepository.delete(id);
   }
 
@@ -201,7 +240,7 @@ export class SurveyService {
     const uniquePartIds = new Set(partIds);
     if (uniquePartIds.size !== partIds.length) {
       throw new BadRequestException(
-        'Setiap HousingAssessmentPart hanya boleh dinilai maksimal 1 kali dalam satu survei.',
+        'Setiap bagian rumah hanya boleh dinilai maksimal 1 kali dalam tiap survei.',
       );
     }
   }

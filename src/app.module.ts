@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { AppController } from './app.controller.js';
 import { AuthModule } from './modules/auth/auth.module.js';
+import { JwtAuthModule } from './common/auth/jwt-auth.module.js';
 import { DisasterModule } from './modules/disaster/disaster.module.js';
 import { HousingDamageAssessmentModule } from './modules/housingDamageAssessment/housing-damage-assessment.module.js';
 import { LossAssessmentModule } from './modules/lossAssessment/loss-assessment.module.js';
@@ -17,12 +18,15 @@ import { SurveyFurnitureDetailModule } from './modules/surveyFurnitureDetail/sur
 import { SurveyHousingDetailModule } from './modules/surveyHousingDetail/survey-housing-detail.module.js';
 import { SurveyLostDetailModule } from './modules/surveyLostDetail/survey-lost-detail.module.js';
 import { SurveyModule } from './modules/survey/survey.module.js';
+import { ActivityHistoryModule } from './modules/activityHistory/activity-history.module.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    JwtAuthModule,
     AuthModule,
+    ActivityHistoryModule,
     DisasterModule,
     HousingDamageAssessmentModule,
     LossAssessmentModule,

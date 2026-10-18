@@ -10,16 +10,17 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LossAssessmentService } from './loss-assessment.service.js';
 import { CreateLossAssessmentDto } from './dto/create-loss-assessment.dto.js';
 import { UpdateLossAssessmentDto } from './dto/update-loss-assessment.dto.js';
 import { LossAssessmentResponseDto } from './dto/response-loss-assessment.dto.js';
+
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
+import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
+import { AdminRole } from '../../generated/prisma/enums.js';
+import { UseGuards } from '@nestjs/common';
 
 @ApiTags('Loss Assessments')
 @Controller('loss-assessments')
@@ -27,6 +28,8 @@ export class LossAssessmentController {
   constructor(private readonly lossAssessmentService: LossAssessmentService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Buat data loss assessment baru' })
   @ApiResponse({
@@ -59,6 +62,8 @@ export class LossAssessmentController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   @ApiParam({ name: 'id', type: Number })
   @ApiOperation({ summary: 'Perbarui data loss assessment' })
   @ApiResponse({
@@ -73,6 +78,8 @@ export class LossAssessmentController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
+  @AdminRoles(AdminRole.Administrator)
   @ApiParam({ name: 'id', type: Number })
   @ApiOperation({ summary: 'Hapus data loss assessment' })
   @ApiResponse({

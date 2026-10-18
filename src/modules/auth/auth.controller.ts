@@ -25,6 +25,7 @@ import { UpdateAdminStatusDto } from './dto/update-admin-status.dto.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
+import { SurveyorGuard } from '../../common/guards/surveyor.guard.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
@@ -94,7 +95,7 @@ export class AuthController {
   }
 
   @Patch('admin/profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @ApiOperation({
     summary: 'Perbarui Profil Admin',
     description:
@@ -232,7 +233,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Persetujuan Registrasi Surveyor',
     description:
-      'Menyetujui (Approved) atau menolak (Rejected) pendaftaran surveyor oleh administrator',
+      'Menyetujui (Approved) atau menolak (Rejected) pendaftaran surveyor oleh admin',
   })
   @ApiResponse({ status: 200, type: ApprovalUserResponseDto })
   @ApiResponse({ status: 404, description: 'Surveyor tidak ditemukan' })

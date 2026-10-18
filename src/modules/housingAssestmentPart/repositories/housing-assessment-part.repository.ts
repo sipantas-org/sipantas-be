@@ -9,6 +9,8 @@ import { CreateHousingAssessmentPartDto } from '../dto/create-housing-assessment
 import { UpdateHousingAssessmentPartDto } from '../dto/update-housing-assessment-part.dto.js';
 import { QueryHousingAssessmentPartDto } from '../dto/query-housing-assessment-part.dto.js';
 import { HousingAssessmentPartResponseDto } from '../dto/response-housing-assessment-part.dto.js';
+import { findPage } from '../../../common/utils/pagination.util.js';
+import { buildPrismaWhere } from '../../../common/utils/filter-data.util.js';
 
 @Injectable()
 export class HousingAssessmentPartRepository {
@@ -23,53 +25,32 @@ export class HousingAssessmentPartRepository {
   }
 
   async findAll(query: QueryHousingAssessmentPartDto) {
-    const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 10;
+    const page = Number(query.page ?? 1);
+    const limit = Number(query.limit ?? 10);
     const skip = (page - 1) * limit;
 
-    const { search, partStatus, partName } = query;
+    const { search, ...filterQuery } = query;
 
-    const where: Prisma.HousingAssessmentPartWhereInput = {};
+    const where = buildPrismaWhere<
+      typeof filterQuery,
+      Prisma.HousingAssessmentPartWhereInput
+    >(filterQuery, {
+      containsFields: ['partName'],
+    });
 
-    if (search) {
-      where.OR = [{ partName: { contains: search, mode: 'insensitive' } }];
-    }
+    const sortBy = query.sortBy ?? 'createdAt';
+    const sortOrder = query.sortOrder ?? 'desc';
 
-    if (partName) {
-      where.partName = { contains: partName, mode: 'insensitive' };
-    }
-
-    if (partStatus) {
-      where.partStatus = partStatus;
-    }
-
-    const [data, total] = await Promise.all([
-      this.prisma.housingAssessmentPart.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.prisma.housingAssessmentPart.count({ where }),
-    ]);
-
-    const formattedData = plainToInstance(
-      HousingAssessmentPartResponseDto,
-      data,
-    );
-
-    const totalPages = Math.ceil(total / limit);
+    const result = await findPage(this.prisma.housingAssessmentPart, {
+      where,
+      skip,
+      take: limit,
+      orderBy: { [sortBy]: sortOrder },
+    });
 
     return {
-      data: formattedData,
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-      },
+      data: plainToInstance(HousingAssessmentPartResponseDto, result.data),
+      pagination: result.pagination,
     };
   }
 

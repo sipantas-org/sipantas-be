@@ -25,7 +25,6 @@ import { UpdateAdminStatusDto } from './dto/update-admin-status.dto.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
-import { SurveyorGuard } from '../../common/guards/surveyor.guard.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 import { AdminRole } from '../../generated/prisma/enums.js';

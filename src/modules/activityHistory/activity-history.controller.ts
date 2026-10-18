@@ -8,9 +8,9 @@ import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
 
 @ApiTags('activity-history')
-// @ApiBearerAuth('access-token')
-// @UseGuards(JwtAuthGuard, AdminRoleGuard)
-// @AdminRoles(AdminRole.Administrator, AdminRole.Monitoring)
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard, AdminRoleGuard)
+@AdminRoles(AdminRole.Administrator, AdminRole.Monitoring)
 @Controller('activity-history')
 export class ActivityHistoryController {
   constructor(

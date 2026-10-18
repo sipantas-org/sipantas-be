@@ -25,6 +25,7 @@ import { QuerySurveyDto } from './dto/query-survey.dto.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { SurveyorGuard } from '../../common/guards/surveyor.guard.js';
 
+@ApiBearerAuth('access-token')
 @ApiTags('surveys')
 @Controller('surveys')
 export class SurveyController {
@@ -32,7 +33,6 @@ export class SurveyController {
 
   @Post()
   @UseGuards(JwtAuthGuard, SurveyorGuard)
-  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Buat survei baru',
     description:
@@ -65,7 +65,6 @@ export class SurveyController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, SurveyorGuard)
-  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Perbarui data survei',
     description:
@@ -81,7 +80,6 @@ export class SurveyController {
 
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, SurveyorGuard)
-  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Perbarui status survei',
     description:
@@ -97,7 +95,6 @@ export class SurveyController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, SurveyorGuard)
-  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Hapus data survei',
     description:

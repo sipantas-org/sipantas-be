@@ -19,6 +19,9 @@ import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
 import { UseGuards } from '@nestjs/common';
 
+import { ApiBearerAuth } from '@nestjs/swagger';
+
+@ApiBearerAuth('access-token')
 @Controller('regencies')
 export class MasterAreaRegencyController {
   constructor(private readonly regencyService: MasterAreaRegencyService) {}

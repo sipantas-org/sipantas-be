@@ -124,7 +124,10 @@ export class AuthController {
       'Mengubah status akun admin role Monitoring (Active atau Inactive) oleh administrator',
   })
   @ApiResponse({ status: 200, type: UserAdminResponseDto })
-  @ApiResponse({ status: 400, description: 'status harus Active atau Inactive' })
+  @ApiResponse({
+    status: 400,
+    description: 'status harus Active atau Inactive',
+  })
   @ApiResponse({
     status: 403,
     description:
@@ -148,7 +151,10 @@ export class AuthController {
       'Mengambil daftar admin dengan role Monitoring secara terpaginasi, dengan filter status, untuk administrator',
   })
   @ApiResponse({ status: 200, type: PaginatedAdminResponseDto })
-  @ApiResponse({ status: 403, description: 'Hanya administrator yang boleh mengakses daftar admin' })
+  @ApiResponse({
+    status: 403,
+    description: 'Hanya administrator yang boleh mengakses daftar admin',
+  })
   listAdmins(@Query() query: ListAdminDto) {
     return this.authService.listAdmins(query);
   }
@@ -219,7 +225,10 @@ export class AuthController {
       'Mengubah status akun surveyor (Active atau Inactive) oleh administrator',
   })
   @ApiResponse({ status: 200, type: UserSurveyorResponseDto })
-  @ApiResponse({ status: 400, description: 'status harus Active atau Inactive' })
+  @ApiResponse({
+    status: 400,
+    description: 'status harus Active atau Inactive',
+  })
   @ApiResponse({ status: 404, description: 'Surveyor tidak ditemukan' })
   updateSurveyorStatus(
     @Param('id', ParseIntPipe) id: number,
@@ -251,7 +260,7 @@ export class AuthController {
   ) {
     return this.authService.approveSurveyor(id, dto, admin);
   }
-  
+
   @Get('surveyor')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator, AdminRole.Monitoring)
@@ -273,7 +282,8 @@ export class AuthController {
   })
   @ApiResponse({
     status: 200,
-    description: 'UserAdminResponseDto jika login sebagai admin, UserSurveyorResponseDto jika login sebagai surveyor',
+    description:
+      'UserAdminResponseDto jika login sebagai admin, UserSurveyorResponseDto jika login sebagai surveyor',
     schema: {
       oneOf: [
         { $ref: getSchemaPath(UserAdminResponseDto) },

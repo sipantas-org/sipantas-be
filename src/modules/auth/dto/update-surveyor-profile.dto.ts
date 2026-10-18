@@ -1,5 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+  ValidateIf,
+} from 'class-validator';
 
 export class UpdateSurveyorProfileDto {
   @ApiPropertyOptional({ example: '081234567890' })
@@ -17,6 +24,15 @@ export class UpdateSurveyorProfileDto {
   @IsString()
   @MinLength(6)
   password?: string;
+
+  @ApiPropertyOptional({
+    example: 'oldpassword123',
+    description: 'Wajib diisi jika ingin mengganti password',
+  })
+  @ValidateIf((dto) => !!dto.password)
+  @IsNotEmpty({ message: 'currentPassword is required to change password' })
+  @IsString()
+  currentPassword?: string;
 
   @ApiPropertyOptional({ example: '32' })
   @IsOptional()

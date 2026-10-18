@@ -1,5 +1,5 @@
 // disaster-response.dto.ts
-import { Transform } from 'class-transformer';
+import { Transform, Expose } from 'class-transformer';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import timezone from 'dayjs/plugin/timezone.js';
@@ -8,12 +8,33 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export class DisasterResponseDto {
-  id: number;
-  Disaster_Code: string;
-  Disaster_Name: string;
-  Disaster_Category: string;
-  Status: string;
+  @Expose()
+  disasterId: String;
+  @Expose()
+  disasterCode: String;
+  @Expose()
+  disasterName: String;
+  @Expose()
+  disasterCategory: String;
+  @Expose()
+  disasterStatus: String;
+  @Expose()
+  provinceId: String;
 
+  @Expose()
+  @Transform(({ obj }) => obj.province?.name ?? null)
+  provinceName!: string | null;
+  @Expose()
+  regencyId: String;
+
+  @Expose()
+  @Transform(({ obj }) => obj.regency?.name ?? null)
+  regencyName!: string | null;
+
+  @Expose()
+  description: String;
+
+  @Expose()
   @Transform(({ value }) =>
     value
       ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
@@ -21,6 +42,7 @@ export class DisasterResponseDto {
   )
   createdAt: Date;
 
+  @Expose()
   @Transform(({ value }) =>
     value
       ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')

@@ -10,6 +10,11 @@ import { DisasterResponseDto } from '../dto/response-disaster.dto.js';
 import { findPage } from '../../../common/utils/pagination.util.js';
 import { buildPrismaWhere } from '../../../common/utils/filter-data.util.js';
 
+const withAreaNames = {
+  province: { select: { name: true } },
+  regency: { select: { name: true } },
+} satisfies Prisma.DisasterInclude;
+
 @Injectable()
 export class DisasterRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -43,16 +48,35 @@ export class DisasterRepository {
 
     const sortBy = query.sortBy ?? 'createdAt';
     const sortOrder = query.sortOrder ?? 'desc';
+    const select = {
+      disasterId: true,
+      disasterCode: true,
+      disasterName: true,
+      disasterCategory: true,
+      description: true,
+      disasterStatus: true,
+      provinceId: true,
+      regencyId: true,
+      ...withAreaNames,
+      createdAt: true,
+      updatedAt: true,
+    } as const;
 
     const result = await findPage(this.prisma.disaster, {
       where,
       skip,
       take: limit,
       orderBy: { [sortBy]: sortOrder },
+      select: select,
     });
 
     return {
-      data: plainToInstance(DisasterResponseDto, result.data),
+      data: result.data.map((item) =>
+        plainToInstance(DisasterResponseDto, item, {
+          excludeExtraneousValues: true,
+        }),
+      ),
+      // plainToInstance(DisasterResponseDto, result.data),
       pagination: result.pagination,
     };
   }
@@ -70,7 +94,9 @@ export class DisasterRepository {
       },
     });
 
-    const formattedData = plainToInstance(DisasterResponseDto, data);
+    const formattedData = plainToInstance(DisasterResponseDto, data, {
+      excludeExtraneousValues: true,
+    });
 
     return formattedData;
   }

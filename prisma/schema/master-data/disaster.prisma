@@ -5,7 +5,7 @@ enum DisasterStatus {
 
 model Disaster {
   disasterId       Int                  @id @default(autoincrement())
-  disasterCode     String               @unique @db.VarChar(20)
+  disasterCode     String               @unique
   disasterName     String
   disasterCategory String
   description       String?

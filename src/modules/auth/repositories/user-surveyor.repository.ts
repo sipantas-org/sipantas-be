@@ -3,6 +3,15 @@ import { PrismaService } from '../../../prisma/prisma.service.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import type { UserSurveyor } from '../entities/auth.entity.js';
 
+const withAreaNames = {
+  province: { select: { name: true } },
+  regency: { select: { name: true } },
+} satisfies Prisma.UserSurveyorInclude;
+
+type UserSurveyorWithAreaNames = Prisma.UserSurveyorGetPayload<{
+  include: typeof withAreaNames;
+}>;
+
 @Injectable()
 export class UserSurveyorRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -29,6 +38,7 @@ export class UserSurveyorRepository {
       lastLogin: true,
       createdAt: true,
       updatedAt: true,
+      ...withAreaNames,
     } as const;
 
     return this.prisma.$transaction([
@@ -43,9 +53,12 @@ export class UserSurveyorRepository {
     ]);
   }
 
-  findById(idSurveyor: number): Promise<UserSurveyor | null> {
+  findById(
+    idSurveyor: number,
+  ): Promise<UserSurveyorWithAreaNames | null> {
     return this.prisma.userSurveyor.findUnique({
       where: { surveyorId: idSurveyor },
+      include: withAreaNames,
     });
   }
 

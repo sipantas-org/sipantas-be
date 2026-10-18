@@ -27,9 +27,11 @@ import { RegisterSurveyorDto } from './dto/register-surveyor.dto.js';
 import { ApproveSurveyorDto } from './dto/approve-surveyor.dto.js';
 import { RegisterAdminDto } from './dto/register-admin.dto.js';
 import { ListSurveyorDto } from './dto/list-surveyor.dto.js';
+import { ListAdminDto } from './dto/list-admin.dto.js';
 import { UpdateSurveyorProfileDto } from './dto/update-surveyor-profile.dto.js';
 import { UpdateAdminProfileDto } from './dto/update-admin-profile.dto.js';
 import { UpdateSurveyorStatusDto } from './dto/update-surveyor-status.dto.js';
+import { UpdateAdminStatusDto } from './dto/update-admin-status.dto.js';
 import {
   ApprovalUserResponseDto,
   UserAdminResponseDto,
@@ -98,6 +100,138 @@ export class AuthService {
     };
   }
 
+  async registerAdmin(dto: RegisterAdminDto) {
+    const admin = await this.userAdminRepository.create({
+      nip: dto.nip,
+      nama: dto.nama,
+      phoneNumber: dto.nomorHp,
+      email: dto.email,
+      password: await bcrypt.hash(dto.password, SALT_ROUNDS),
+      status: AdminStatus.Active,
+      role: AdminRole.Monitoring,
+    });
+
+    return this.toResponse(UserAdminResponseDto, admin);
+  }
+
+  async updateAdminProfile(user: JwtPayload, dto: UpdateAdminProfileDto) {
+    if (user.userType !== 'admin') {
+      throw new ForbiddenException('Only admins can update admin profile');
+    }
+
+    const admin = await this.prisma.userAdmin.findUnique({
+      where: { adminId: user.sub },
+    });
+    if (!admin) {
+      throw new NotFoundException('Admin not found');
+    }
+
+    if (dto.email && dto.email !== admin.email) {
+      const existing = await this.prisma.userAdmin.findUnique({
+        where: { email: dto.email },
+      });
+      if (existing) {
+        throw new ConflictException('Email already in use');
+      }
+    }
+
+    if (dto.password) {
+      const isCurrentPasswordValid = await bcrypt.compare(
+        dto.currentPassword ?? '',
+        admin.password,
+      );
+      if (!isCurrentPasswordValid) {
+        throw new UnauthorizedException('Current password is incorrect');
+      }
+    }
+
+    const passwordHash = dto.password
+      ? await bcrypt.hash(dto.password, SALT_ROUNDS)
+      : undefined;
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.userAdmin.update({
+        where: { adminId: user.sub },
+        data: {
+          ...(dto.nomorHp !== undefined ? { phoneNumber: dto.nomorHp } : {}),
+          ...(dto.email !== undefined ? { email: dto.email } : {}),
+          ...(passwordHash !== undefined ? { password: passwordHash } : {}),
+        },
+      });
+
+      if (passwordHash !== undefined) {
+        await this.activityHistoryService.record(
+          {
+            idUser: null,
+            idAdmin: user.sub,
+            relationId: user.sub,
+            module: 'Auth - Admin Profile Update',
+            activity: 'Changed own password',
+          },
+          tx,
+        );
+      }
+
+      return result;
+    });
+
+    return this.toResponse(UserAdminResponseDto, updated);
+  }
+
+  async updateAdminStatus(
+    id: number,
+    dto: UpdateAdminStatusDto,
+    user: JwtPayload,
+  ) {
+    const admin = await this.userAdminRepository.findById(id);
+    if (!admin) {
+      throw new NotFoundException('Admin not found');
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.userAdmin.update({
+        where: { adminId: id },
+        data: { status: dto.status },
+      });
+
+      await this.activityHistoryService.record(
+        {
+          idUser: null,
+          idAdmin: user.sub,
+          relationId: id,
+          module: 'Auth - Admin Status Update',
+          activity: `Changed admin status to ${dto.status}`,
+        },
+        tx,
+      );
+
+      return result;
+    });
+
+    return this.toResponse(UserAdminResponseDto, updated);
+  }
+
+  async listAdmins(query: ListAdminDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const [items, total] = await this.userAdminRepository.findPage({
+      role: AdminRole.Monitoring,
+      status: query.status,
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      items: items.map((item) => this.toResponse(UserAdminResponseDto, item)),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async loginSurveyor(dto: LoginDto, meta: LoginMeta) {
     const surveyor = await this.userSurveyorRepository.findByEmail(dto.email);
     const isPasswordValid =
@@ -158,40 +292,107 @@ export class AuthService {
     return this.toResponse(UserSurveyorResponseDto, surveyor);
   }
 
-  async registerAdmin(dto: RegisterAdminDto) {
-    const admin = await this.userAdminRepository.create({
-      nip: dto.nip,
-      nama: dto.nama,
-      phoneNumber: dto.nomorHp,
-      email: dto.email,
-      password: await bcrypt.hash(dto.password, SALT_ROUNDS),
-      status: AdminStatus.Active,
-      role: AdminRole.Monitoring,
+  async updateSurveyorProfile(user: JwtPayload, dto: UpdateSurveyorProfileDto) {
+    if (user.userType !== 'surveyor') {
+      throw new ForbiddenException(
+        'Only surveyors can update surveyor profile',
+      );
+    }
+
+    const surveyor = await this.userSurveyorRepository.findById(user.sub);
+    if (!surveyor) {
+      throw new NotFoundException('Surveyor not found');
+    }
+
+    if (dto.email && dto.email !== surveyor.email) {
+      const existing = await this.prisma.userSurveyor.findUnique({
+        where: { email: dto.email },
+      });
+      if (existing) {
+        throw new ConflictException('Email already in use');
+      }
+    }
+
+    if (dto.password) {
+      const isCurrentPasswordValid = await bcrypt.compare(
+        dto.currentPassword ?? '',
+        surveyor.password,
+      );
+      if (!isCurrentPasswordValid) {
+        throw new UnauthorizedException('Current password is incorrect');
+      }
+    }
+
+    const passwordHash = dto.password
+      ? await bcrypt.hash(dto.password, SALT_ROUNDS)
+      : undefined;
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.userSurveyor.update({
+        where: { surveyorId: user.sub },
+        data: {
+          ...(dto.nomorHp !== undefined ? { phoneNumber: dto.nomorHp } : {}),
+          ...(dto.email !== undefined ? { email: dto.email } : {}),
+          ...(passwordHash !== undefined ? { password: passwordHash } : {}),
+          ...(dto.idProvince !== undefined
+            ? { provinceId: String(dto.idProvince) }
+            : {}),
+          ...(dto.idCity !== undefined
+            ? { regencyId: String(dto.idCity) }
+            : {}),
+        },
+      });
+
+      if (passwordHash !== undefined) {
+        await this.activityHistoryService.record(
+          {
+            idUser: user.sub,
+            idAdmin: null,
+            relationId: user.sub,
+            module: 'Auth - Surveyor Profile Update',
+            activity: 'Changed own password',
+          },
+          tx,
+        );
+      }
+
+      return result;
     });
 
-    return this.toResponse(UserAdminResponseDto, admin);
+    return this.toResponse(UserSurveyorResponseDto, updated);
   }
 
-  async listSurveyors(query: ListSurveyorDto) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 10;
-    const [items, total] = await this.userSurveyorRepository.findPage({
-      status: query.status,
-      skip: (page - 1) * limit,
-      take: limit,
+  async updateSurveyorStatus(
+    id: number,
+    dto: UpdateSurveyorStatusDto,
+    user: JwtPayload,
+  ) {
+    const surveyor = await this.userSurveyorRepository.findById(id);
+    if (!surveyor) {
+      throw new NotFoundException('Surveyor not found');
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.userSurveyor.update({
+        where: { surveyorId: id },
+        data: { status: dto.status },
+      });
+
+      await this.activityHistoryService.record(
+        {
+          idUser: null,
+          idAdmin: user.sub,
+          relationId: id,
+          module: 'Auth - Surveyor Status Update',
+          activity: `Changed surveyor status to ${dto.status}`,
+        },
+        tx,
+      );
+
+      return result;
     });
 
-    return {
-      items: items.map((item) =>
-        this.toResponse(UserSurveyorResponseDto, item),
-      ),
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+    return this.toResponse(UserSurveyorResponseDto, updated);
   }
 
   async approveSurveyor(
@@ -238,12 +439,26 @@ export class AuthService {
     return this.toResponse(ApprovalUserResponseDto, approval);
   }
 
-  async getSurveyorById(id: number) {
-    const surveyor = await this.userSurveyorRepository.findById(id);
-    if (!surveyor) {
-      throw new NotFoundException('Surveyor not found');
-    }
-    return this.toResponse(UserSurveyorResponseDto, surveyor);
+  async listSurveyors(query: ListSurveyorDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const [items, total] = await this.userSurveyorRepository.findPage({
+      status: query.status,
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      items: items.map((item) =>
+        this.toResponse(UserSurveyorResponseDto, item),
+      ),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async getProfile(user: JwtPayload) {
@@ -266,117 +481,6 @@ export class AuthService {
     }
 
     throw new UnauthorizedException('Unknown user type');
-  }
-
-  async updateSurveyorProfile(user: JwtPayload, dto: UpdateSurveyorProfileDto) {
-    if (user.userType !== 'surveyor') {
-      throw new ForbiddenException(
-        'Only surveyors can update surveyor profile',
-      );
-    }
-
-    const surveyor = await this.userSurveyorRepository.findById(user.sub);
-    if (!surveyor) {
-      throw new NotFoundException('Surveyor not found');
-    }
-
-    if (dto.email && dto.email !== surveyor.email) {
-      const existing = await this.prisma.userSurveyor.findUnique({
-        where: { email: dto.email },
-      });
-      if (existing) {
-        throw new ConflictException('Email already in use');
-      }
-    }
-
-    const passwordHash = dto.password
-      ? await bcrypt.hash(dto.password, SALT_ROUNDS)
-      : undefined;
-
-    const updated = await this.prisma.userSurveyor.update({
-      where: { surveyorId: user.sub },
-      data: {
-        ...(dto.nomorHp !== undefined ? { phoneNumber: dto.nomorHp } : {}),
-        ...(dto.email !== undefined ? { email: dto.email } : {}),
-        ...(passwordHash !== undefined ? { password: passwordHash } : {}),
-        ...(dto.idProvince !== undefined
-          ? { provinceId: String(dto.idProvince) }
-          : {}),
-        ...(dto.idCity !== undefined ? { regencyId: String(dto.idCity) } : {}),
-      },
-    });
-
-    return this.toResponse(UserSurveyorResponseDto, updated);
-  }
-
-  async updateSurveyorStatus(id: number, dto: UpdateSurveyorStatusDto) {
-    const surveyor = await this.userSurveyorRepository.findById(id);
-    if (!surveyor) {
-      throw new NotFoundException('Surveyor not found');
-    }
-
-    const updated = await this.prisma.userSurveyor.update({
-      where: { surveyorId: id },
-      data: { status: dto.status },
-    });
-
-    return this.toResponse(UserSurveyorResponseDto, updated);
-  }
-
-  async updateAdminProfile(user: JwtPayload, dto: UpdateAdminProfileDto) {
-    if (user.userType !== 'admin') {
-      throw new ForbiddenException('Only admins can update admin profile');
-    }
-
-    const admin = await this.prisma.userAdmin.findUnique({
-      where: { adminId: user.sub },
-    });
-    if (!admin) {
-      throw new NotFoundException('Admin not found');
-    }
-
-    if (dto.email && dto.email !== admin.email) {
-      const existing = await this.prisma.userAdmin.findUnique({
-        where: { email: dto.email },
-      });
-      if (existing) {
-        throw new ConflictException('Email already in use');
-      }
-    }
-
-    const passwordHash = dto.password
-      ? await bcrypt.hash(dto.password, SALT_ROUNDS)
-      : undefined;
-
-    const updated = await this.prisma.userAdmin.update({
-      where: { adminId: user.sub },
-      data: {
-        ...(dto.nomorHp !== undefined ? { phoneNumber: dto.nomorHp } : {}),
-        ...(dto.email !== undefined ? { email: dto.email } : {}),
-        ...(passwordHash !== undefined ? { password: passwordHash } : {}),
-      },
-    });
-
-    return this.toResponse(UserAdminResponseDto, updated);
-  }
-
-  private recordLogin(
-    meta: LoginMeta,
-    status: LoginStatus,
-    actor: Pick<Prisma.LoginHistoryUncheckedCreateInput, 'adminId' | 'userId'>,
-    token?: string | null,
-  ) {
-    return this.loginHistoryRepository.create({
-      ...actor,
-      ipAddress: meta.ipAddress,
-      deviceInfo: meta.deviceInfo ?? null,
-      statusLogin: status,
-      token: token ?? '',
-    });
-  }
-
-  private toResponse<T>(cls: ClassConstructor<T>, data: object): T {
-    return plainToInstance(cls, data, { excludeExtraneousValues: true });
   }
 
   async isTokenActiveInHistory(
@@ -419,6 +523,25 @@ export class AuthService {
     }
 
     return false;
+  }
+
+  private recordLogin(
+    meta: LoginMeta,
+    status: LoginStatus,
+    actor: Pick<Prisma.LoginHistoryUncheckedCreateInput, 'adminId' | 'userId'>,
+    token?: string | null,
+  ) {
+    return this.loginHistoryRepository.create({
+      ...actor,
+      ipAddress: meta.ipAddress,
+      deviceInfo: meta.deviceInfo ?? null,
+      statusLogin: status,
+      token: token ?? '',
+    });
+  }
+
+  private toResponse<T>(cls: ClassConstructor<T>, data: object): T {
+    return plainToInstance(cls, data, { excludeExtraneousValues: true });
   }
 
   private hashToken(token: string): string {

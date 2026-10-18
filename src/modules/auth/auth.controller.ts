@@ -125,7 +125,11 @@ export class AuthController {
   })
   @ApiResponse({ status: 200, type: UserAdminResponseDto })
   @ApiResponse({ status: 400, description: 'status harus Active atau Inactive' })
-  @ApiResponse({ status: 403, description: 'Hanya administrator yang boleh mengubah status admin' })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Hanya administrator yang boleh mengubah status admin, dan target harus admin role Monitoring',
+  })
   @ApiResponse({ status: 404, description: 'Admin tidak ditemukan' })
   updateAdminStatus(
     @Param('id', ParseIntPipe) id: number,

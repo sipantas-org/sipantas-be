@@ -187,6 +187,11 @@ export class AuthService {
     if (!admin) {
       throw new NotFoundException('Admin not found');
     }
+    if (admin.role !== AdminRole.Monitoring) {
+      throw new ForbiddenException(
+        'Only admins with role Monitoring can have their status changed',
+      );
+    }
 
     const updated = await this.prisma.$transaction(async (tx) => {
       const result = await tx.userAdmin.update({

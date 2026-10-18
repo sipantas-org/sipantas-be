@@ -21,7 +21,9 @@ import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
 import { UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth('access-token')
 @ApiTags('Loss Assessments')
 @Controller('loss-assessments')
 export class LossAssessmentController {

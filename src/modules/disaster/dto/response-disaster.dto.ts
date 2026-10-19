@@ -36,6 +36,12 @@ export class DisasterResponseDto {
 
   @Expose()
   @Transform(({ value }) =>
+    value ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM') : null,
+  )
+  disasterDate: Date;
+
+  @Expose()
+  @Transform(({ value }) =>
     value
       ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
       : null,

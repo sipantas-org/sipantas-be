@@ -8,6 +8,7 @@ model Disaster {
   disasterCode     String               @unique
   disasterName     String
   disasterCategory String
+  disasterDate DateTime @db.Date
   description       String?
   disasterStatus            DisasterStatus @map("Status")
 

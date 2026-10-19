@@ -2,8 +2,6 @@ import { plainToInstance } from 'class-transformer';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 import { Prisma } from '../../../generated/prisma/client.js';
-import { CreateDisasterDto } from '../dto/create-disaster.dto.js';
-import { UpdateDisasterDto } from '../dto/update-disaster.dto.js';
 import { Disaster } from '../../../generated/prisma/client.js';
 import { QueryDisasterDto } from '../dto/query-disaster.dto.js';
 import { DisasterResponseDto } from '../dto/response-disaster.dto.js';
@@ -19,7 +17,7 @@ const withAreaNames = {
 export class DisasterRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateDisasterDto): Promise<Disaster> {
+  async create(data: Prisma.DisasterUncheckedCreateInput): Promise<Disaster> {
     return this.prisma.disaster.create({
       data,
     });
@@ -55,6 +53,7 @@ export class DisasterRepository {
       disasterCategory: true,
       description: true,
       disasterStatus: true,
+      disasterDate: true,
       provinceId: true,
       regencyId: true,
       ...withAreaNames,
@@ -101,7 +100,7 @@ export class DisasterRepository {
     return formattedData;
   }
 
-  async update(disasterId: number, data: UpdateDisasterDto): Promise<Disaster> {
+  async update(disasterId: number, data: any): Promise<Disaster> {
     return this.prisma.disaster.update({
       where: { disasterId },
       data,

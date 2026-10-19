@@ -124,23 +124,23 @@ SET "typeOfLoss" = EXCLUDED."typeOfLoss",
 -- 5. DISASTER (Data Master Kejadian Bencana)
 INSERT INTO "Disaster" (
   "disasterId", "disasterCode", "disasterName", "disasterCategory", 
-  "description", "Status", "provinceId", "regencyId", "createdAt", "updatedAt"
+  "description", "Status", "disasterDate", "provinceId", "regencyId", "createdAt", "updatedAt"
 )
 VALUES
   (1, 'DIS-2024-CJR-001', 'Gempa Bumi Tektonik Cianjur', 'Gempa Bumi', 
-   'Gempa bumi dangkal M 5.6 yang memicu kerusakan permukiman dan tanah longsor di beberapa kecamatan.', 'Inactive', NULL, NULL, NOW(), NOW()),
+   'Gempa bumi dangkal M 5.6 yang memicu kerusakan permukiman dan tanah longsor di beberapa kecamatan.', 'Inactive',NOW(), '11', '11.09', NOW(), NOW()),
   
   (2, 'DIS-2024-SKB-002', 'Banjir Bandang Cicurug Sukabumi', 'Banjir Bandang', 
-   'Luapan air sungai akibat curah hujan ekstrem merusak jembatan antardesa dan puluhan rumah warga.', 'Active', NULL, NULL, NOW(), NOW()),
+   'Luapan air sungai akibat curah hujan ekstrem merusak jembatan antardesa dan puluhan rumah warga.', 'Active',NOW(), '11', '11.09', NOW(), NOW()),
   
   (3, 'DIS-2024-BGR-003', 'Tanah Longsor Perbukitan Puncak', 'Tanah Longsor', 
-   'Pergerakan tanah pada tebing lereng curam yang menimbun akses jalan utama dan fasilitas publik.', 'Active', NULL, NULL, NOW(), NOW()),
+   'Pergerakan tanah pada tebing lereng curam yang menimbun akses jalan utama dan fasilitas publik.', 'Active',NOW(), '11', '11.09', NOW(), NOW()),
   
   (4, 'DIS-2024-BDG-004', 'Angin Puting Beliung Rancaekek', 'Angin Puting Beliung', 
-   'Pusaran angin kencang merusak struktur rangka atap bangunan industri, fasilitas umum, dan permukiman padat.', 'Active', NULL, NULL, NOW(), NOW()),
+   'Pusaran angin kencang merusak struktur rangka atap bangunan industri, fasilitas umum, dan permukiman padat.', 'Active',NOW(), '11', '11.09', NOW(), NOW()),
   
   (5, 'DIS-2024-LBG-005', 'Kekeringan dan Krisis Air Bersih', 'Kekeringan', 
-   'Kekeringan berkepanjangan pada sektor pertanian pangan dan sumber mata air baku masyarakat desa.', 'Active', NULL, NULL, NOW(), NOW())
+   'Kekeringan berkepanjangan pada sektor pertanian pangan dan sumber mata air baku masyarakat desa.', 'Active',NOW(), '11', '11.09', NOW(), NOW())
 ON CONFLICT ("disasterCode") DO UPDATE 
 SET "disasterName" = EXCLUDED."disasterName",
     "disasterCategory" = EXCLUDED."disasterCategory",

@@ -15,7 +15,7 @@ export class LossAssessmentRepository {
 
   findAll(): Promise<LossAssessment[]> {
     return this.prisma.lossAssessment.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { lossAssessmentId: 'asc' },
     });
   }
 

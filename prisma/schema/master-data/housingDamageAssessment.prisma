@@ -15,6 +15,6 @@ model HousingDamageAssessment {
   housingAssessmentPart HousingAssessmentPart @relation(fields: [housingAssessmentPartId], references: [housingAssessmentPartId])
   SurveyHousingDetails SurveyHousingDetail[]
 
-
+  @@unique([housingAssessmentPartId, surveyDamageQuestion])
   @@map("HousingDamageAssessment")
 }

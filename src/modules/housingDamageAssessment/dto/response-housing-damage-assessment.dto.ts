@@ -20,6 +20,14 @@ export class HousingDamageAssessmentResponseDto {
   idHousingAssessmentPart!: number;
 
   @ApiProperty({
+    example: 'Pondasi/Sloof',
+    nullable: true,
+  })
+  @Expose()
+  @Transform(({ obj }) => obj?.housingAssessmentPart?.partName ?? null)
+  housingAssessmentPartName!: string | null;
+
+  @ApiProperty({
     example: 'Apakah dinding rumah mengalami keretakan struktural?',
   })
   @Expose({ name: 'surveyDamageQuestion' })

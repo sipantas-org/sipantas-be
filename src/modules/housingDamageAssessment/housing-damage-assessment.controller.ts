@@ -9,18 +9,19 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HousingDamageAssessmentService } from './housing-damage-assessment.service.js';
 import { CreateHousingDamageAssessmentDto } from './dto/create-housing-damage-assessment.dto.js';
 import { UpdateHousingDamageAssessmentDto } from './dto/update-housing-damage-assessment.dto.js';
 import { HousingDamageAssessmentResponseDto } from './dto/response-housing-damage-assessment.dto.js';
-
+import { QueryHousingDamageAssessmentDto } from './dto/query-housing-damage-assessment.dto.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
-import { UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiBearerAuth('access-token')
@@ -50,8 +51,8 @@ export class HousingDamageAssessmentController {
     status: HttpStatus.OK,
     type: [HousingDamageAssessmentResponseDto],
   })
-  findAll() {
-    return this.housingDamageAssessmentService.findAll();
+  findAll(@Query() query: QueryHousingDamageAssessmentDto) {
+    return this.housingDamageAssessmentService.findAll(query);
   }
 
   @Get(':id')

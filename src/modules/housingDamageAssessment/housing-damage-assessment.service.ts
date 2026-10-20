@@ -6,6 +6,8 @@ import { UpdateHousingDamageAssessmentDto } from './dto/update-housing-damage-as
 import { HousingDamageAssessmentResponseDto } from './dto/response-housing-damage-assessment.dto.js';
 import type { HousingDamageAssessment } from './entities/housing-damage-assessment.entity.js';
 
+import { QueryHousingDamageAssessmentDto } from './dto/query-housing-damage-assessment.dto.js';
+
 @Injectable()
 export class HousingDamageAssessmentService {
   constructor(private readonly repository: HousingDamageAssessmentRepository) {}
@@ -24,9 +26,8 @@ export class HousingDamageAssessmentService {
     return this.toResponse(row);
   }
 
-  async findAll() {
-    const rows = await this.repository.findAll();
-    return rows.map((row) => this.toResponse(row));
+  async findAll(query: QueryHousingDamageAssessmentDto) {
+    return this.repository.findAll(query);
   }
 
   async findOne(id: number) {
@@ -59,7 +60,7 @@ export class HousingDamageAssessmentService {
     return this.toResponse(row);
   }
 
-  private toResponse(row: HousingDamageAssessment) {
+  private toResponse(row: any) {
     return plainToInstance(HousingDamageAssessmentResponseDto, row, {
       excludeExtraneousValues: true,
     });

@@ -5,6 +5,9 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import { PrismaClientExceptionFilter } from './common/filters/prisma-exception.filter.js';
+import { ValidationError } from 'class-validator';
+import { BadRequestException } from '@nestjs/common';
+import { DISPLAY_NAME_KEY } from './common/decorators/display-name.decorator.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -33,8 +36,37 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      transform: true,
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
+        const detailedErrors = validationErrors.map((error) => {
+          // 1. Check if @DisplayName exists on the DTO property
+          const customDisplayName =
+            error.target &&
+            Reflect.getMetadata(DISPLAY_NAME_KEY, error.target, error.property);
+
+          // 2. Use custom name if present; fallback to regex auto-capitalization
+          const fieldName = customDisplayName || error.property;
+
+          const messages = error.constraints
+            ? Object.values(error.constraints).map((msg) =>
+                msg.replace(error.property, fieldName),
+              )
+            : [];
+
+          return {
+            field: fieldName,
+            messages,
+          };
+        });
+
+        const errorMessages = detailedErrors.flatMap((e) => e.messages);
+
+        return new BadRequestException({
+          statusCode: 400,
+          success: false,
+          message: errorMessages,
+          errors: detailedErrors,
+        });
+      },
     }),
   );
 

@@ -1,5 +1,5 @@
 // src/housing-assessment-part/dto/query-housing-assessment-part.dto.ts
-import { IsOptional, IsString, IsEnum } from 'class-validator';
+import { IsOptional, IsString, IsEnum, Matches } from 'class-validator';
 import { QueryDefaultDto } from '../../../dto/query-default.dto.js';
 import { DisasterStatus } from '../../../generated/prisma/enums.js';
 import { ApiPropertyOptional } from '@nestjs/swagger';
@@ -33,6 +33,18 @@ export class QueryDisasterDto extends QueryDefaultDto {
   @IsOptional()
   @IsString()
   disasterStatus?: DisasterStatus;
+
+  @ApiPropertyOptional({
+    example: '2025-05',
+    description:
+      'Filter tahun dan bulan kejadian bencana dengan format YYYY-MM',
+  })
+  @IsOptional()
+  @IsString()
+  @Matches(/^\d{4}-(0[1-9]|1[0-2])$/, {
+    message: 'disasterDate harus berformat YYYY-MM',
+  })
+  disasterDate?: string;
 
   @ApiPropertyOptional({
     description: 'Nama field/kolom yang digunakan untuk pengurutan data',

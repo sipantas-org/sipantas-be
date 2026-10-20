@@ -28,7 +28,7 @@ export class DisasterRepository {
     const limit = Number(query.limit ?? 10);
     const skip = (page - 1) * limit;
 
-    const { search, ...filterQuery } = query;
+    const { search, disasterDate, ...filterQuery } = query;
 
     const where = buildPrismaWhere<
       typeof filterQuery,
@@ -36,6 +36,19 @@ export class DisasterRepository {
     >(filterQuery, {
       containsFields: ['disasterCode', 'disasterName', 'disasterCategory'],
     });
+
+    if (disasterDate) {
+      const [yearStr, monthStr] = disasterDate.split('-');
+      const year = parseInt(yearStr, 10);
+      const month = parseInt(monthStr, 10);
+      const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
+      const nextMonthStartDate = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
+
+      where.disasterDate = {
+        gte: startDate,
+        lt: nextMonthStartDate,
+      };
+    }
 
     if (search) {
       where.OR = [

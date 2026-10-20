@@ -31,6 +31,7 @@ export class QueryHousingAssessmentPartDto extends QueryDefaultDto {
     enum: Prisma.HousingAssessmentPartScalarFieldEnum,
     example: 'createdAt',
   })
+  @DisplayName('Sort By')
   @IsOptional()
   @IsEnum(Prisma.HousingAssessmentPartScalarFieldEnum)
   sortBy?: Prisma.HousingAssessmentPartScalarFieldEnum;
@@ -40,6 +41,7 @@ export class QueryHousingAssessmentPartDto extends QueryDefaultDto {
     enum: ['asc', 'desc'],
     example: 'desc',
   })
+  @DisplayName('Sort Order')
   @IsOptional()
   @IsString()
   sortOrder?: 'asc' | 'desc';

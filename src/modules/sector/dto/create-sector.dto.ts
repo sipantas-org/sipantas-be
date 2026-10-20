@@ -7,12 +7,14 @@ import {
 } from 'class-validator';
 import { SectorStatus } from '../../../generated/prisma/enums.js';
 import { ApiProperty } from '@nestjs/swagger';
+import { DisplayName } from '../../../common/decorators/display-name.decorator.js';
 
 export class CreateSectorDto {
   @ApiProperty({
     example: 'Perumahan',
     description: '',
   })
+  @DisplayName('Sector Name')
   @IsString()
   @IsNotEmpty()
   sectorName: string;
@@ -21,6 +23,7 @@ export class CreateSectorDto {
     example: 1,
     description: '',
   })
+  @DisplayName('Parent ID')
   @IsInt()
   @IsOptional()
   parentId?: number;
@@ -29,6 +32,7 @@ export class CreateSectorDto {
     example: '',
     description: '',
   })
+  @DisplayName('Description')
   @IsString()
   @IsOptional()
   description?: string;
@@ -37,6 +41,7 @@ export class CreateSectorDto {
     example: 'Active',
     description: '',
   })
+  @DisplayName('Status')
   @IsEnum(SectorStatus)
   status: SectorStatus;
 }

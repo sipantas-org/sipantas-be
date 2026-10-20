@@ -4,12 +4,14 @@ import { QueryDefaultDto } from '../../../dto/query-default.dto.js';
 import { DisasterStatus } from '../../../generated/prisma/enums.js';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Prisma } from '../../../generated/prisma/client.js';
+import { DisplayName } from '../../../common/decorators/display-name.decorator.js';
 
 export class QueryDisasterDto extends QueryDefaultDto {
   @ApiPropertyOptional({
     example: 'FLOOD',
     description: '',
   })
+  @DisplayName('Disaster Code')
   @IsOptional()
   @IsString()
   disasterCode?: string;
@@ -18,6 +20,7 @@ export class QueryDisasterDto extends QueryDefaultDto {
     example: 'Banjir',
     description: '',
   })
+  @DisplayName('Disaster Name')
   @IsOptional()
   @IsString()
   disasterName?: string;
@@ -26,10 +29,12 @@ export class QueryDisasterDto extends QueryDefaultDto {
     example: 'Banjir',
     description: '',
   })
+  @DisplayName('Disaster Category')
   @IsOptional()
   @IsString()
   disasterCategory?: string;
 
+  @DisplayName('Disaster Status')
   @IsOptional()
   @IsString()
   disasterStatus?: DisasterStatus;
@@ -39,6 +44,7 @@ export class QueryDisasterDto extends QueryDefaultDto {
     description:
       'Filter tahun dan bulan kejadian bencana dengan format YYYY-MM',
   })
+  @DisplayName('Disaster Date')
   @IsOptional()
   @IsString()
   @Matches(/^\d{4}-(0[1-9]|1[0-2])$/, {
@@ -50,6 +56,7 @@ export class QueryDisasterDto extends QueryDefaultDto {
     description: 'Nama field/kolom yang digunakan untuk pengurutan data',
     example: 'createdAt',
   })
+  @DisplayName('Sort By')
   @IsOptional()
   @IsEnum(Prisma.DisasterScalarFieldEnum)
   sortBy?: Prisma.DisasterScalarFieldEnum;
@@ -59,6 +66,7 @@ export class QueryDisasterDto extends QueryDefaultDto {
     enum: ['asc', 'desc'],
     example: 'desc',
   })
+  @DisplayName('Sort Order')
   @IsOptional()
   @IsString()
   sortOrder?: 'asc' | 'desc';

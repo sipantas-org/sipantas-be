@@ -47,18 +47,6 @@ export class MasterAreaVillageService {
 
   async update(id: string, updateDto: UpdateVillageDto) {
     await this.findOne(id); // Throws 404 if village not found
-
-    if (updateDto.districtId) {
-      const districtExists = await this.repository.existsDistrict(
-        updateDto.districtId,
-      );
-      if (!districtExists) {
-        throw new BadRequestException(
-          `District with ID '${updateDto.districtId}' does not exist.`,
-        );
-      }
-    }
-
     return this.repository.update(id, updateDto);
   }
 

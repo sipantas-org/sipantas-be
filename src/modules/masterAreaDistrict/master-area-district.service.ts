@@ -47,18 +47,6 @@ export class MasterAreaDistrictService {
 
   async update(id: string, updateDto: UpdateDistrictDto) {
     await this.findOne(id); // Throws 404 if district not found
-
-    if (updateDto.regencyId) {
-      const regencyExists = await this.repository.existsRegency(
-        updateDto.regencyId,
-      );
-      if (!regencyExists) {
-        throw new BadRequestException(
-          `Regency with ID '${updateDto.regencyId}' does not exist.`,
-        );
-      }
-    }
-
     return this.repository.update(id, updateDto);
   }
 

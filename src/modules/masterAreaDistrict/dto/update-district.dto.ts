@@ -1,4 +1,13 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateDistrictDto } from './create-district.dto.js';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { DisplayName } from '../../../common/decorators/display-name.decorator.js';
 
-export class UpdateDistrictDto extends PartialType(CreateDistrictDto) {}
+export class UpdateDistrictDto {
+  @ApiPropertyOptional({ example: 'Johan Pahlawan' })
+  @DisplayName('District Name')
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  name?: string;
+}

@@ -1,4 +1,13 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateRegencyDto } from './create-regency.dto.js';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { DisplayName } from '../../../common/decorators/display-name.decorator.js';
 
-export class UpdateRegencyDto extends PartialType(CreateRegencyDto) {}
+export class UpdateRegencyDto {
+  @ApiPropertyOptional({ example: 'Kabupaten Aceh Barat' })
+  @DisplayName('Regency Name')
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  name?: string;
+}

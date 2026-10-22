@@ -47,18 +47,6 @@ export class MasterAreaRegencyService {
 
   async update(id: string, updateDto: UpdateRegencyDto) {
     await this.findOne(id); // Throws 404 if regency not found
-
-    if (updateDto.provinceId) {
-      const provinceExists = await this.repository.existsProvince(
-        updateDto.provinceId,
-      );
-      if (!provinceExists) {
-        throw new BadRequestException(
-          `Province with ID '${updateDto.provinceId}' does not exist.`,
-        );
-      }
-    }
-
     return this.repository.update(id, updateDto);
   }
 

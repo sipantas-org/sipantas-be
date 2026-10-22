@@ -13,6 +13,7 @@ import {
 import { MasterAreaRegencyService } from './master-area-regency.service.js';
 import { CreateRegencyDto } from './dto/create-regency.dto.js';
 import { UpdateRegencyDto } from './dto/update-regency.dto.js';
+import { QueryRegencyDto } from './dto/query-regency.dto.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
@@ -35,8 +36,8 @@ export class MasterAreaRegencyController {
   }
 
   @Get()
-  findAll(@Query('provinceId') provinceId?: string) {
-    return this.regencyService.findAll(provinceId);
+  findAll(@Query() query: QueryRegencyDto) {
+    return this.regencyService.findAll(query);
   }
 
   @Get(':id')

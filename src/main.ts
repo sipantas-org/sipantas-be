@@ -36,6 +36,8 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
+      whitelist: true,
+      transform: true,
       exceptionFactory: (validationErrors: ValidationError[] = []) => {
         const detailedErrors = validationErrors.map((error) => {
           // 1. Check if @DisplayName exists on the DTO property

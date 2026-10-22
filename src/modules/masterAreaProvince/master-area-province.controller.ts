@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { MasterAreaProvinceService } from './master-area-province.service.js';
 import { CreateProvinceDto } from './dto/create-province.dto.js';
 import { UpdateProvinceDto } from './dto/update-province.dto.js';
+import { QueryProvinceDto } from './dto/query-province.dto.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
@@ -33,8 +35,8 @@ export class MasterAreaProvinceController {
   }
 
   @Get()
-  findAll() {
-    return this.provinceService.findAll();
+  findAll(@Query() query: QueryProvinceDto) {
+    return this.provinceService.findAll(query);
   }
 
   @Get(':id')

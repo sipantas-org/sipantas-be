@@ -13,6 +13,7 @@ import {
 import { MasterAreaVillageService } from './master-area-village.service.js';
 import { CreateVillageDto } from './dto/create-village.dto.js';
 import { UpdateVillageDto } from './dto/update-village.dto.js';
+import { QueryVillageDto } from './dto/query-village.dto.js';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
@@ -35,8 +36,8 @@ export class MasterAreaVillageController {
   }
 
   @Get()
-  findAll(@Query('districtId') districtId?: string) {
-    return this.villageService.findAll(districtId);
+  findAll(@Query() query: QueryVillageDto) {
+    return this.villageService.findAll(query);
   }
 
   @Get(':id')

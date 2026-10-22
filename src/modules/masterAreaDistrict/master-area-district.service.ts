@@ -7,6 +7,7 @@ import {
 import { MasterAreaDistrictRepository } from './repositories/master-area-district.repository.js';
 import { CreateDistrictDto } from './dto/create-district.dto.js';
 import { UpdateDistrictDto } from './dto/update-district.dto.js';
+import { QueryDistrictDto } from './dto/query-district.dto.js';
 
 @Injectable()
 export class MasterAreaDistrictService {
@@ -32,8 +33,8 @@ export class MasterAreaDistrictService {
     return this.repository.create(createDto);
   }
 
-  async findAll(regencyId?: string) {
-    return this.repository.findAll(regencyId);
+  async findAll(query: QueryDistrictDto) {
+    return this.repository.findAll(query);
   }
 
   async findOne(id: string) {

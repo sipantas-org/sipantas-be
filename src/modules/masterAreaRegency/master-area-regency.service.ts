@@ -7,6 +7,7 @@ import {
 import { MasterAreaRegencyRepository } from './repositories/master-area-regency.repository.js';
 import { CreateRegencyDto } from './dto/create-regency.dto.js';
 import { UpdateRegencyDto } from './dto/update-regency.dto.js';
+import { QueryRegencyDto } from './dto/query-regency.dto.js';
 
 @Injectable()
 export class MasterAreaRegencyService {
@@ -32,8 +33,8 @@ export class MasterAreaRegencyService {
     return this.repository.create(createDto);
   }
 
-  async findAll(provinceId?: string) {
-    return this.repository.findAll(provinceId);
+  async findAll(query: QueryRegencyDto) {
+    return this.repository.findAll(query);
   }
 
   async findOne(id: string) {

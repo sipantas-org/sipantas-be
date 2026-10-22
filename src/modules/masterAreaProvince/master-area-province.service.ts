@@ -6,6 +6,7 @@ import {
 import { MasterAreaProvinceRepository } from './repositories/master-area-province.repository.js';
 import { CreateProvinceDto } from './dto/create-province.dto.js';
 import { UpdateProvinceDto } from './dto/update-province.dto.js';
+import { QueryProvinceDto } from './dto/query-province.dto.js';
 
 @Injectable()
 export class MasterAreaProvinceService {
@@ -21,8 +22,8 @@ export class MasterAreaProvinceService {
     return this.repository.create(createDto);
   }
 
-  async findAll() {
-    return this.repository.findAll();
+  async findAll(query: QueryProvinceDto) {
+    return this.repository.findAll(query);
   }
 
   async findOne(id: string) {

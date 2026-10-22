@@ -7,6 +7,7 @@ import {
 import { MasterAreaVillageRepository } from './repositories/master-area-village.repository.js';
 import { CreateVillageDto } from './dto/create-village.dto.js';
 import { UpdateVillageDto } from './dto/update-village.dto.js';
+import { QueryVillageDto } from './dto/query-village.dto.js';
 
 @Injectable()
 export class MasterAreaVillageService {
@@ -32,8 +33,8 @@ export class MasterAreaVillageService {
     return this.repository.create(createDto);
   }
 
-  async findAll(districtId?: string) {
-    return this.repository.findAll(districtId);
+  async findAll(query: QueryVillageDto) {
+    return this.repository.findAll(query);
   }
 
   async findOne(id: string) {

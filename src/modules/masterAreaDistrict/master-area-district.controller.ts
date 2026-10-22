@@ -13,6 +13,7 @@ import {
 import { MasterAreaDistrictService } from './master-area-district.service.js';
 import { CreateDistrictDto } from './dto/create-district.dto.js';
 import { UpdateDistrictDto } from './dto/update-district.dto.js';
+import { QueryDistrictDto } from './dto/query-district.dto.js';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
@@ -35,8 +36,8 @@ export class MasterAreaDistrictController {
   }
 
   @Get()
-  findAll(@Query('regencyId') regencyId?: string) {
-    return this.districtService.findAll(regencyId);
+  findAll(@Query() query: QueryDistrictDto) {
+    return this.districtService.findAll(query);
   }
 
   @Get(':id')

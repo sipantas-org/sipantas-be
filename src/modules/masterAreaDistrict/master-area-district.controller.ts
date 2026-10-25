@@ -17,7 +17,7 @@ import { UpdateDistrictDto } from './dto/update-district.dto.js';
 import { QueryDistrictDto } from './dto/query-district.dto.js';
 import {
   DistrictDetailResponseDto,
-  DistrictResponseDto,
+  DistrictListItemResponseDto,
   DistrictWithRegencyResponseDto,
 } from './dto/district-response.dto.js';
 import { PaginationMetaDto } from '../../dto/pagination-meta.dto.js';
@@ -37,7 +37,7 @@ import {
 
 @ApiTags('master-area-district')
 @ApiBearerAuth('access-token')
-@ApiExtraModels(DistrictResponseDto, PaginationMetaDto)
+@ApiExtraModels(DistrictListItemResponseDto, PaginationMetaDto)
 @Controller('districts')
 export class MasterAreaDistrictController {
   constructor(private readonly districtService: MasterAreaDistrictService) {}
@@ -70,7 +70,7 @@ export class MasterAreaDistrictController {
   @ApiOperation({
     summary: 'Daftar District',
     description:
-      'Mengambil daftar district secara terpaginasi, dengan filter regencyId, provinceId, dan pencarian nama',
+      'Mengambil daftar district secara terpaginasi, dengan filter regencyId, provinceId, dan pencarian nama. Setiap item menyertakan nama regency (kabupaten/kota) dan provinsi induknya.',
   })
   @ApiResponse({
     status: 200,
@@ -81,7 +81,7 @@ export class MasterAreaDistrictController {
           properties: {
             data: {
               type: 'array',
-              items: { $ref: getSchemaPath(DistrictResponseDto) },
+              items: { $ref: getSchemaPath(DistrictListItemResponseDto) },
             },
           },
         },

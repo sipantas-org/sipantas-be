@@ -16,6 +16,7 @@ import { CreateVillageDto } from './dto/create-village.dto.js';
 import { UpdateVillageDto } from './dto/update-village.dto.js';
 import { QueryVillageDto } from './dto/query-village.dto.js';
 import {
+  VillageListItemResponseDto,
   VillageResponseDto,
   VillageWithDistrictResponseDto,
 } from './dto/village-response.dto.js';
@@ -36,7 +37,7 @@ import {
 
 @ApiTags('master-area-village')
 @ApiBearerAuth('access-token')
-@ApiExtraModels(VillageResponseDto, PaginationMetaDto)
+@ApiExtraModels(VillageResponseDto, VillageListItemResponseDto, PaginationMetaDto)
 @Controller('villages')
 export class MasterAreaVillageController {
   constructor(private readonly villageService: MasterAreaVillageService) {}
@@ -69,7 +70,7 @@ export class MasterAreaVillageController {
   @ApiOperation({
     summary: 'Daftar Village',
     description:
-      'Mengambil daftar village secara terpaginasi, dengan filter districtId, regencyId, provinceId, dan pencarian nama',
+      'Mengambil daftar village secara terpaginasi, dengan filter districtId, regencyId, provinceId, dan pencarian nama. Setiap item menyertakan nama district (kecamatan) dan regency (kabupaten/kota) induknya.',
   })
   @ApiResponse({
     status: 200,
@@ -80,7 +81,7 @@ export class MasterAreaVillageController {
           properties: {
             data: {
               type: 'array',
-              items: { $ref: getSchemaPath(VillageResponseDto) },
+              items: { $ref: getSchemaPath(VillageListItemResponseDto) },
             },
           },
         },

@@ -7,6 +7,16 @@ import { QueryVillageDto } from '../dto/query-village.dto.js';
 import { findPage } from '../../../common/utils/pagination.util.js';
 import { buildPrismaWhere } from '../../../common/utils/filter-data.util.js';
 
+const withDistrictAndRegencyName = {
+  district: {
+    select: { name: true, regency: { select: { name: true } } },
+  },
+} satisfies Prisma.MasterAreaVillageInclude;
+
+type VillageWithDistrictAndRegencyName = Prisma.MasterAreaVillageGetPayload<{
+  include: typeof withDistrictAndRegencyName;
+}>;
+
 @Injectable()
 export class MasterAreaVillageRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -63,12 +73,24 @@ export class MasterAreaVillageRepository {
     const sortBy = query.sortBy ?? 'name';
     const sortOrder = query.sortOrder ?? 'asc';
 
-    return findPage(this.prisma.masterAreaVillage, {
+    const result = await findPage(this.prisma.masterAreaVillage, {
       where,
       skip,
       take: limit,
       orderBy: { [sortBy]: sortOrder },
+      include: withDistrictAndRegencyName,
     });
+
+    const data = result.data as VillageWithDistrictAndRegencyName[];
+
+    return {
+      data: data.map(({ district, ...item }) => ({
+        ...item,
+        districtName: district?.name ?? null,
+        regencyName: district?.regency?.name ?? null,
+      })),
+      pagination: result.pagination,
+    };
   }
 
   async update(id: string, data: UpdateVillageDto) {

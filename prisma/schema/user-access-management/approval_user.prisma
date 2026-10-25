@@ -1,0 +1,21 @@
+enum ApprovalStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+model ApprovalUser {
+  approvalId     Int            @id @default(autoincrement())
+  surveyorId     Int
+  adminId        Int
+  statusApproval ApprovalStatus
+  description     String?
+  approvalDate   DateTime?      @db.Timestamptz
+  createdAt      DateTime       @default(now()) @db.Timestamptz
+  updatedAt      DateTime       @updatedAt @db.Timestamptz
+
+  surveyor UserSurveyor @relation(fields: [surveyorId], references: [surveyorId])
+  admin    UserAdmin    @relation(fields: [adminId], references: [adminId])
+
+  @@map("ApprovalUser")
+}

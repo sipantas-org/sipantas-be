@@ -1,0 +1,20 @@
+enum HousingDamageAssessmentStatus {
+  Active
+  Inactive
+}
+
+model HousingDamageAssessment {
+  housingDamageAssessmentId Int                           @id @default(autoincrement())
+  housingAssessmentPartId   Int
+  surveyDamageQuestion       String
+  surveyScoring                Json
+  housingDamageAssessmentStatus                        HousingDamageAssessmentStatus
+  createdAt                    DateTime                     @default(now()) @db.Timestamptz
+  updatedAt                    DateTime                     @updatedAt @db.Timestamptz
+
+  housingAssessmentPart HousingAssessmentPart @relation(fields: [housingAssessmentPartId], references: [housingAssessmentPartId])
+  SurveyHousingDetails SurveyHousingDetail[]
+
+  @@unique([housingAssessmentPartId, surveyDamageQuestion])
+  @@map("HousingDamageAssessment")
+}

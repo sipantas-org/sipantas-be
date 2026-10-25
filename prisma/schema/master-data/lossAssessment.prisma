@@ -1,0 +1,22 @@
+enum LossAssessmentTypeOfLoss {
+  additional_cost
+  income_lost
+}
+
+enum LossAssessmentStatus {
+  Active
+  Inactive
+}
+
+model LossAssessment {
+  lossAssessmentId  Int  @id  @default(autoincrement())
+  typeOfLoss  LossAssessmentTypeOfLoss
+  surveyLossQuestion String
+  lossAssessmentStatus  LossAssessmentStatus
+  createdAt           DateTime                 @default(now()) @db.Timestamptz
+  updatedAt           DateTime                 @updatedAt @db.Timestamptz
+  SurveyLostDetail SurveyLostDetail[]
+
+
+  @@map("LossAssessment")
+}

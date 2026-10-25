@@ -1,0 +1,18 @@
+enum SectorStatus {
+  Active
+  Inactive
+}
+model Sector {
+  sectorId   Int          @id @default(autoincrement())
+  parentId   Int?
+  sectorName String @unique
+  description String?
+  status      SectorStatus
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  parent   Sector?  @relation("ParentChildSector", fields: [parentId], references: [sectorId])
+  children Sector[] @relation("ParentChildSector")
+
+   @@map("Sector")
+}

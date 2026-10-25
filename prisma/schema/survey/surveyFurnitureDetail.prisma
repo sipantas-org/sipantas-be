@@ -1,0 +1,19 @@
+enum DamageCategory {
+  Ringan
+  Sedang
+  Berat
+}
+
+model SurveyFurnitureDetail {
+  surveyFurnitureDetailId   Int          @id @default(autoincrement())
+  surveyId Int
+  furnitureName String
+  damageCategory DamageCategory
+  quantity Int
+  unitPrice Decimal @db.Decimal(15, 2)
+  totalPrice Decimal @db.Decimal(15, 2)
+  description String
+
+
+   @@map("SurveyFurnitureDetail")
+}

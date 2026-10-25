@@ -1,0 +1,62 @@
+enum DamageLevel {
+  TMK @map("Tidak Masuk Kategori")
+  Ringan
+  Sedang
+  Berat
+}
+
+enum SurveyStatus {
+  Pending
+  OnComplain @map("On Complain")
+  OnBudgeting @map("On Budgeting")
+  OnConstruction @map("On Construction")
+  Completed
+}
+
+enum Authority {
+  Pusat
+  Provinsi
+  KabupatenKota @map("Kabupaten / Kota")
+  MasyarakatSwasta @map("Masyarakat / Swasta")
+}
+
+model Survey {
+  surveyId   Int          @id @default(autoincrement())
+  disasterId Int
+  sectorId Int
+  surveyStatus SurveyStatus
+
+  provinceId        String?               @db.VarChar(20)
+  regencyId         String?              @db.VarChar(20)  
+  districtId        String?               @db.VarChar(20)
+  villageId         String?              @db.VarChar(20)
+
+  // Gunakan Restrict untuk province (karena provinceId wajib/non-nullable)
+  province          MasterAreaProvince? @relation(fields: [provinceId], references: [id], onDelete: SetNull)
+  // SetNull valid untuk regency (karena regencyId opsional ?)
+  regency           MasterAreaRegency? @relation(fields: [regencyId], references: [id], onDelete: SetNull)        
+
+  // Gunakan Restrict untuk district (karena districtId wajib/non-nullable)
+  district          MasterAreaDistrict? @relation(fields: [districtId], references: [id], onDelete: SetNull)
+  // SetNull valid untuk village (karena villageId opsional ?)
+  village           MasterAreaVillage? @relation(fields: [villageId], references: [id], onDelete: SetNull)
+  
+  addressDetail String
+  authority Authority
+  assetName String
+  latitude String
+  longitude String
+  damageLevel DamageLevel
+  volume String
+  volumeUnit String
+  volumeUnitOther String
+  totalPriceUnit Decimal @db.Decimal(15, 2)
+  totalPriceFurniture Decimal @db.Decimal(15, 2)
+  totalScore Decimal @db.Decimal(15, 2)
+  sourceOfBudgetting String?
+
+  createdAt        DateTime             @default(now()) @db.Timestamptz
+  updatedAt        DateTime             @updatedAt @db.Timestamptz
+
+  @@map("Survey")
+}

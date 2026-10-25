@@ -1,0 +1,17 @@
+enum PartStatus {
+  Active
+  Inactive
+}
+
+model HousingAssessmentPart {
+  housingAssessmentPartId Int      @id @default(autoincrement())
+  partName                  String @unique
+  partStatus            PartStatus
+
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  HousingDamageAssessments HousingDamageAssessment[]
+
+   @@map("HousingAssessmentPart")
+}

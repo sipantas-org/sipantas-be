@@ -1,0 +1,29 @@
+enum AdminStatus {
+  Active
+  Inactive
+}
+
+enum AdminRole {
+  Administrator
+  Monitoring
+}
+
+model UserAdmin {
+  adminId   Int         @id @default(autoincrement())
+  nip        String      @unique
+  nama       String
+  phoneNumber   String
+  email      String      @unique
+  password   String
+  status     AdminStatus
+  role       AdminRole
+  lastLogin DateTime?   @db.Timestamptz
+  createdAt DateTime    @default(now()) @db.Timestamptz
+  updatedAt DateTime    @updatedAt @db.Timestamptz
+
+  loginHistories    LoginHistory[]
+  approvals         ApprovalUser[]
+  activityHistories ActivityHistory[]
+
+  @@map("UserAdmin")
+}

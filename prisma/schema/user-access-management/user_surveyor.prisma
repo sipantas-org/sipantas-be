@@ -1,0 +1,29 @@
+enum SurveyorStatus {
+  Pending
+  Active
+  Inactive
+  Rejected
+}
+
+model UserSurveyor {
+  surveyorId Int            @id @default(autoincrement())
+  nip         String         @unique
+  nama        String
+  phoneNumber    String
+  email       String         @unique
+  password    String
+  status      SurveyorStatus
+  provinceId  String             @db.VarChar(20)
+  regencyId   String             @db.VarChar(20)
+  province    MasterAreaProvince @relation(fields: [provinceId], references: [id], onDelete: Restrict)
+  regency     MasterAreaRegency  @relation(fields: [regencyId], references: [id], onDelete: Restrict)
+  lastLogin  DateTime?      @db.Timestamptz
+  createdAt  DateTime       @default(now()) @db.Timestamptz
+  updatedAt  DateTime       @updatedAt @db.Timestamptz
+
+  loginHistories    LoginHistory[]
+  approvals         ApprovalUser[]
+  activityHistories ActivityHistory[]
+
+  @@map("UserSurveyor")
+}

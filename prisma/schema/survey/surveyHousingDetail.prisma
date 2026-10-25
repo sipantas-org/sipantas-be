@@ -1,0 +1,11 @@
+model SurveyHousingDetail {
+  surveyHousingDetailId   Int          @id @default(autoincrement())
+  surveyId Int
+  housingDamageAssessmentId Int
+  totalUnit Int
+  score Int
+
+  HousingDamageAssessment HousingDamageAssessment @relation(fields: [housingDamageAssessmentId], references: [housingDamageAssessmentId])
+
+   @@map("SurveyHousingDetail")
+}

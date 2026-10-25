@@ -1,0 +1,22 @@
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { DisplayName } from '../../../common/decorators/display-name.decorator.js';
+
+export class CreateRegencyDto {
+  @DisplayName('Regency ID')
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(20)
+  id: string;
+
+  @DisplayName('Province ID')
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(20)
+  provinceId: string;
+
+  @DisplayName('Regency Name')
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  name: string;
+}

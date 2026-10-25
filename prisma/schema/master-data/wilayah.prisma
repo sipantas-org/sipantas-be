@@ -1,0 +1,36 @@
+model MasterAreaProvince {
+  id        String    @id @db.VarChar(20)
+  name      String    @db.VarChar(255)
+  regencies MasterAreaRegency[]
+  disasters Disaster[]
+  surveys   Survey[]
+  surveyors UserSurveyor[]
+}
+
+model MasterAreaRegency {
+  id         String     @id @db.VarChar(20)
+  provinceId String     @db.VarChar(20)
+  name       String     @db.VarChar(255)
+  province   MasterAreaProvince   @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+  districts  MasterAreaDistrict[]
+  disasters Disaster[]
+  surveys   Survey[]
+  surveyors UserSurveyor[]
+}
+
+model MasterAreaDistrict {
+  id        String    @id @db.VarChar(20)
+  regencyId String    @db.VarChar(20)
+  name      String    @db.VarChar(255)
+  regency   MasterAreaRegency   @relation(fields: [regencyId], references: [id], onDelete: Cascade)
+  villages  MasterAreaVillage[]
+  surveys   Survey[]
+}
+
+model MasterAreaVillage {
+  id         String   @id @db.VarChar(20)
+  districtId String   @db.VarChar(20)
+  name       String   @db.VarChar(255)
+  district   MasterAreaDistrict @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  surveys    Survey[]
+}

@@ -29,6 +29,18 @@
 
 ```bash
 $ npm install
+
+# sync DB using prisma biar ada migrasi nya
+$ npx prisma migrate dev
+
+# sync DB using prisma kalo local pakai ini aja
+$ npx prisma db push
+
+# generate prisma client
+$ npx prisma generate
+
+# seed data master
+$ npx prisma db seed
 ```
 
 ## Compile and run the project

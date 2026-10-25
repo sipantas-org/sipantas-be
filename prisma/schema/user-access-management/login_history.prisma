@@ -1,0 +1,20 @@
+enum LoginStatus {
+  Success
+  Failed
+}
+
+model LoginHistory {
+  loginId     Int         @id @default(autoincrement())
+  userId      Int?
+  adminId     Int?
+  ipAddress   String
+  token String
+  loginAt     DateTime    @default(now()) @db.Timestamptz
+  deviceInfo  String?
+  statusLogin LoginStatus
+
+  user  UserSurveyor? @relation(fields: [userId], references: [surveyorId])
+  admin UserAdmin?    @relation(fields: [adminId], references: [adminId])
+
+  @@map("LoginHistory")
+}

@@ -1,0 +1,31 @@
+enum DisasterStatus {
+  Active
+  Inactive
+}
+
+model Disaster {
+  disasterId       Int                  @id @default(autoincrement())
+  disasterCode     String               @unique
+  disasterName     String
+  disasterCategory String
+  disasterDate DateTime @db.Date
+  description       String?
+  disasterStatus            DisasterStatus @map("Status")
+
+  provinceId        String?               @db.VarChar(20)
+  regencyId         String?              @db.VarChar(20)
+
+  // Gunakan Restrict untuk province (karena provinceId wajib/non-nullable)
+  province          MasterAreaProvince? @relation(fields: [provinceId], references: [id], onDelete: SetNull)
+  // SetNull valid untuk regency (karena regencyId opsional ?)
+  regency           MasterAreaRegency? @relation(fields: [regencyId], references: [id], onDelete: SetNull)
+
+  createdAt        DateTime             @default(now()) @db.Timestamptz
+  updatedAt        DateTime             @updatedAt @db.Timestamptz
+
+  @@map("Disaster")
+}
+
+
+
+

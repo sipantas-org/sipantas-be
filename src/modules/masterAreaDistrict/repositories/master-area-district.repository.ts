@@ -7,6 +7,16 @@ import { QueryDistrictDto } from '../dto/query-district.dto.js';
 import { findPage } from '../../../common/utils/pagination.util.js';
 import { buildPrismaWhere } from '../../../common/utils/filter-data.util.js';
 
+const withRegencyAndProvinceName = {
+  regency: {
+    select: { name: true, province: { select: { name: true } } },
+  },
+} satisfies Prisma.MasterAreaDistrictInclude;
+
+type DistrictWithRegencyAndProvinceName = Prisma.MasterAreaDistrictGetPayload<{
+  include: typeof withRegencyAndProvinceName;
+}>;
+
 @Injectable()
 export class MasterAreaDistrictRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -57,12 +67,24 @@ export class MasterAreaDistrictRepository {
     const sortBy = query.sortBy ?? 'name';
     const sortOrder = query.sortOrder ?? 'asc';
 
-    return findPage(this.prisma.masterAreaDistrict, {
+    const result = await findPage(this.prisma.masterAreaDistrict, {
       where,
       skip,
       take: limit,
       orderBy: { [sortBy]: sortOrder },
+      include: withRegencyAndProvinceName,
     });
+
+    const data = result.data as DistrictWithRegencyAndProvinceName[];
+
+    return {
+      data: data.map(({ regency, ...item }) => ({
+        ...item,
+        regencyName: regency?.name ?? null,
+        provinceName: regency?.province?.name ?? null,
+      })),
+      pagination: result.pagination,
+    };
   }
 
   async update(id: string, data: UpdateDistrictDto) {

@@ -26,3 +26,11 @@ export class VillageWithDistrictResponseDto extends VillageResponseDto {
   @ApiProperty({ type: DistrictOfVillageDto })
   district!: DistrictOfVillageDto;
 }
+
+export class VillageListItemResponseDto extends VillageResponseDto {
+  @ApiProperty({ example: 'Bakongan', nullable: true })
+  districtName!: string | null;
+
+  @ApiProperty({ example: 'Kabupaten Aceh Selatan', nullable: true })
+  regencyName!: string | null;
+}

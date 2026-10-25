@@ -27,6 +27,14 @@ export class DistrictWithRegencyResponseDto extends DistrictResponseDto {
   regency!: RegencyOfDistrictDto;
 }
 
+export class DistrictListItemResponseDto extends DistrictResponseDto {
+  @ApiProperty({ example: 'Kabupaten Aceh Selatan', nullable: true })
+  regencyName!: string | null;
+
+  @ApiProperty({ example: 'Aceh', nullable: true })
+  provinceName!: string | null;
+}
+
 export class VillageOfDistrictDto {
   @ApiProperty({ example: '11.01.01.2001' })
   id!: string;

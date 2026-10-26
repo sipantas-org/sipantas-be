@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBasicAuth,
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
@@ -20,8 +21,10 @@ import { SurveyService } from './survey.service.js';
 import { CreateSurveyDto } from './dto/create-survey.dto.js';
 import { UpdateSurveyDto } from './dto/update-survey.dto.js';
 import { UpdateSurveyStatusDto } from './dto/update-survey-status.dto.js';
+import { UpdateSurveyComplainDto } from './dto/update-survey-complain.dto.js';
 import { QuerySurveyDto } from './dto/query-survey.dto.js';
 
+import { CombinedAuthGuard } from '../../common/guards/combine-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { SurveyorGuard } from '../../common/guards/surveyor.guard.js';
 
@@ -43,6 +46,8 @@ export class SurveyController {
   }
 
   @Get()
+  @UseGuards(CombinedAuthGuard)
+  @ApiBasicAuth('basic-auth')
   @ApiOperation({
     summary: 'Daftar survei',
     description:
@@ -53,6 +58,8 @@ export class SurveyController {
   }
 
   @Get(':id')
+  @UseGuards(CombinedAuthGuard)
+  @ApiBasicAuth('basic-auth')
   @ApiOperation({
     summary: 'Detail survei',
     description:
@@ -91,6 +98,24 @@ export class SurveyController {
     @Body() updateSurveyStatusDto: UpdateSurveyStatusDto,
   ) {
     return this.surveyService.updateStatus(id, updateSurveyStatusDto);
+  }
+
+  @Patch(':id/complain')
+  @UseGuards(JwtAuthGuard, SurveyorGuard)
+  @ApiOperation({
+    summary: 'Kirim keluhan / komplain survei',
+    description:
+      'Mengajukan komplain terhadap hasil survei beserta deskripsi dan bukti foto.',
+  })
+  @ApiParam({ name: 'id', description: 'ID Survei', type: Number, example: 1 })
+  doComplain(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateSurveyComplainDto: UpdateSurveyComplainDto,
+  ) {
+    return this.surveyService.updateStatus(
+      id,
+      updateSurveyComplainDto as unknown as UpdateSurveyStatusDto,
+    );
   }
 
   @Delete(':id')

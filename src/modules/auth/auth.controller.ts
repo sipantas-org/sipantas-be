@@ -22,6 +22,7 @@ import { UpdateSurveyorProfileDto } from './dto/update-surveyor-profile.dto.js';
 import { UpdateAdminProfileDto } from './dto/update-admin-profile.dto.js';
 import { UpdateSurveyorStatusDto } from './dto/update-surveyor-status.dto.js';
 import { UpdateAdminStatusDto } from './dto/update-admin-status.dto.js';
+import { BasicAuthGuard } from '../../common/guards/basic-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
@@ -30,6 +31,7 @@ import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.j
 import { AdminRole } from '../../generated/prisma/enums.js';
 import {
   ApiBearerAuth,
+  ApiBasicAuth,
   ApiExtraModels,
   ApiTags,
   ApiOperation,
@@ -55,6 +57,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('admin/login')
+  @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic-auth')
   @ApiOperation({
     summary: 'Login Admin',
     description:
@@ -160,6 +164,8 @@ export class AuthController {
   }
 
   @Post('surveyor/login')
+  @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic-auth')
   @ApiOperation({
     summary: 'Login Surveyor',
     description: 'Endpoint untuk melakukan autentikasi dan login akun surveyor',
@@ -183,6 +189,8 @@ export class AuthController {
   }
 
   @Post('surveyor/register')
+  @UseGuards(BasicAuthGuard)
+  @ApiBasicAuth('basic-auth')
   @ApiOperation({
     summary: 'Registrasi Surveyor Baru',
     description:

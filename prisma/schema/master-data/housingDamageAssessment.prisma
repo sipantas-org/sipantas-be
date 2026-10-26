@@ -6,6 +6,7 @@ enum HousingDamageAssessmentStatus {
 model HousingDamageAssessment {
   housingDamageAssessmentId Int                           @id @default(autoincrement())
   housingAssessmentPartId   Int
+  surveyOrderNumber   Int
   surveyDamageQuestion       String
   surveyScoring                Json
   housingDamageAssessmentStatus                        HousingDamageAssessmentStatus

@@ -8,9 +8,12 @@ import { PrismaClientExceptionFilter } from './common/filters/prisma-exception.f
 import { ValidationError } from 'class-validator';
 import { BadRequestException } from '@nestjs/common';
 import { DISPLAY_NAME_KEY } from './common/decorators/display-name.decorator.js';
+import { getSwaggerCustomOptions } from './swagger-dev.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const customOptions = getSwaggerCustomOptions();
 
   const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
     .split(',')
@@ -74,7 +77,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('SIPANTAS API')
-    .setDescription('The SIPANTAS API description')
+    .setDescription('SIPANTAS API Documentation')
     .setVersion('1.0')
     .addTag('SIPANTAS')
     .addBearerAuth(
@@ -88,13 +91,19 @@ async function bootstrap() {
       },
       'access-token',
     )
+    .addBasicAuth(
+      {
+        type: 'http',
+        scheme: 'basic',
+        description: 'Enter username & password',
+      },
+      'basic-auth',
+    )
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('swagger', app, documentFactory, {
-    jsonDocumentUrl: 'swagger/json',
-  });
+  SwaggerModule.setup('swagger', app, documentFactory, customOptions);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
 await bootstrap();

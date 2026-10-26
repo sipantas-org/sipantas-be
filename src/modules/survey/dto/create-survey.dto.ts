@@ -6,15 +6,14 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsNumberString,
+  IsNotEmpty,
+  Length,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import {
-  Authority,
-  DamageLevel,
-  SurveyStatus,
-} from '../../../generated/prisma/enums.js';
+import { Authority, SurveyStatus } from '../../../generated/prisma/enums.js';
 import { CreateSurveyFurnitureDetailDto } from '../../surveyFurnitureDetail/dto/create-survey-furniture-detail.dto.js';
 import { CreateSurveyHousingDetailDto } from '../../surveyHousingDetail/dto/create-survey-housing-detail.dto.js';
 import { CreateSurveyLostDetailDto } from '../../surveyLostDetail/dto/create-survey-lost-detail.dto.js';
@@ -36,6 +35,11 @@ export class CreateSurveyDto {
   @DisplayName('Sector ID')
   @IsInt()
   sectorId: number;
+
+  @ApiProperty({ description: 'ID Surveyor', example: 1 })
+  @DisplayName('Surveyor ID')
+  @IsInt()
+  surveyorId: number;
 
   @ApiProperty({
     enum: SurveyStatus,
@@ -110,8 +114,21 @@ export class CreateSurveyDto {
   authority: Authority;
 
   @ApiProperty({
+    description: 'NIK penduduk',
+    example: '1102132211990001',
+  })
+  @DisplayName('NIK')
+  @IsString({ message: 'NIK harus berupa teks' })
+  @IsNumberString(
+    { no_symbols: true },
+    { message: 'NIK hanya boleh berisi angka' },
+  )
+  @Length(16, 16, { message: 'NIK harus terdiri dari 16 digit' })
+  nik: string;
+
+  @ApiProperty({
     description: 'Nama aset atau infrastruktur yang disurvei',
-    example: 'Jembatan Penghubung Desa',
+    example: 'Rumah Pak Budi',
   })
   @DisplayName('Asset Name')
   @IsString()
@@ -200,4 +217,53 @@ export class CreateSurveyDto {
   @ValidateNested({ each: true })
   @Type(() => CreateSurveyLostDetailDto)
   lostDetails?: CreateSurveyLostDetailDto[];
+
+  @ApiProperty({
+    description: 'Identifier atau path folder unik penyimpanan berkas survei',
+    example: Date.now().toString(),
+  })
+  @DisplayName('Survey Folder Path')
+  @IsString()
+  @IsNotEmpty()
+  surveyFolderPath: string;
+
+  @ApiPropertyOptional({
+    type: () => [SurveyFileItemDto],
+    description: 'Daftar berkas dokumentasi survey',
+  })
+  @DisplayName('Survey Files')
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SurveyFileItemDto)
+  files?: SurveyFileItemDto[];
+}
+
+export class SurveyFileItemDto {
+  @ApiProperty({
+    example: 'Pondasi/Sloof',
+    description: 'Kategori berkas atau elemen kerusakan',
+  })
+  @DisplayName('Category')
+  @IsString()
+  @IsNotEmpty()
+  category: string;
+
+  @ApiProperty({
+    example: 'uploads/surveys/',
+    description: 'Path direktori atau URL penyimpanan file',
+  })
+  @DisplayName('File Path')
+  @IsString()
+  @IsNotEmpty()
+  filePath: string;
+
+  @ApiProperty({
+    example: 'kerusakan-pondasi-1.jpg',
+    description: 'Nama asli atau nama simpan file',
+  })
+  @DisplayName('File Name')
+  @IsString()
+  @IsNotEmpty()
+  fileName: string;
 }

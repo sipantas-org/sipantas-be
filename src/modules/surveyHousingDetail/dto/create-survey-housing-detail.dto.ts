@@ -15,7 +15,7 @@ export class CreateSurveyHousingDetailDto {
   @IsNotEmpty()
   totalUnit: number;
 
-  @ApiProperty({ description: 'Score', example: 85 })
+  @ApiProperty({ description: 'Score', example: 15 })
   @DisplayName('Score')
   @IsInt()
   @IsNotEmpty()

@@ -104,6 +104,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('swagger', app, documentFactory, customOptions);
 
-  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
+  await app.listen(process.env.PORT ?? 3000);
 }
 await bootstrap();

@@ -242,21 +242,21 @@ export class SurveyService {
       case SurveyStatus.Pending:
         if (currentStatus !== SurveyStatus.OnComplain) {
           throw new BadRequestException(
-            `Status hanya dapat diubah ke ${SurveyStatus.Pending} jika status saat ini adalah ${SurveyStatus.OnComplain}`,
+            `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.OnComplain}`,
           );
         }
         break;
       case SurveyStatus.OnConstruction:
         if (currentStatus !== SurveyStatus.OnBudgeting) {
           throw new BadRequestException(
-            `Status hanya dapat diubah ke ${SurveyStatus.OnConstruction} jika status saat ini adalah ${SurveyStatus.OnBudgeting}`,
+            `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.OnBudgeting}`,
           );
         }
         break;
       case SurveyStatus.Completed:
         if (currentStatus !== SurveyStatus.OnConstruction) {
           throw new BadRequestException(
-            `Status hanya dapat diubah ke ${SurveyStatus.Completed} jika status saat ini adalah ${SurveyStatus.OnConstruction}`,
+            `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.OnConstruction}`,
           );
         }
         break;

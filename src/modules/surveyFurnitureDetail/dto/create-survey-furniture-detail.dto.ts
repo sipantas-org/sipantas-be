@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsNumberString,
+  IsString,
+  IsOptional,
+} from 'class-validator';
 import { DamageCategory } from '../../../generated/prisma/enums.js';
 import { DisplayName } from '../../../common/decorators/display-name.decorator.js';
 
@@ -24,19 +32,19 @@ export class CreateSurveyFurnitureDetailDto {
 
   @ApiProperty({ description: 'Unit price of the item' })
   @DisplayName('Unit Price')
-  @IsNumber()
+  @IsNumberString()
   @IsNotEmpty()
   unitPrice: number;
 
   @ApiProperty({ description: 'Total price of the items' })
   @DisplayName('Total Price')
-  @IsNumber()
+  @IsNumberString()
   @IsNotEmpty()
   totalPrice: number;
 
   @ApiProperty({ description: 'Damage description' })
   @DisplayName('Description')
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   description: string;
 }

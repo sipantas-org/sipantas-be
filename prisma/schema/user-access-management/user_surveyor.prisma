@@ -24,6 +24,7 @@ model UserSurveyor {
   loginHistories    LoginHistory[]
   approvals         ApprovalUser[]
   activityHistories ActivityHistory[]
+  surveys           Survey[]
 
   @@map("UserSurveyor")
 }

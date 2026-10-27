@@ -10,7 +10,6 @@ import type { JwtPayload } from '../interfaces/jwt-payload.interface.js';
 export class SurveyorGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<{ user?: JwtPayload }>();
-    console.log(request.user);
     if (!request.user || request.user.userType !== 'surveyor') {
       throw new ForbiddenException('Access denied. Surveyor role required.');
     }

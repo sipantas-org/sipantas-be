@@ -3,14 +3,23 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { SurveyRepository } from './repositories/survey.repository.js';
+import {
+  SurveyRepository,
+  CreateSurveyFileDetailItem,
+} from './repositories/survey.repository.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
-import { CreateSurveyDto } from './dto/create-survey.dto.js';
+import { CreateSurveyDto, SurveyFileItemDto } from './dto/create-survey.dto.js';
 import { UpdateSurveyDto } from './dto/update-survey.dto.js';
 import { UpdateSurveyStatusDto } from './dto/update-survey-status.dto.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 import { DamageLevel, SurveyStatus } from '../../generated/prisma/enums.js';
 import { QuerySurveyDto } from './dto/query-survey.dto.js';
+
+const DAMAGE_SCORE_THRESHOLDS = {
+  HEAVY: 70,
+  MEDIUM: 30,
+  LIGHT: 20,
+} as const;
 
 @Injectable()
 export class SurveyService {
@@ -19,21 +28,21 @@ export class SurveyService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async create(dto: CreateSurveyDto) {
-    const {
-      provinceId,
-      regencyId,
-      districtId,
-      villageId,
-      volumeUnitOther,
-      furnitureDetails,
-      housingDetails,
-      lostDetails,
-      ...rest
-    } = dto;
+  private formatFiles(
+    files?: SurveyFileItemDto[],
+  ): CreateSurveyFileDetailItem[] | undefined {
+    if (!files) return undefined;
 
-    await this.validateUniqueHousingAssessmentParts(housingDetails);
+    return files.map((item) => ({
+      category: item.category,
+      filePath: item.filePath,
+      fileName: item.fileName,
+    }));
+  }
 
+  private calculateDamageLevelAndScore(
+    housingDetails?: Array<{ score?: number | string }>,
+  ): { damageLevel: DamageLevel; totalScore: string } {
     const totalHousingScore =
       housingDetails && housingDetails.length > 0
         ? housingDetails.reduce(
@@ -44,11 +53,11 @@ export class SurveyService {
 
     let damage: DamageLevel;
     if (totalHousingScore !== null) {
-      if (totalHousingScore > 70) {
+      if (totalHousingScore > DAMAGE_SCORE_THRESHOLDS.HEAVY) {
         damage = DamageLevel.Berat;
-      } else if (totalHousingScore > 30) {
+      } else if (totalHousingScore > DAMAGE_SCORE_THRESHOLDS.MEDIUM) {
         damage = DamageLevel.Sedang;
-      } else if (totalHousingScore >= 20) {
+      } else if (totalHousingScore >= DAMAGE_SCORE_THRESHOLDS.LIGHT) {
         damage = DamageLevel.Ringan;
       } else {
         damage = DamageLevel.TMK;
@@ -56,34 +65,72 @@ export class SurveyService {
     } else {
       damage = DamageLevel.TMK;
     }
-    const data: Prisma.SurveyCreateInput = {
-      ...rest,
+
+    return {
       damageLevel: damage,
       totalScore: totalHousingScore?.toString() ?? '',
+    };
+  }
+
+  async create(dto: CreateSurveyDto) {
+    const {
+      surveyorId,
+      provinceId,
+      regencyId,
+      districtId,
+      villageId,
+      volumeUnitOther,
+      files,
+      furnitureDetails,
+      housingDetails,
+      lostDetails,
+      ...rest
+    } = dto;
+
+    await this.validateForeignEntities({
+      surveyorId,
+      provinceId,
+      regencyId,
+      districtId,
+      villageId,
+    });
+
+    await this.validateUniqueHousingAssessmentParts(housingDetails);
+
+    const { damageLevel, totalScore } =
+      this.calculateDamageLevelAndScore(housingDetails);
+
+    const data: Prisma.SurveyCreateInput = {
+      ...rest,
+      damageLevel,
+      totalScore,
       volumeUnitOther: volumeUnitOther ?? '',
+      ...(surveyorId ? { surveyor: { connect: { surveyorId } } } : {}),
       ...(provinceId ? { province: { connect: { id: provinceId } } } : {}),
       ...(regencyId ? { regency: { connect: { id: regencyId } } } : {}),
       ...(districtId ? { district: { connect: { id: districtId } } } : {}),
       ...(villageId ? { village: { connect: { id: villageId } } } : {}),
     };
 
+    const fileDetails = this.formatFiles(files);
+
     return this.surveyRepository.createWithDetails({
       data,
       furnitureDetails,
       housingDetails,
       lostDetails,
+      fileDetails,
     });
   }
 
   async findAll(query: QuerySurveyDto) {
-    const surveys = await this.surveyRepository.findAll(query);
-    return surveys;
+    return this.surveyRepository.findAll(query);
   }
 
   async findOne(id: number) {
     const survey = await this.surveyRepository.findById(id);
     if (!survey) {
-      throw new NotFoundException(`Survey with ID ${id} not found`);
+      throw new NotFoundException(`Survey tidak ditemukan`);
     }
     return survey;
   }
@@ -102,18 +149,36 @@ export class SurveyService {
       districtId,
       villageId,
       volumeUnitOther,
+      files,
       furnitureDetails,
       housingDetails,
       lostDetails,
       ...rest
     } = dto;
 
+    await this.validateForeignEntities({
+      provinceId,
+      regencyId,
+      districtId,
+      villageId,
+    });
     if (housingDetails !== undefined) {
       await this.validateUniqueHousingAssessmentParts(housingDetails);
     }
 
+    const damageAssessment =
+      housingDetails !== undefined
+        ? this.calculateDamageLevelAndScore(housingDetails)
+        : undefined;
+
     const data: Prisma.SurveyUpdateInput = {
       ...rest,
+      ...(damageAssessment !== undefined
+        ? {
+            damageLevel: damageAssessment.damageLevel,
+            totalScore: damageAssessment.totalScore,
+          }
+        : {}),
       ...(volumeUnitOther !== undefined
         ? { volumeUnitOther: volumeUnitOther ?? '' }
         : {}),
@@ -138,11 +203,16 @@ export class SurveyService {
           : { village: { disconnect: true } }
         : {}),
     };
+
+    const fileDetails =
+      files !== undefined ? this.formatFiles(files) : undefined;
+
     return this.surveyRepository.updateWithDetails(id, {
       data,
       furnitureDetails,
       housingDetails,
       lostDetails,
+      fileDetails,
     });
   }
 
@@ -172,21 +242,21 @@ export class SurveyService {
       case SurveyStatus.Pending:
         if (currentStatus !== SurveyStatus.OnComplain) {
           throw new BadRequestException(
-            `Status hanya dapat diubah ke ${SurveyStatus.Pending} jika status saat ini adalah ${SurveyStatus.OnComplain}`,
+            `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.OnComplain}`,
           );
         }
         break;
       case SurveyStatus.OnConstruction:
         if (currentStatus !== SurveyStatus.OnBudgeting) {
           throw new BadRequestException(
-            `Status hanya dapat diubah ke ${SurveyStatus.OnConstruction} jika status saat ini adalah ${SurveyStatus.OnBudgeting}`,
+            `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.OnBudgeting}`,
           );
         }
         break;
       case SurveyStatus.Completed:
         if (currentStatus !== SurveyStatus.OnConstruction) {
           throw new BadRequestException(
-            `Status hanya dapat diubah ke ${SurveyStatus.Completed} jika status saat ini adalah ${SurveyStatus.OnConstruction}`,
+            `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.OnConstruction}`,
           );
         }
         break;
@@ -208,6 +278,96 @@ export class SurveyService {
       );
     }
     return this.surveyRepository.delete(id);
+  }
+
+  private async validateForeignEntities(params: {
+    surveyorId?: number;
+    provinceId?: string;
+    regencyId?: string;
+    districtId?: string;
+    villageId?: string;
+  }) {
+    const validations: Promise<void>[] = [];
+
+    if (params.surveyorId !== undefined) {
+      validations.push(
+        (async () => {
+          const surveyor = await this.prisma.userSurveyor.findUnique({
+            where: { surveyorId: params.surveyorId },
+            select: { surveyorId: true, provinceId: true, regencyId: true },
+          });
+          if (!surveyor) {
+            throw new NotFoundException(`Surveyor tidak ditemukan`);
+          }
+          if (
+            surveyor.provinceId !== params.provinceId ||
+            surveyor.regencyId !== params.regencyId
+          ) {
+            throw new BadRequestException(
+              'Provinsi dan kabupaten/kota survei harus sesuai dengan wilayah tugas surveyor',
+            );
+          }
+        })(),
+      );
+    }
+
+    if (params.provinceId) {
+      validations.push(
+        (async () => {
+          const province = await this.prisma.masterAreaProvince.findUnique({
+            where: { id: params.provinceId },
+            select: { id: true },
+          });
+          if (!province) {
+            throw new NotFoundException(`Provinsi tidak ditemukan`);
+          }
+        })(),
+      );
+    }
+
+    if (params.regencyId) {
+      validations.push(
+        (async () => {
+          const regency = await this.prisma.masterAreaRegency.findUnique({
+            where: { id: params.regencyId },
+            select: { id: true },
+          });
+          if (!regency) {
+            throw new NotFoundException(`Kabupaten/Kota tidak ditemukan`);
+          }
+        })(),
+      );
+    }
+
+    if (params.districtId) {
+      validations.push(
+        (async () => {
+          const district = await this.prisma.masterAreaDistrict.findUnique({
+            where: { id: params.districtId },
+            select: { id: true },
+          });
+          if (!district) {
+            throw new NotFoundException(`Kecamatan tidak ditemukan`);
+          }
+        })(),
+      );
+    }
+
+    if (params.villageId) {
+      validations.push(
+        (async () => {
+          const village = await this.prisma.masterAreaVillage.findUnique({
+            where: { id: params.villageId },
+            select: { id: true },
+          });
+          if (!village) {
+            throw new NotFoundException(`Kelurahan/Desa tidak ditemukan`);
+          }
+        })(),
+      );
+    }
+
+    await Promise.all(validations);
   }
 
   private async validateUniqueHousingAssessmentParts(

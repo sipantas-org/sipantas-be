@@ -23,26 +23,27 @@ enum Authority {
 model Survey {
   surveyId   Int          @id @default(autoincrement())
   disasterId Int
-  sectorId Int
+  sectorId   Int
   surveyStatus SurveyStatus
 
+  surveyorId Int?
+  surveyor   UserSurveyor? @relation(fields: [surveyorId], references: [surveyorId], onDelete: SetNull)
+
   provinceId        String?               @db.VarChar(20)
-  regencyId         String?              @db.VarChar(20)  
-  districtId        String?               @db.VarChar(20)
-  villageId         String?              @db.VarChar(20)
-
-  // Gunakan Restrict untuk province (karena provinceId wajib/non-nullable)
   province          MasterAreaProvince? @relation(fields: [provinceId], references: [id], onDelete: SetNull)
-  // SetNull valid untuk regency (karena regencyId opsional ?)
-  regency           MasterAreaRegency? @relation(fields: [regencyId], references: [id], onDelete: SetNull)        
 
-  // Gunakan Restrict untuk district (karena districtId wajib/non-nullable)
+  regencyId         String?              @db.VarChar(20)  
+  regency           MasterAreaRegency? @relation(fields: [regencyId], references: [id], onDelete: SetNull)
+
+  districtId        String?               @db.VarChar(20)
   district          MasterAreaDistrict? @relation(fields: [districtId], references: [id], onDelete: SetNull)
-  // SetNull valid untuk village (karena villageId opsional ?)
+
+  villageId         String?              @db.VarChar(20)
   village           MasterAreaVillage? @relation(fields: [villageId], references: [id], onDelete: SetNull)
   
   addressDetail String
   authority Authority
+  nik String
   assetName String
   latitude String
   longitude String
@@ -54,6 +55,9 @@ model Survey {
   totalPriceFurniture Decimal @db.Decimal(15, 2)
   totalScore Decimal @db.Decimal(15, 2)
   sourceOfBudgetting String?
+  surveyFolderPath String
+
+  files     SurveyFileDetail[]
 
   createdAt        DateTime             @default(now()) @db.Timestamptz
   updatedAt        DateTime             @updatedAt @db.Timestamptz

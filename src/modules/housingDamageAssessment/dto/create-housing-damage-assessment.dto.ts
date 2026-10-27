@@ -36,6 +36,14 @@ export class CreateHousingDamageAssessmentDto {
   idHousingAssessmentPart!: number;
 
   @ApiProperty({
+    example: 1,
+    description: 'Urutan pertanyaan survei per part',
+  })
+  @DisplayName('Order Number per part')
+  @IsInt()
+  surveyOrderNumber!: number;
+
+  @ApiProperty({
     example: 'Apakah dinding rumah mengalami keretakan struktural?',
     description: 'Pertanyaan survei kerusakan',
   })

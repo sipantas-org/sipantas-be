@@ -55,6 +55,7 @@ SET "partName" = EXCLUDED."partName",
 INSERT INTO "HousingDamageAssessment" (
   "housingDamageAssessmentId",
   "housingAssessmentPartId",
+  "surveyOrderNumber",
   "surveyDamageQuestion",
   "surveyScoring",
   "housingDamageAssessmentStatus",
@@ -63,30 +64,30 @@ INSERT INTO "HousingDamageAssessment" (
 )
 VALUES
   -- 1. Pondasi/Sloof (housingAssessmentPartId: 1)
-  (1, 1, 'Retak terlihat jelas pada permukaan beton (lebar retakan kira-kira 1 - 2 mm)', '[{"total": "1", "score": 3}, {"total": "2", "score": 4}, {"total": "≥ 3", "score": 5}]'::jsonb, 'Active', NOW(), NOW()),
-  (2, 1, 'Kehancuran beton yang sangat nyata dengan tulangan beton terlihat', '[{"total": "1", "score": 5}, {"total": "2", "score": 8}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
-  (3, 1, 'Penurunan dan atau Pondasi hancur', '[{"total": "1", "score": 11}, {"total": "2", "score": 14}, {"total": "≥ 3", "score": 15}]'::jsonb, 'Active', NOW(), NOW()),
+  (1, 1, '1', 'Retak terlihat jelas pada permukaan beton (lebar retakan kira-kira 1 - 2 mm)', '[{"total": "1", "score": 3}, {"total": "2", "score": 4}, {"total": "≥ 3", "score": 5}]'::jsonb, 'Active', NOW(), NOW()),
+  (2, 1, '2', 'Kehancuran beton yang sangat nyata dengan tulangan beton terlihat', '[{"total": "1", "score": 5}, {"total": "2", "score": 8}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (3, 1, '3','Penurunan dan atau Pondasi hancur', '[{"total": "1", "score": 11}, {"total": "2", "score": 14}, {"total": "≥ 3", "score": 15}]'::jsonb, 'Active', NOW(), NOW()),
 
   -- 2. Kolom/Balok (housingAssessmentPartId: 2)
-  (4, 2, 'Retak rambut terlihat jelas pada permukaan beton (lebar retakan kira-kira 0,2 - 1 mm)', '[{"total": "1", "score": 7}, {"total": "2", "score": 9}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
-  (5, 2, 'Retakan yang sangat jelas (lebar retakan kira-kira 1 - 2 mm)', '[{"total": "1", "score": 7}, {"total": "2", "score": 9}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
-  (6, 2, 'Kehancuran beton, tulangan tertekuk dan atau deformasi pada kolom dapat terlihat', '[{"total": "1", "score": 12}, {"total": "2", "score": 26}, {"total": "≥ 3", "score": 35}]'::jsonb, 'Active', NOW(), NOW()),
+  (4, 2, '1','Retak rambut terlihat jelas pada permukaan beton (lebar retakan kira-kira 0,2 - 1 mm)', '[{"total": "1", "score": 7}, {"total": "2", "score": 9}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (5, 2, '2','Retakan yang sangat jelas (lebar retakan kira-kira 1 - 2 mm)', '[{"total": "1", "score": 7}, {"total": "2", "score": 9}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (6, 2, '3','Kehancuran beton, tulangan tertekuk dan atau deformasi pada kolom dapat terlihat', '[{"total": "1", "score": 12}, {"total": "2", "score": 26}, {"total": "≥ 3", "score": 35}]'::jsonb, 'Active', NOW(), NOW()),
 
   -- 3. Rangka Atap/Kuda-Kuda (housingAssessmentPartId: 3)
-  (7, 3, 'Reng dan atau usuk hancur sebagian atau seluruh', '[{"total": "1", "score": 3}, {"total": "2", "score": 5}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
-  (8, 3, 'Kuda-kuda roboh sebagian atau seluruh', '[{"total": "1", "score": 11}, {"total": "2", "score": 14}, {"total": "≥ 3", "score": 15}]'::jsonb, 'Active', NOW(), NOW()),
+  (7, 3, '1','Reng dan atau usuk hancur sebagian atau seluruh', '[{"total": "1", "score": 3}, {"total": "2", "score": 5}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (8, 3, '2', 'Kuda-kuda roboh sebagian atau seluruh', '[{"total": "1", "score": 11}, {"total": "2", "score": 14}, {"total": "≥ 3", "score": 15}]'::jsonb, 'Active', NOW(), NOW()),
 
   -- 4. Penutup Atap (housingAssessmentPartId: 4)
-  (9, 4, 'Berjatuhan menyebar sebagian atau seluruh', '[{"total": "1", "score": 5}, {"total": "≥ 2", "score": 10}]'::jsonb, 'Active', NOW(), NOW()),
+  (9, 4, '1','Berjatuhan menyebar sebagian atau seluruh', '[{"total": "1", "score": 5}, {"total": "≥ 2", "score": 10}]'::jsonb, 'Active', NOW(), NOW()),
 
   -- 5. Dinding (housingAssessmentPartId: 5)
-  (10, 5, 'Plesteran dan atau terkelupas', '[{"total": "1", "score": 3}, {"total": "2", "score": 4}, {"total": "≥ 3", "score": 5}]'::jsonb, 'Active', NOW(), NOW()),
-  (11, 5, 'Retakan dapat terlihat jelas, tembus pada pasangan batu', '[{"total": "1", "score": 5}, {"total": "2", "score": 8}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
-  (12, 5, 'Dinding jatuh sebagian atau menyeluruh', '[{"total": "1", "score": 11}, {"total": "2", "score": 14}, {"total": "≥ 3", "score": 15}]'::jsonb, 'Active', NOW(), NOW()),
+  (10, 5, '1','Plesteran dan atau terkelupas', '[{"total": "1", "score": 3}, {"total": "2", "score": 4}, {"total": "≥ 3", "score": 5}]'::jsonb, 'Active', NOW(), NOW()),
+  (11, 5, '2','Retakan dapat terlihat jelas, tembus pada pasangan batu', '[{"total": "1", "score": 5}, {"total": "2", "score": 8}, {"total": "≥ 3", "score": 11}]'::jsonb, 'Active', NOW(), NOW()),
+  (12, 5, '3', 'Dinding jatuh sebagian atau menyeluruh', '[{"total": "1", "score": 11}, {"total": "2", "score": 14}, {"total": "≥ 3", "score": 15}]'::jsonb, 'Active', NOW(), NOW()),
 
   -- 6. Lantai (housingAssessmentPartId: 6)
-  (13, 6, 'Retak rambut menyebar sebagian atau seluruh', '[{"total": "1", "score": 2}, {"total": "≥ 3", "score": 3}]'::jsonb, 'Active', NOW(), NOW()),
-  (14, 6, 'Retak besar/terbelah/hancur menyebar sebagian atau seluruh', '[{"total": "1", "score": 8}, {"total": "2", "score": 9}, {"total": "≥ 3", "score": 10}]'::jsonb, 'Active', NOW(), NOW())
+  (13, 6, '1','Retak rambut menyebar sebagian atau seluruh', '[{"total": "1", "score": 2}, {"total": "≥ 3", "score": 3}]'::jsonb, 'Active', NOW(), NOW()),
+  (14, 6, '2', 'Retak besar/terbelah/hancur menyebar sebagian atau seluruh', '[{"total": "1", "score": 8}, {"total": "2", "score": 9}, {"total": "≥ 3", "score": 10}]'::jsonb, 'Active', NOW(), NOW())
 ON CONFLICT ("housingDamageAssessmentId") DO UPDATE 
 SET "surveyDamageQuestion" = EXCLUDED."surveyDamageQuestion",
     "surveyScoring" = EXCLUDED."surveyScoring",
@@ -147,6 +148,8 @@ SET "disasterName" = EXCLUDED."disasterName",
     "description" = EXCLUDED."description",
     "Status" = EXCLUDED."Status",
     "updatedAt" = NOW();
+
+INSERT INTO "UserSurveyor" ("surveyorId", "nip", "nama", "phoneNumber", "email", "password", "status", "provinceId", "regencyId", "lastLogin", "createdAt", "updatedAt") VALUES (1, '21312321', 'budi', '086321731321', 'surveyor.sipantas@gmail.com', '$2b$10$8ZCQNerrB.Xh922RskPPVeUVDYzhG.OGQlizUpayQGjsFBd7De8ue', 'Active', '11', '11.01', '2026-10-22T07:50:20.521+07:00', '2026-10-22T07:48:24.013+07:00', '2026-10-22T07:50:20.535+07:00');
 
 -- ==========================================
 -- SYNCHRONIZE POSTGRESQL SEQUENCES

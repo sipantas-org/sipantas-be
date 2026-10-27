@@ -1,6 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsNumberString,
+} from 'class-validator';
 import { QueryDefaultDto } from '../../../dto/query-default.dto.js';
 import { Prisma } from '../../../generated/prisma/client.js';
 import { DisplayName } from '../../../common/decorators/display-name.decorator.js';
@@ -30,12 +36,19 @@ export class QuerySurveyDto extends QueryDefaultDto {
   @IsString()
   status?: string;
 
-  @ApiPropertyOptional({ description: 'Filter berdasarkan ID Bencana' })
-  @DisplayName('Disaster ID')
+  @ApiPropertyOptional({ description: 'Filter berdasarkan ID Surveyor' })
+  @DisplayName('Surveyor ID')
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  disasterId?: number;
+  surveyorId?: number;
+
+  @ApiPropertyOptional({ description: 'Filter berdasarkan NIK' })
+  @DisplayName('NIK')
+  @IsOptional()
+  @Type(() => String)
+  @IsNumberString()
+  nik?: string;
 }
 
 export type RequestListSurveyDto = QuerySurveyDto;

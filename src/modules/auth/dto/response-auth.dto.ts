@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import timezone from 'dayjs/plugin/timezone.js';
+import { PaginationMetaDto } from '../../../dto/pagination-meta.dto.js';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -179,20 +180,6 @@ export class ApprovalUserResponseDto {
   @Expose({ name: 'updatedAt' })
   @Transform(formatJakarta)
   updatedAt!: string;
-}
-
-export class PaginationMetaDto {
-  @ApiProperty({ example: 1 })
-  page!: number;
-
-  @ApiProperty({ example: 10 })
-  limit!: number;
-
-  @ApiProperty({ example: 42 })
-  total!: number;
-
-  @ApiProperty({ example: 5 })
-  totalPages!: number;
 }
 
 export class PaginatedAdminResponseDto {

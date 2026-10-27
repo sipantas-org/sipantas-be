@@ -17,11 +17,12 @@ import { UpdateDisasterDto } from './dto/update-disaster.dto.js';
 import { QueryDisasterDto } from './dto/query-disaster.dto.js';
 
 import { UseGuards } from '@nestjs/common';
+import { CombinedAuthGuard } from '../../common/guards/combine-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBasicAuth, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiBearerAuth('access-token')
 @Controller('disasters')
@@ -37,11 +38,15 @@ export class DisasterController {
   }
 
   @Get()
+  @UseGuards(CombinedAuthGuard)
+  @ApiBasicAuth('basic-auth')
   findAll(@Query() query: QueryDisasterDto) {
     return this.disasterService.findAll(query);
   }
 
   @Get(':id')
+  @UseGuards(CombinedAuthGuard)
+  @ApiBasicAuth('basic-auth')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.disasterService.findOne(id);
   }

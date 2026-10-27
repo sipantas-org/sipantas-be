@@ -12,9 +12,11 @@ import { PrismaClientExceptionFilter } from './common/filters/prisma-exception.f
 import { ValidationError } from 'class-validator';
 import { BadRequestException } from '@nestjs/common';
 import { DISPLAY_NAME_KEY } from './common/decorators/display-name.decorator.js';
+import { getSwaggerCustomOptions } from './swagger-dev.js';
 
 // --- Vercel deploy: exported so src/serverless.ts can reuse it (same setup as local) ---
 export function configureApp(app: INestApplication) {
+  const customOptions = getSwaggerCustomOptions();
   const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
     .split(',')
     .map((origin) => origin.trim());
@@ -77,7 +79,7 @@ export function configureApp(app: INestApplication) {
 
   const config = new DocumentBuilder()
     .setTitle('SIPANTAS API')
-    .setDescription('The SIPANTAS API description')
+    .setDescription('SIPANTAS API Documentation')
     .setVersion('1.0')
     .addTag('SIPANTAS')
     .addBearerAuth(
@@ -91,12 +93,19 @@ export function configureApp(app: INestApplication) {
       },
       'access-token',
     )
+    .addBasicAuth(
+      {
+        type: 'http',
+        scheme: 'basic',
+        description: 'Enter username & password',
+      },
+      'basic-auth',
+    )
     .build();
+
   const documentFactory = () => SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('swagger', app, documentFactory, {
-    jsonDocumentUrl: 'swagger/json',
-  });
+  SwaggerModule.setup('swagger', app, documentFactory, customOptions);
 }
 // --- end Vercel deploy ---
 

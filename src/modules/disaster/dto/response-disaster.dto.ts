@@ -18,12 +18,14 @@ export class DisasterResponseDto {
   disasterCategory: String;
   @Expose()
   disasterStatus: String;
+
   @Expose()
   provinceId: String;
 
   @Expose()
   @Transform(({ obj }) => obj.province?.name ?? null)
   provinceName!: string | null;
+
   @Expose()
   regencyId: String;
 

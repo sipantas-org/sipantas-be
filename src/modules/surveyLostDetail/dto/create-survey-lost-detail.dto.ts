@@ -1,31 +1,43 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsOptional,
+} from 'class-validator';
 import { DurationUnit } from '../../../generated/prisma/enums.js';
 import { DisplayName } from '../../../common/decorators/display-name.decorator.js';
+import { Type } from 'class-transformer';
 
 export class CreateSurveyLostDetailDto {
   @ApiProperty({ description: 'Lost Assessment ID', example: 1 })
   @DisplayName('Loss Assessment ID')
   @IsInt()
+  @Type(() => Number)
   @IsNotEmpty()
   lossAssessmentId: number;
 
   @ApiProperty({ description: 'Total units', example: 2 })
   @DisplayName('Total Unit')
+  @IsOptional()
   @IsInt()
-  @IsNotEmpty()
+  @Type(() => Number)
   totalUnit: number;
 
   @ApiProperty({ description: 'Unit price', example: 150000 })
   @DisplayName('Unit Price')
+  @IsOptional()
   @IsNumber()
-  @IsNotEmpty()
+  @Type(() => Number)
   unitPrice: number;
 
   @ApiProperty({ description: 'Duration', example: 3 })
   @DisplayName('Duration')
+  @IsOptional()
   @IsInt()
-  @IsNotEmpty()
+  @Type(() => Number)
   duration: number;
 
   @ApiProperty({
@@ -43,7 +55,7 @@ export class CreateSurveyLostDetailDto {
     example: 'Kerugian operasional bulanan',
   })
   @DisplayName('Description')
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   description: string;
 }

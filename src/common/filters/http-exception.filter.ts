@@ -43,6 +43,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       typeof exceptionResponse === 'object' &&
       exceptionResponse.message
     ) {
+      // console.log(exceptionResponse.message);
       message = Array.isArray(exceptionResponse.message)
         ? 'Error Validation'
         : exceptionResponse.message;

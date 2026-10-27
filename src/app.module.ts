@@ -1,3 +1,5 @@
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware.js';
 import { ConfigModule } from '@nestjs/config';
@@ -19,10 +21,15 @@ import { SurveyHousingDetailModule } from './modules/surveyHousingDetail/survey-
 import { SurveyLostDetailModule } from './modules/surveyLostDetail/survey-lost-detail.module.js';
 import { SurveyModule } from './modules/survey/survey.module.js';
 import { ActivityHistoryModule } from './modules/activityHistory/activity-history.module.js';
+import { UploadFileController } from './modules/upload-file.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+    }),
     PrismaModule,
     JwtAuthModule,
     AuthModule,
@@ -43,6 +50,7 @@ import { ActivityHistoryModule } from './modules/activityHistory/activity-histor
   ],
   controllers: [
     AppController, // <-- Pastikan AppController terdaftar di sini
+    UploadFileController,
   ],
 })
 export class AppModule implements NestModule {

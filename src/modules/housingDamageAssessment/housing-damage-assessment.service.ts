@@ -15,6 +15,7 @@ export class HousingDamageAssessmentService {
   async create(dto: CreateHousingDamageAssessmentDto) {
     const row = await this.repository.create({
       housingAssessmentPartId: dto.idHousingAssessmentPart,
+      surveyOrderNumber: dto.surveyOrderNumber,
       surveyDamageQuestion: dto.surveyDamageQuestion,
       surveyScoring: dto.surveyScoring.map((item) => ({
         total: item.total,

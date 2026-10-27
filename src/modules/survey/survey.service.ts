@@ -135,6 +135,7 @@ export class SurveyService {
     return survey;
   }
 
+  // kalau update dan status nya OnInvestigating, update status nya ke pending, cari data complain dengan survey id dan status OnProgress, kemudian update ke Completed
   async update(id: number, dto: UpdateSurveyDto) {
     const survey = await this.findOne(id);
     if (survey.surveyStatus !== SurveyStatus.Pending) {

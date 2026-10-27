@@ -8,6 +8,7 @@ enum DamageLevel {
 enum SurveyStatus {
   Pending
   OnComplain @map("On Complain")
+  OnVerification @map("On Verification")
   OnBudgeting @map("On Budgeting")
   OnConstruction @map("On Construction")
   Completed
@@ -58,6 +59,7 @@ model Survey {
   surveyFolderPath String
 
   files     SurveyFileDetail[]
+  surveyComplain     SurveyComplain[]
 
   createdAt        DateTime             @default(now()) @db.Timestamptz
   updatedAt        DateTime             @updatedAt @db.Timestamptz

@@ -20,6 +20,7 @@ import { SurveyFurnitureDetailModule } from './modules/surveyFurnitureDetail/sur
 import { SurveyHousingDetailModule } from './modules/surveyHousingDetail/survey-housing-detail.module.js';
 import { SurveyLostDetailModule } from './modules/surveyLostDetail/survey-lost-detail.module.js';
 import { SurveyModule } from './modules/survey/survey.module.js';
+import { ComplainModule } from './modules/surveyComplain/complain.module.js';
 import { ActivityHistoryModule } from './modules/activityHistory/activity-history.module.js';
 import { UploadFileController } from './modules/upload-file.js';
 
@@ -47,6 +48,7 @@ import { UploadFileController } from './modules/upload-file.js';
     SurveyHousingDetailModule,
     SurveyLostDetailModule,
     SurveyModule,
+    ComplainModule,
   ],
   controllers: [
     AppController, // <-- Pastikan AppController terdaftar di sini

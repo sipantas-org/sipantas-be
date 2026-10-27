@@ -1,0 +1,15 @@
+model SurveyComplainDocument {
+  id        String   @id @default(uuid())
+  complainId  Int
+  category  String
+  filePath  String
+  fileName  String
+  createdAt DateTime @default(now())
+
+  // Relasi ke parent model Survey
+  SurveyComplain    SurveyComplain   @relation(fields: [complainId], references: [complainId], onDelete: Cascade)
+
+  @@index([complainId])
+  
+  @@map("SurveyComplainDocument")
+}

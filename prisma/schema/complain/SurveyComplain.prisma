@@ -1,0 +1,29 @@
+enum ComplainStatus {
+  Pending
+  OnProgress @map("On Progress")
+  Completed
+}
+
+enum ComplainAction {
+  Resolved
+  Rejected
+}
+
+model SurveyComplain {
+  complainId       Int            @id @default(autoincrement())
+  surveyId         Int
+  Survey           Survey         @relation(fields: [surveyId], references: [surveyId], onDelete: SetNull)
+  complainantName  String?
+  complainantNik   String?
+  complainantPhone String?
+  description      String         @db.Text
+  status           ComplainStatus @default(Pending)
+  action           ComplainAction?
+  responseNotes    String?        @db.Text
+  createdAt        DateTime       @default(now()) @db.Timestamptz
+  updatedAt        DateTime       @updatedAt @db.Timestamptz
+
+  SurveyComplainDocument SurveyComplainDocument[]
+
+  @@map("SurveyComplain")
+}

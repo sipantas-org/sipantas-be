@@ -12,7 +12,11 @@ import { CreateSurveyDto, SurveyFileItemDto } from './dto/create-survey.dto.js';
 import { UpdateSurveyDto } from './dto/update-survey.dto.js';
 import { UpdateSurveyStatusDto } from './dto/update-survey-status.dto.js';
 import type { Prisma } from '../../generated/prisma/client.js';
-import { DamageLevel, SurveyStatus } from '../../generated/prisma/enums.js';
+import {
+  ComplainStatus,
+  DamageLevel,
+  SurveyStatus,
+} from '../../generated/prisma/enums.js';
 import { QuerySurveyDto } from './dto/query-survey.dto.js';
 
 const DAMAGE_SCORE_THRESHOLDS = {
@@ -137,11 +141,20 @@ export class SurveyService {
 
   async update(id: number, dto: UpdateSurveyDto) {
     const survey = await this.findOne(id);
-    if (survey.surveyStatus !== SurveyStatus.Pending) {
+
+    const allowedStatuses: SurveyStatus[] = [
+      SurveyStatus.Pending,
+      SurveyStatus.OnVerification,
+    ];
+
+    if (!allowedStatuses.includes(survey.surveyStatus)) {
       throw new BadRequestException(
-        `Hanya survei dengan status ${SurveyStatus.Pending} yang dapat diupdate`,
+        `Hanya survei dengan status ${allowedStatuses.join(' atau ')} yang dapat diupdate`,
       );
     }
+
+    const isOnVerification =
+      survey.surveyStatus === SurveyStatus.OnVerification;
 
     const {
       provinceId,
@@ -162,6 +175,7 @@ export class SurveyService {
       districtId,
       villageId,
     });
+
     if (housingDetails !== undefined) {
       await this.validateUniqueHousingAssessmentParts(housingDetails);
     }
@@ -173,6 +187,7 @@ export class SurveyService {
 
     const data: Prisma.SurveyUpdateInput = {
       ...rest,
+      ...(isOnVerification ? { surveyStatus: SurveyStatus.Pending } : {}),
       ...(damageAssessment !== undefined
         ? {
             damageLevel: damageAssessment.damageLevel,
@@ -207,13 +222,31 @@ export class SurveyService {
     const fileDetails =
       files !== undefined ? this.formatFiles(files) : undefined;
 
-    return this.surveyRepository.updateWithDetails(id, {
+    const updatedSurvey = await this.surveyRepository.updateWithDetails(id, {
       data,
       furnitureDetails,
       housingDetails,
       lostDetails,
       fileDetails,
     });
+
+    if (isOnVerification) {
+      const activeComplain = await this.prisma.surveyComplain.findFirst({
+        where: {
+          surveyId: id,
+          status: ComplainStatus.OnProgress,
+        },
+      });
+
+      if (activeComplain) {
+        await this.prisma.surveyComplain.update({
+          where: { complainId: activeComplain.complainId },
+          data: { status: ComplainStatus.Completed },
+        });
+      }
+    }
+
+    return updatedSurvey;
   }
 
   async updateStatus(id: number, dto: UpdateSurveyStatusDto) {
@@ -231,18 +264,10 @@ export class SurveyService {
     }
 
     switch (targetStatus) {
-      case SurveyStatus.OnComplain:
       case SurveyStatus.OnBudgeting:
         if (currentStatus !== SurveyStatus.Pending) {
           throw new BadRequestException(
             `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.Pending}`,
-          );
-        }
-        break;
-      case SurveyStatus.Pending:
-        if (currentStatus !== SurveyStatus.OnComplain) {
-          throw new BadRequestException(
-            `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.OnComplain}`,
           );
         }
         break;
@@ -260,6 +285,10 @@ export class SurveyService {
           );
         }
         break;
+      default:
+        throw new BadRequestException(
+          `Perubahan ke status ${targetStatus} tidak dapat dilakukan`,
+        );
     }
 
     return this.surveyRepository.update(id, {

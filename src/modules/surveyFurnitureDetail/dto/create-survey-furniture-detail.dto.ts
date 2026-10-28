@@ -32,13 +32,13 @@ export class CreateSurveyFurnitureDetailDto {
 
   @ApiProperty({ description: 'Unit price of the item' })
   @DisplayName('Unit Price')
-  @IsNumberString()
+  @IsNumber()
   @IsNotEmpty()
   unitPrice: number;
 
   @ApiProperty({ description: 'Total price of the items' })
   @DisplayName('Total Price')
-  @IsNumberString()
+  @IsNumber()
   @IsNotEmpty()
   totalPrice: number;
 

@@ -23,6 +23,7 @@ import { SurveyModule } from './modules/survey/survey.module.js';
 import { ComplainModule } from './modules/surveyComplain/complain.module.js';
 import { ActivityHistoryModule } from './modules/activityHistory/activity-history.module.js';
 import { UploadFileController } from './modules/upload-file.js';
+import { UploadFileBlobController } from './modules/upload-file-blob.js';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { UploadFileController } from './modules/upload-file.js';
   controllers: [
     AppController, // <-- Pastikan AppController terdaftar di sini
     UploadFileController,
+    UploadFileBlobController,
   ],
 })
 export class AppModule implements NestModule {

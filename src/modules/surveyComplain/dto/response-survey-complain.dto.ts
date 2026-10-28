@@ -1,4 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform, Expose } from 'class-transformer';
+import dayjs from 'dayjs';
 import {
   ComplainAction,
   ComplainStatus,
@@ -35,74 +37,69 @@ export class ComplainSurveyDetailResponseDto {
 
 export class ComplainResponseDto {
   @ApiProperty({ example: 1 })
+  @Expose()
   complainId: number;
 
   @ApiProperty({ example: 1 })
+  @Expose()
   surveyId: number;
 
   @ApiPropertyOptional({ example: 'Budi Santoso' })
+  @Expose()
   complainantName?: string | null;
 
   @ApiPropertyOptional({ example: '3201123456780001' })
+  @Expose()
   complainantNik?: string | null;
 
   @ApiPropertyOptional({ example: '081234567890' })
+  @Expose()
   complainantPhone?: string | null;
 
   @ApiProperty({
     example:
       'Tingkat kerusakan rumah seharusnya masuk kategori Berat bukan Sedang.',
   })
+  @Expose()
   description: string;
 
   @ApiProperty({ enum: ComplainStatus, example: ComplainStatus.Pending })
+  @Expose()
   status: ComplainStatus;
 
   @ApiPropertyOptional({
     enum: ComplainAction,
     example: ComplainAction.Resolved,
   })
+  @Expose()
   action?: ComplainAction | null;
 
   @ApiPropertyOptional({
     example:
       'Akan dilakukan investigasi dan verifikasi ulang oleh tim lapangan.',
   })
+  @Expose()
   responseNotes?: string | null;
 
-  @ApiProperty({ example: '2025-01-15T08:00:00.000Z' })
+  @Expose()
+  @Transform(({ value }) =>
+    value
+      ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
+      : null,
+  )
   createdAt: Date;
 
-  @ApiProperty({ example: '2025-01-15T08:00:00.000Z' })
+  @Expose()
+  @Transform(({ value }) =>
+    value
+      ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
+      : null,
+  )
   updatedAt: Date;
-
-  @ApiPropertyOptional({ type: () => ComplainSurveyDetailResponseDto })
-  Survey?: ComplainSurveyDetailResponseDto | null;
 
   @ApiPropertyOptional({
     type: () => [SurveyComplainDocumentResponseDto],
   })
+  @Expose()
   SurveyComplainDocument?: SurveyComplainDocumentResponseDto[];
-}
-
-export class ComplainPaginationMetaDto {
-  @ApiProperty({ example: 100 })
-  total: number;
-
-  @ApiProperty({ example: 1 })
-  page: number;
-
-  @ApiProperty({ example: 10 })
-  limit: number;
-
-  @ApiProperty({ example: 10 })
-  totalPages: number;
-}
-
-export class PaginatedComplainResponseDto {
-  @ApiProperty({ type: () => [ComplainResponseDto] })
-  data: ComplainResponseDto[];
-
-  @ApiProperty({ type: () => ComplainPaginationMetaDto })
-  meta: ComplainPaginationMetaDto;
 }

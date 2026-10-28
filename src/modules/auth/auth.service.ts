@@ -67,14 +67,14 @@ export class AuthService {
       await this.recordLogin(meta, LoginStatus.Failed, {
         adminId: admin?.adminId ?? null,
       });
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Username atau password tidak sesuai');
     }
 
     if (admin.status !== AdminStatus.Active) {
       await this.recordLogin(meta, LoginStatus.Failed, {
         adminId: admin.adminId,
       });
-      throw new ForbiddenException('Account is not active');
+      throw new ForbiddenException('Profil sudah tidak aktif');
     }
 
     const accessToken = await this.jwtService.signAsync({
@@ -123,7 +123,7 @@ export class AuthService {
       where: { adminId: user.sub },
     });
     if (!admin) {
-      throw new NotFoundException('Admin not found');
+      throw new NotFoundException('Data Admin tidak ditemukan');
     }
 
     if (dto.email && dto.email !== admin.email) {
@@ -185,7 +185,7 @@ export class AuthService {
   ) {
     const admin = await this.userAdminRepository.findById(id);
     if (!admin) {
-      throw new NotFoundException('Admin not found');
+      throw new NotFoundException('Data Admin tidak ditemukan');
     }
     if (admin.role !== AdminRole.Monitoring) {
       throw new ForbiddenException(
@@ -247,14 +247,14 @@ export class AuthService {
       await this.recordLogin(meta, LoginStatus.Failed, {
         userId: surveyor?.surveyorId ?? null,
       });
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Username atau password');
     }
 
     if (surveyor.status !== SurveyorStatus.Active) {
       await this.recordLogin(meta, LoginStatus.Failed, {
         userId: surveyor.surveyorId,
       });
-      throw new ForbiddenException('Account is not active');
+      throw new ForbiddenException('Profil sudah tidak aktif');
     }
 
     const accessToken = await this.jwtService.signAsync({
@@ -299,14 +299,12 @@ export class AuthService {
 
   async updateSurveyorProfile(user: JwtPayload, dto: UpdateSurveyorProfileDto) {
     if (user.userType !== 'surveyor') {
-      throw new ForbiddenException(
-        'Only surveyors can update surveyor profile',
-      );
+      throw new ForbiddenException('Tipe user tidak cocok');
     }
 
     const surveyor = await this.userSurveyorRepository.findById(user.sub);
     if (!surveyor) {
-      throw new NotFoundException('Surveyor not found');
+      throw new NotFoundException('Data Surveyor tidak ditemukan');
     }
 
     if (dto.email && dto.email !== surveyor.email) {
@@ -314,7 +312,7 @@ export class AuthService {
         where: { email: dto.email },
       });
       if (existing) {
-        throw new ConflictException('Email already in use');
+        throw new ConflictException('Email sudah digunakan');
       }
     }
 
@@ -374,7 +372,7 @@ export class AuthService {
   ) {
     const surveyor = await this.userSurveyorRepository.findById(id);
     if (!surveyor) {
-      throw new NotFoundException('Surveyor not found');
+      throw new NotFoundException('Data Surveyor tidak ditemukan');
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {
@@ -407,10 +405,12 @@ export class AuthService {
   ) {
     const surveyor = await this.userSurveyorRepository.findById(idSurveyor);
     if (!surveyor) {
-      throw new NotFoundException('Surveyor not found');
+      throw new NotFoundException('Data Surveyor tidak ditemukan');
     }
     if (surveyor.status !== SurveyorStatus.Pending) {
-      throw new ConflictException('Surveyor is not pending approval');
+      throw new ConflictException(
+        `Status surveyor saat ini ${surveyor.status}`,
+      );
     }
 
     const approval = await this.prisma.$transaction(async (tx) => {
@@ -472,7 +472,7 @@ export class AuthService {
         where: { adminId: user.sub },
       });
       if (!admin) {
-        throw new NotFoundException('Admin not found');
+        throw new NotFoundException('Data Admin tidak ditemukan');
       }
       return this.toResponse(UserAdminResponseDto, admin);
     }
@@ -480,12 +480,12 @@ export class AuthService {
     if (user.userType === 'surveyor') {
       const surveyor = await this.userSurveyorRepository.findById(user.sub);
       if (!surveyor) {
-        throw new NotFoundException('Surveyor not found');
+        throw new NotFoundException('Data Surveyor tidak ditemukan');
       }
       return this.toResponse(UserSurveyorResponseDto, surveyor);
     }
 
-    throw new UnauthorizedException('Unknown user type');
+    throw new UnauthorizedException('Tipe user tidak valid');
   }
 
   async isTokenActiveInHistory(

@@ -13,17 +13,7 @@ import { SurveyComplainFileItemDto } from '../dto/create-survey-complain.dto.js'
 import { findPage } from '../../../common/utils/pagination.util.js';
 import { buildPrismaWhere } from '../../../common/utils/filter-data.util.js';
 
-const defaultComplainInclude = {
-  Survey: {
-    select: {
-      surveyId: true,
-      nik: true,
-      assetName: true,
-      surveyStatus: true,
-    },
-  },
-  SurveyComplainDocument: true,
-} satisfies Prisma.SurveyComplainInclude;
+const defaultComplainInclude = {} satisfies Prisma.SurveyComplainInclude;
 
 @Injectable()
 export class ComplainRepository {
@@ -39,23 +29,29 @@ export class ComplainRepository {
   }) {
     const { files, ...complainData } = data;
 
-    return this.prisma.surveyComplain.create({
-      data: {
-        ...complainData,
-        status: ComplainStatus.Pending,
-        ...(files && files.length > 0
-          ? {
-              SurveyComplainDocument: {
-                create: files.map((file) => ({
-                  category: file.category,
-                  filePath: file.filePath,
-                  fileName: file.fileName,
-                })),
-              },
-            }
-          : {}),
-      },
-      include: defaultComplainInclude,
+    return this.prisma.$transaction(async (tx) => {
+      await tx.survey.update({
+        where: { surveyId: data.surveyId },
+        data: { surveyStatus: SurveyStatus.OnComplain },
+      });
+
+      return tx.surveyComplain.create({
+        data: {
+          ...complainData,
+          status: ComplainStatus.Pending,
+          ...(files && files.length > 0
+            ? {
+                SurveyComplainDocument: {
+                  create: files.map((file) => ({
+                    category: file.category,
+                    filePath: file.filePath,
+                    fileName: file.fileName,
+                  })),
+                },
+              }
+            : {}),
+        },
+      });
     });
   }
 
@@ -107,23 +103,34 @@ export class ComplainRepository {
       skip,
       take: limit,
       orderBy: { [sortBy]: sortOrder },
-      include: defaultComplainInclude,
     });
 
     return {
       data: result.data.map((item) =>
-        plainToInstance(ComplainResponseDto, item),
+        plainToInstance(ComplainResponseDto, item, {
+          excludeExtraneousValues: true,
+        }),
       ),
       pagination: result.pagination,
-      meta: result.pagination,
     };
   }
 
   async findById(complainId: number) {
-    return this.prisma.surveyComplain.findUnique({
+    const data = await this.prisma.surveyComplain.findUnique({
       where: { complainId },
-      include: defaultComplainInclude,
+      include: {
+        SurveyComplainDocument: true,
+      },
     });
+
+    if (!data) return null;
+
+    const { SurveyComplainDocument, ...rest } = data;
+
+    return {
+      ...rest,
+      fileComplain: SurveyComplainDocument,
+    };
   }
 
   async findActiveBySurveyId(surveyId: number) {
@@ -162,7 +169,6 @@ export class ComplainRepository {
           action: params.action,
           responseNotes: params.responseNotes,
         },
-        include: defaultComplainInclude,
       });
     });
   }

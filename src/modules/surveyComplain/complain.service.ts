@@ -46,7 +46,7 @@ export class ComplainService {
 
     if (activeComplain) {
       throw new BadRequestException(
-        `Masih ada komplain yang sedang berjalan untuk survei dengan ID ${createDto.surveyId}.`,
+        `Masih ada komplain yang sedang berjalan untuk survei tersebut.`,
       );
     }
 

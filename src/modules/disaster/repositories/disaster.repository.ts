@@ -88,7 +88,6 @@ export class DisasterRepository {
           excludeExtraneousValues: true,
         }),
       ),
-      // plainToInstance(DisasterResponseDto, result.data),
       pagination: result.pagination,
     };
   }

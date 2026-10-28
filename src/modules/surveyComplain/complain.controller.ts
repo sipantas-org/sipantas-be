@@ -21,10 +21,6 @@ import { ComplainService } from './complain.service.js';
 import { CreateSurveyComplainDto } from './dto/create-survey-complain.dto.js';
 import { QuerySurveyComplainDto } from './dto/query-survey-complain.dto.js';
 import { UpdateSurveyComplainStatusDto } from './dto/update-survey-complain-status.dto.js';
-import {
-  ComplainResponseDto,
-  PaginatedComplainResponseDto,
-} from './dto/response-survey-complain.dto.js';
 import { CombinedAuthGuard } from '../../common/guards/combine-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 
@@ -42,11 +38,6 @@ export class ComplainController {
     description:
       'Menyimpan data komplain survei baru beserta dokumen pendukung. NIK pelapor akan otomatis diambil dari data survei terkait.',
   })
-  @ApiResponse({
-    status: 201,
-    description: 'Komplain berhasil disimpan',
-    type: ComplainResponseDto,
-  })
   @ApiResponse({ status: 404, description: 'Survei tidak ditemukan' })
   create(@Body() createDto: CreateSurveyComplainDto) {
     return this.complainService.create(createDto);
@@ -59,11 +50,6 @@ export class ComplainController {
     summary: 'Daftar komplain survei',
     description:
       'Mengambil daftar seluruh komplain survei terpaginasi dengan filter status, NIK, pencarian, dan sorting.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Daftar komplain berhasil diambil',
-    type: PaginatedComplainResponseDto,
   })
   findAll(@Query() query: QuerySurveyComplainDto) {
     return this.complainService.findAll(query);
@@ -83,11 +69,6 @@ export class ComplainController {
     type: Number,
     example: 1,
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Detail data komplain',
-    type: ComplainResponseDto,
-  })
   @ApiResponse({ status: 404, description: 'Komplain tidak ditemukan' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.complainService.findOne(id);
@@ -106,7 +87,6 @@ export class ComplainController {
     type: Number,
     example: 1,
   })
-  @ApiResponse({ status: 200, type: ComplainResponseDto })
   @ApiResponse({ status: 404, description: 'Komplain tidak ditemukan' })
   updateStatus(
     @Param('id', ParseIntPipe) id: number,

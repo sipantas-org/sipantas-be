@@ -28,7 +28,7 @@ export {
 export class CreateSurveyDto {
   @ApiProperty({ description: 'ID Bencana', example: 1 })
   @DisplayName('Disaster ID')
-  @IsInt()
+  @IsNumberString()
   disasterId: number;
 
   @ApiProperty({ description: 'ID Sektor', example: 1 })

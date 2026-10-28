@@ -39,6 +39,8 @@ export class SurveyRepository {
     lostDetails?: CreateSurveyLostDetailDto[];
     fileDetails?: CreateSurveyFileDetailItem[];
   }) {
+    params.data.disasterId = Number(params.data.disasterId);
+
     return this.prisma.$transaction(async (tx) => {
       const survey = await tx.survey.create({
         data: params.data,

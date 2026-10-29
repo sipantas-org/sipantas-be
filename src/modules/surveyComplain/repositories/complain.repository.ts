@@ -133,6 +133,30 @@ export class ComplainRepository {
     };
   }
 
+  /**
+   * Mencari survei berstatus Pending terbaru milik sebuah NIK.
+   * Hanya mengambil kolom seperlunya (tanpa surveyor, koordinat, maupun rincian harga)
+   * karena dipakai oleh endpoint publik halaman "Ajukan Komplain".
+   */
+  async findLatestPendingSurveyByNik(nik: string) {
+    return this.prisma.survey.findFirst({
+      where: { nik, surveyStatus: SurveyStatus.Pending },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        surveyId: true,
+        nik: true,
+        assetName: true,
+        addressDetail: true,
+        surveyStatus: true,
+        createdAt: true,
+        province: { select: { name: true } },
+        regency: { select: { name: true } },
+        district: { select: { name: true } },
+        village: { select: { name: true } },
+      },
+    });
+  }
+
   async findActiveBySurveyId(surveyId: number) {
     return this.prisma.surveyComplain.findFirst({
       where: {

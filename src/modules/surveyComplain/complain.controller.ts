@@ -20,7 +20,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ComplainService } from './complain.service.js';
 import { CreateSurveyComplainDto } from './dto/create-survey-complain.dto.js';
 import { QuerySurveyComplainDto } from './dto/query-survey-complain.dto.js';
@@ -30,6 +29,9 @@ import { ComplainSurveyDetailResponseDto } from './dto/response-survey-complain.
 import { BasicAuthGuard } from '../../common/guards/basic-auth.guard.js';
 import { CombinedAuthGuard } from '../../common/guards/combine-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { createRateLimitGuard } from '../../common/guards/rate-limit.guard.js';
+
+const SearchByNikRateLimitGuard = createRateLimitGuard(5, 60000);
 
 @ApiTags('survey-complains')
 @Controller('survey-complains')
@@ -69,8 +71,7 @@ export class ComplainController {
 
   @Post('search-by-nik')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(BasicAuthGuard, ThrottlerGuard)
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @UseGuards(BasicAuthGuard, SearchByNikRateLimitGuard)
   @ApiBasicAuth('basic-auth')
   @ApiBody({ type: SearchSurveyByNikDto })
   @ApiOperation({

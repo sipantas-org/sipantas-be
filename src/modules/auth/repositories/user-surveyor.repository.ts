@@ -53,9 +53,7 @@ export class UserSurveyorRepository {
     ]);
   }
 
-  findById(
-    idSurveyor: number,
-  ): Promise<UserSurveyorWithAreaNames | null> {
+  findById(idSurveyor: number): Promise<UserSurveyorWithAreaNames | null> {
     return this.prisma.userSurveyor.findUnique({
       where: { surveyorId: idSurveyor },
       include: withAreaNames,
@@ -63,7 +61,10 @@ export class UserSurveyorRepository {
   }
 
   findByEmail(email: string): Promise<UserSurveyor | null> {
-    return this.prisma.userSurveyor.findUnique({ where: { email: email } });
+    return this.prisma.userSurveyor.findUnique({
+      where: { email: email },
+      include: withAreaNames,
+    });
   }
 
   updateLastLogin(idSurveyor: number, lastLogin: Date): Promise<UserSurveyor> {

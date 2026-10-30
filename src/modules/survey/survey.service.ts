@@ -78,6 +78,7 @@ export class SurveyService {
 
   async create(dto: CreateSurveyDto) {
     const {
+      disasterId,
       surveyorId,
       provinceId,
       regencyId,
@@ -92,6 +93,7 @@ export class SurveyService {
     } = dto;
 
     await this.validateForeignEntities({
+      disasterId,
       surveyorId,
       provinceId,
       regencyId,
@@ -109,6 +111,7 @@ export class SurveyService {
       damageLevel,
       totalScore,
       volumeUnitOther: volumeUnitOther ?? '',
+      ...(disasterId ? { disaster: { connect: { disasterId } } } : {}),
       ...(surveyorId ? { surveyor: { connect: { surveyorId } } } : {}),
       ...(provinceId ? { province: { connect: { id: provinceId } } } : {}),
       ...(regencyId ? { regency: { connect: { id: regencyId } } } : {}),
@@ -271,17 +274,10 @@ export class SurveyService {
           );
         }
         break;
-      case SurveyStatus.OnConstruction:
+      case SurveyStatus.Completed:
         if (currentStatus !== SurveyStatus.OnBudgeting) {
           throw new BadRequestException(
             `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.OnBudgeting}`,
-          );
-        }
-        break;
-      case SurveyStatus.Completed:
-        if (currentStatus !== SurveyStatus.OnConstruction) {
-          throw new BadRequestException(
-            `Status hanya dapat diubah ke ${targetStatus} jika status saat ini adalah ${SurveyStatus.OnConstruction}`,
           );
         }
         break;
@@ -310,6 +306,7 @@ export class SurveyService {
   }
 
   private async validateForeignEntities(params: {
+    disasterId?: number;
     surveyorId?: number;
     provinceId?: string;
     regencyId?: string;
@@ -317,6 +314,20 @@ export class SurveyService {
     villageId?: string;
   }) {
     const validations: Promise<void>[] = [];
+
+    if (params.disasterId !== undefined) {
+      validations.push(
+        (async () => {
+          const disaster = await this.prisma.disaster.findUnique({
+            where: { disasterId: params.disasterId },
+            select: { disasterId: true },
+          });
+          if (!disaster) {
+            throw new NotFoundException(`Bencana tidak ditemukan`);
+          }
+        })(),
+      );
+    }
 
     if (params.surveyorId !== undefined) {
       validations.push(

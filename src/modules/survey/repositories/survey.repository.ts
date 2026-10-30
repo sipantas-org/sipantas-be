@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service.js';
+import { plainToInstance } from 'class-transformer';
+import { SurveyResponseDto } from '../dto/response-survey.dto.js';
 import type { Prisma } from '../../../generated/prisma/client.js';
 import { findPage } from '../../../common/utils/pagination.util.js';
 import { buildPrismaWhere } from '../../../common/utils/filter-data.util.js';
@@ -39,8 +41,6 @@ export class SurveyRepository {
     lostDetails?: CreateSurveyLostDetailDto[];
     fileDetails?: CreateSurveyFileDetailItem[];
   }) {
-    params.data.disasterId = Number(params.data.disasterId);
-
     return this.prisma.$transaction(async (tx) => {
       const survey = await tx.survey.create({
         data: params.data,
@@ -127,18 +127,31 @@ export class SurveyRepository {
     const limit = Number(query.limit ?? 10);
     const skip = (page - 1) * limit;
 
-    const where = buildPrismaWhere<QuerySurveyDto, Prisma.SurveyWhereInput>(
-      query,
+    const { startDate, endDate, ...filterQuery } = query;
+
+    const where = buildPrismaWhere<typeof filterQuery, Prisma.SurveyWhereInput>(
+      filterQuery as QuerySurveyDto,
       {
-        containsFields: ['status'],
+        containsFields: ['assetName', 'nik'],
         fieldMappings: {},
       },
     );
 
+    if (startDate || endDate) {
+      where.createdAt = {
+        ...(startDate
+          ? { gte: new Date(new Date(startDate).setHours(0, 0, 0, 0)) }
+          : {}),
+        ...(endDate
+          ? { lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)) }
+          : {}),
+      };
+    }
+
     const sortBy = query.sortBy ?? 'createdAt';
     const sortOrder = query.sortOrder ?? 'desc';
 
-    return findPage(this.prisma.survey, {
+    const result = await findPage(this.prisma.survey, {
       where,
       skip,
       take: limit,
@@ -147,6 +160,7 @@ export class SurveyRepository {
         province: true,
         regency: true,
         district: true,
+        disaster: true,
         village: true,
         surveyor: {
           select: {
@@ -157,6 +171,24 @@ export class SurveyRepository {
         },
       },
     });
+
+    return {
+      data: result.data.map((item) =>
+        plainToInstance(
+          SurveyResponseDto,
+          {
+            ...item,
+            totalScore: item.totalScore?.toString() ?? null,
+            totalPriceUnit: item.totalPriceUnit?.toString() ?? null,
+            totalPriceFurniture: item.totalPriceFurniture?.toString() ?? null,
+          },
+          {
+            excludeExtraneousValues: true,
+          },
+        ),
+      ),
+      pagination: result.pagination,
+    };
   }
 
   async findById(surveyId: number, tx?: Prisma.TransactionClient) {

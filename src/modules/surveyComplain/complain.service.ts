@@ -14,10 +14,7 @@ import {
   ComplainStatus,
   SurveyStatus,
 } from '../../generated/prisma/enums.js';
-import {
-  ComplainResponseDto,
-  ComplainSurveyDetailResponseDto,
-} from './dto/response-survey-complain.dto.js';
+import { ComplainResponseDto } from './dto/response-survey-complain.dto.js';
 
 @Injectable()
 export class ComplainService {
@@ -72,10 +69,11 @@ export class ComplainService {
   }
 
   /**
-   * Mencari survei berstatus Pending terbaru milik sebuah NIK.
-   * Dipakai oleh halaman publik "Ajukan Komplain" sebagai pengganti GET /api/surveys?nik=...
-   * agar survei yang sudah OnComplain/OnVerification/OnBudgeting/OnConstruction/Completed
-   * tidak bisa dikomplain ulang lewat jalur ini, dan data yang dibocorkan ke publik seminimal mungkin.
+   * Mencari survei berstatus Pending terbaru milik sebuah NIK, dengan data LENGKAP
+   * (surveyor, koordinat, harga, dsb). Dipakai oleh halaman publik "Ajukan Komplain".
+   * Tetap membatasi ke status Pending saja supaya survei yang sudah
+   * OnComplain/OnVerification/OnBudgeting/OnConstruction/Completed tidak bisa
+   * dikomplain ulang lewat jalur ini.
    */
   async searchPendingSurveyByNik(nik: string) {
     const survey =
@@ -87,19 +85,7 @@ export class ComplainService {
       );
     }
 
-    const { province, regency, district, village, ...rest } = survey;
-
-    return plainToInstance(
-      ComplainSurveyDetailResponseDto,
-      {
-        ...rest,
-        provinceName: province?.name ?? null,
-        regencyName: regency?.name ?? null,
-        districtName: district?.name ?? null,
-        villageName: village?.name ?? null,
-      },
-      { excludeExtraneousValues: true },
-    );
+    return survey;
   }
 
   /**

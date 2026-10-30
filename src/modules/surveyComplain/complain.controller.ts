@@ -25,7 +25,7 @@ import { CreateSurveyComplainDto } from './dto/create-survey-complain.dto.js';
 import { QuerySurveyComplainDto } from './dto/query-survey-complain.dto.js';
 import { SearchSurveyByNikDto } from './dto/search-survey-by-nik.dto.js';
 import { UpdateSurveyComplainStatusDto } from './dto/update-survey-complain-status.dto.js';
-import { ComplainSurveyDetailResponseDto } from './dto/response-survey-complain.dto.js';
+import { SurveyResponseDto } from '../survey/dto/response-survey.dto.js';
 import { BasicAuthGuard } from '../../common/guards/basic-auth.guard.js';
 import { CombinedAuthGuard } from '../../common/guards/combine-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
@@ -75,16 +75,16 @@ export class ComplainController {
   @ApiBasicAuth('basic-auth')
   @ApiBody({ type: SearchSurveyByNikDto })
   @ApiOperation({
-    summary: 'Cari survei Pending berdasarkan NIK',
+    summary: 'Cari survei Pending berdasarkan NIK (data lengkap)',
     description:
       'Endpoint publik untuk halaman "Ajukan Komplain". NIK dikirim lewat request body (bukan query string) ' +
-      'supaya tidak tercatat di access log. Mengembalikan HANYA survei berstatus Pending terbaru milik NIK ' +
-      'yang diberikan, dengan data seperlunya (tanpa data surveyor, koordinat, maupun rincian harga). Survei ' +
-      'yang sudah berstatus OnComplain, OnVerification, OnBudgeting, OnConstruction, atau Completed tidak ' +
-      'dapat ditemukan lewat endpoint ini, karena tidak boleh dikomplain ulang. Dibatasi maksimal 5 permintaan ' +
-      'per menit per klien untuk mencegah penebakan NIK secara massal.',
+      'supaya tidak tercatat di access log. Mengembalikan data LENGKAP survei berstatus Pending terbaru milik ' +
+      'NIK yang diberikan (termasuk surveyor, koordinat, dan rincian harga). Survei yang sudah berstatus ' +
+      'OnComplain, OnVerification, OnBudgeting, OnConstruction, atau Completed tidak dapat ditemukan lewat ' +
+      'endpoint ini, karena tidak boleh dikomplain ulang. Dibatasi maksimal 5 permintaan per menit per klien ' +
+      'untuk mencegah penebakan NIK secara massal.',
   })
-  @ApiResponse({ status: 200, type: ComplainSurveyDetailResponseDto })
+  @ApiResponse({ status: 200, type: SurveyResponseDto })
   @ApiResponse({ status: 401, description: 'Basic Auth tidak valid' })
   @ApiResponse({
     status: 404,

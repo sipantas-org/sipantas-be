@@ -134,25 +134,28 @@ export class ComplainRepository {
   }
 
   /**
-   * Mencari survei berstatus Pending terbaru milik sebuah NIK.
-   * Hanya mengambil kolom seperlunya (tanpa surveyor, koordinat, maupun rincian harga)
-   * karena dipakai oleh endpoint publik halaman "Ajukan Komplain".
+   * Mencari survei berstatus Pending terbaru milik sebuah NIK, dengan data lengkap
+   * (surveyor, koordinat, harga, dsb). Dipakai oleh endpoint publik halaman
+   * "Ajukan Komplain" atas permintaan eksplisit — endpoint ini hanya dilindungi
+   * Basic Auth bersama, jadi perlu diingat datanya tidak lagi minimal.
    */
   async findLatestPendingSurveyByNik(nik: string) {
     return this.prisma.survey.findFirst({
       where: { nik, surveyStatus: SurveyStatus.Pending },
       orderBy: { createdAt: 'desc' },
-      select: {
-        surveyId: true,
-        nik: true,
-        assetName: true,
-        addressDetail: true,
-        surveyStatus: true,
-        createdAt: true,
-        province: { select: { name: true } },
-        regency: { select: { name: true } },
-        district: { select: { name: true } },
-        village: { select: { name: true } },
+      include: {
+        province: true,
+        regency: true,
+        district: true,
+        village: true,
+        disaster: true,
+        surveyor: {
+          select: {
+            nama: true,
+            nip: true,
+            phoneNumber: true,
+          },
+        },
       },
     });
   }

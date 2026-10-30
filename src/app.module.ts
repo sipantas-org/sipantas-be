@@ -24,6 +24,8 @@ import { ComplainModule } from './modules/surveyComplain/complain.module.js';
 import { ActivityHistoryModule } from './modules/activityHistory/activity-history.module.js';
 import { UploadFileController } from './modules/upload-file.js';
 import { UploadFileBlobController } from './modules/upload-file-blob.js';
+import { DashboardModule } from './modules/dashboard/dashboard.module.js';
+import { DashboardSurveyorModule } from './modules/dashboardSurveyor/dashboard-surveyor.module.js';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { UploadFileBlobController } from './modules/upload-file-blob.js';
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
     }),
+    DashboardModule,
+    DashboardSurveyorModule,
     PrismaModule,
     JwtAuthModule,
     AuthModule,

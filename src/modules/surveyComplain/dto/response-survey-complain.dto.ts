@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import {
   ComplainAction,
   ComplainStatus,
-  SurveyStatus,
 } from '../../../generated/prisma/enums.js';
 
 export class SurveyComplainDocumentResponseDto {
@@ -19,53 +18,6 @@ export class SurveyComplainDocumentResponseDto {
 
   @ApiProperty({ example: 'bukti-1.jpg' })
   fileName: string;
-}
-
-export class ComplainSurveyDetailResponseDto {
-  @ApiProperty({ example: 1 })
-  @Expose()
-  surveyId: number;
-
-  @ApiProperty({ example: '3201123456780001' })
-  @Expose()
-  nik: string;
-
-  @ApiProperty({ example: 'Rumah Pak Budi' })
-  @Expose()
-  assetName: string;
-
-  @ApiProperty({ example: 'Jl. Merdeka No. 10, RT 01/RW 02' })
-  @Expose()
-  addressDetail: string;
-
-  @ApiProperty({ enum: SurveyStatus, example: SurveyStatus.Pending })
-  @Expose()
-  surveyStatus: SurveyStatus;
-
-  @ApiPropertyOptional({ example: 'Jawa Barat', nullable: true })
-  @Expose()
-  provinceName: string | null;
-
-  @ApiPropertyOptional({ example: 'Kabupaten Cianjur', nullable: true })
-  @Expose()
-  regencyName: string | null;
-
-  @ApiPropertyOptional({ example: 'Cianjur', nullable: true })
-  @Expose()
-  districtName: string | null;
-
-  @ApiPropertyOptional({ example: 'Sukamanah', nullable: true })
-  @Expose()
-  villageName: string | null;
-
-  @ApiProperty({ example: '2026-10-22 10:00:00' })
-  @Expose()
-  @Transform(({ value }) =>
-    value
-      ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
-      : null,
-  )
-  createdAt: Date;
 }
 
 export class ComplainResponseDto {

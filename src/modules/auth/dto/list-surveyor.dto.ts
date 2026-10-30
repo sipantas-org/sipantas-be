@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { SurveyorStatus } from '../../../generated/prisma/enums.js';
 
 export class ListSurveyorDto {
@@ -12,6 +12,22 @@ export class ListSurveyorDto {
   @IsOptional()
   @IsEnum(SurveyorStatus)
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected';
+
+  @ApiPropertyOptional({
+    example: '',
+    description: 'Filter surveyor berdasarkan NIP',
+  })
+  @IsOptional()
+  @IsString()
+  nip?: string;
+
+  @ApiPropertyOptional({
+    example: '',
+    description: 'Filter surveyor berdasarkan nama lengkap',
+  })
+  @IsOptional()
+  @IsString()
+  nama?: string;
 
   @ApiPropertyOptional({
     example: 1,

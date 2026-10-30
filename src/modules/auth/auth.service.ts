@@ -222,6 +222,8 @@ export class AuthService {
     const [items, total] = await this.userAdminRepository.findPage({
       role: AdminRole.Monitoring,
       status: query.status,
+      nip: query.nip,
+      nama: query.nama,
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -449,6 +451,8 @@ export class AuthService {
     const limit = query.limit ?? 10;
     const [items, total] = await this.userSurveyorRepository.findPage({
       status: query.status,
+      nip: query.nip,
+      nama: query.nama,
       skip: (page - 1) * limit,
       take: limit,
     });

@@ -22,10 +22,20 @@ export class UserSurveyorRepository {
 
   findPage(params: {
     status?: UserSurveyor['status'];
+    nip?: string;
+    nama?: string;
     skip: number;
     take: number;
   }) {
-    const where = params.status ? { status: params.status } : {};
+    const where: Prisma.UserSurveyorWhereInput = {
+      ...(params.status ? { status: params.status } : {}),
+      ...(params.nip
+        ? { nip: { contains: params.nip, mode: 'insensitive' } }
+        : {}),
+      ...(params.nama
+        ? { nama: { contains: params.nama, mode: 'insensitive' } }
+        : {}),
+    };
     const select = {
       surveyorId: true,
       nip: true,

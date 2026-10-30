@@ -24,12 +24,20 @@ export class UserAdminRepository {
   findPage(params: {
     role?: UserAdmin['role'];
     status?: UserAdmin['status'];
+    nip?: string;
+    nama?: string;
     skip: number;
     take: number;
   }) {
-    const where = {
+    const where: Prisma.UserAdminWhereInput = {
       ...(params.role ? { role: params.role } : {}),
       ...(params.status ? { status: params.status } : {}),
+      ...(params.nip
+        ? { nip: { contains: params.nip, mode: 'insensitive' } }
+        : {}),
+      ...(params.nama
+        ? { nama: { contains: params.nama, mode: 'insensitive' } }
+        : {}),
     };
 
     return this.prisma.$transaction([

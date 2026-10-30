@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -12,6 +14,7 @@ import {
 import {
   ApiBearerAuth,
   ApiBasicAuth,
+  ApiBody,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -20,31 +23,42 @@ import {
 import { ComplainService } from './complain.service.js';
 import { CreateSurveyComplainDto } from './dto/create-survey-complain.dto.js';
 import { QuerySurveyComplainDto } from './dto/query-survey-complain.dto.js';
+import { SearchSurveyByNikDto } from './dto/search-survey-by-nik.dto.js';
 import { UpdateSurveyComplainStatusDto } from './dto/update-survey-complain-status.dto.js';
+import { ComplainSurveyDetailResponseDto } from './dto/response-survey-complain.dto.js';
+import { BasicAuthGuard } from '../../common/guards/basic-auth.guard.js';
 import { CombinedAuthGuard } from '../../common/guards/combine-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
+import { createRateLimitGuard } from '../../common/guards/rate-limit.guard.js';
+
+const SearchByNikRateLimitGuard = createRateLimitGuard(5, 60000);
 
 @ApiTags('survey-complains')
-@ApiBearerAuth('access-token')
 @Controller('survey-complains')
 export class ComplainController {
   constructor(private readonly complainService: ComplainService) {}
 
   @Post()
   @UseGuards(CombinedAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiBasicAuth('basic-auth')
   @ApiOperation({
     summary: 'Ajukan komplain survei',
     description:
-      'Menyimpan data komplain survei baru beserta dokumen pendukung. NIK pelapor akan otomatis diambil dari data survei terkait.',
+      'Menyimpan data komplain survei baru beserta dokumen pendukung. NIK pelapor akan otomatis diambil dari data survei terkait. Hanya survei berstatus Pending yang dapat dikomplain.',
   })
   @ApiResponse({ status: 404, description: 'Survei tidak ditemukan' })
+  @ApiResponse({
+    status: 400,
+    description: 'Survei tidak berstatus Pending, atau sudah ada komplain aktif',
+  })
   create(@Body() createDto: CreateSurveyComplainDto) {
     return this.complainService.create(createDto);
   }
 
   @Get()
   @UseGuards(CombinedAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiBasicAuth('basic-auth')
   @ApiOperation({
     summary: 'Daftar komplain survei',
@@ -55,8 +69,38 @@ export class ComplainController {
     return this.complainService.findAll(query);
   }
 
+  @Post('search-by-nik')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(BasicAuthGuard, SearchByNikRateLimitGuard)
+  @ApiBasicAuth('basic-auth')
+  @ApiBody({ type: SearchSurveyByNikDto })
+  @ApiOperation({
+    summary: 'Cari survei Pending berdasarkan NIK',
+    description:
+      'Endpoint publik untuk halaman "Ajukan Komplain". NIK dikirim lewat request body (bukan query string) ' +
+      'supaya tidak tercatat di access log. Mengembalikan HANYA survei berstatus Pending terbaru milik NIK ' +
+      'yang diberikan, dengan data seperlunya (tanpa data surveyor, koordinat, maupun rincian harga). Survei ' +
+      'yang sudah berstatus OnComplain, OnVerification, OnBudgeting, OnConstruction, atau Completed tidak ' +
+      'dapat ditemukan lewat endpoint ini, karena tidak boleh dikomplain ulang. Dibatasi maksimal 5 permintaan ' +
+      'per menit per klien untuk mencegah penebakan NIK secara massal.',
+  })
+  @ApiResponse({ status: 200, type: ComplainSurveyDetailResponseDto })
+  @ApiResponse({ status: 401, description: 'Basic Auth tidak valid' })
+  @ApiResponse({
+    status: 404,
+    description: 'Tidak ditemukan survei berstatus Pending untuk NIK tersebut',
+  })
+  @ApiResponse({
+    status: 429,
+    description: 'Terlalu banyak permintaan, coba lagi beberapa saat lagi',
+  })
+  searchByNik(@Body() dto: SearchSurveyByNikDto) {
+    return this.complainService.searchPendingSurveyByNik(dto.nik);
+  }
+
   @Get(':id')
   @UseGuards(CombinedAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiBasicAuth('basic-auth')
   @ApiOperation({
     summary: 'Detail komplain survei',
@@ -76,6 +120,7 @@ export class ComplainController {
 
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Perbarui status / tindak lanjut komplain',
     description:

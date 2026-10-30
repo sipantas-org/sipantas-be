@@ -14,7 +14,10 @@ import {
   ComplainStatus,
   SurveyStatus,
 } from '../../generated/prisma/enums.js';
-import { ComplainResponseDto } from './dto/response-survey-complain.dto.js';
+import {
+  ComplainResponseDto,
+  ComplainSurveyDetailResponseDto,
+} from './dto/response-survey-complain.dto.js';
 
 @Injectable()
 export class ComplainService {
@@ -31,12 +34,18 @@ export class ComplainService {
   async create(createDto: CreateSurveyComplainDto) {
     const survey = await this.prisma.survey.findUnique({
       where: { surveyId: createDto.surveyId },
-      select: { surveyId: true, nik: true },
+      select: { surveyId: true, nik: true, surveyStatus: true },
     });
 
     if (!survey) {
       throw new NotFoundException(
         `Data survei dengan ID ${createDto.surveyId} tidak ditemukan.`,
+      );
+    }
+
+    if (survey.surveyStatus !== SurveyStatus.Pending) {
+      throw new BadRequestException(
+        'Survei ini tidak dapat dikomplain karena status saat ini bukan Pending.',
       );
     }
 
@@ -60,6 +69,37 @@ export class ComplainService {
     });
 
     return plainToInstance(ComplainResponseDto, complain);
+  }
+
+  /**
+   * Mencari survei berstatus Pending terbaru milik sebuah NIK.
+   * Dipakai oleh halaman publik "Ajukan Komplain" sebagai pengganti GET /api/surveys?nik=...
+   * agar survei yang sudah OnComplain/OnVerification/OnBudgeting/OnConstruction/Completed
+   * tidak bisa dikomplain ulang lewat jalur ini, dan data yang dibocorkan ke publik seminimal mungkin.
+   */
+  async searchPendingSurveyByNik(nik: string) {
+    const survey =
+      await this.complainRepository.findLatestPendingSurveyByNik(nik);
+
+    if (!survey) {
+      throw new NotFoundException(
+        `Tidak ditemukan survei berstatus Pending untuk NIK ${nik}.`,
+      );
+    }
+
+    const { province, regency, district, village, ...rest } = survey;
+
+    return plainToInstance(
+      ComplainSurveyDetailResponseDto,
+      {
+        ...rest,
+        provinceName: province?.name ?? null,
+        regencyName: regency?.name ?? null,
+        districtName: district?.name ?? null,
+        villageName: village?.name ?? null,
+      },
+      { excludeExtraneousValues: true },
+    );
   }
 
   /**

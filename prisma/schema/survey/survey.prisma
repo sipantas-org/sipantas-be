@@ -10,7 +10,6 @@ enum SurveyStatus {
   OnComplain @map("On Complain")
   OnVerification @map("On Verification")
   OnBudgeting @map("On Budgeting")
-  OnConstruction @map("On Construction")
   Completed
 }
 
@@ -24,6 +23,8 @@ enum Authority {
 model Survey {
   surveyId   Int          @id @default(autoincrement())
   disasterId Int
+  disaster   Disaster?    @relation(fields: [disasterId], references: [disasterId], onDelete: SetNull)
+
   sectorId   Int
   surveyStatus SurveyStatus
 

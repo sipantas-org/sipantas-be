@@ -34,7 +34,19 @@ export class QuerySurveyDto extends QueryDefaultDto {
   @DisplayName('Status')
   @IsOptional()
   @IsString()
-  status?: string;
+  surveyStatus?: string;
+
+  @ApiPropertyOptional({ description: 'Filter status survei' })
+  @DisplayName('Status')
+  @IsOptional()
+  @IsString()
+  assetName?: string;
+
+  @ApiPropertyOptional({ description: 'Filter status survei' })
+  @DisplayName('Status')
+  @IsOptional()
+  @IsString()
+  damageLevel?: string;
 
   @ApiPropertyOptional({ description: 'Filter berdasarkan ID Surveyor' })
   @DisplayName('Surveyor ID')
@@ -43,12 +55,49 @@ export class QuerySurveyDto extends QueryDefaultDto {
   @IsInt()
   surveyorId?: number;
 
+  @ApiPropertyOptional({ description: 'Filter berdasarkan ID Disaster' })
+  @DisplayName('Disaster ID')
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  disasterId?: number;
+
+  @ApiPropertyOptional({ description: 'Filter berdasarkan ID province' })
+  @DisplayName('province ID')
+  @IsOptional()
+  @Type(() => String)
+  @IsString()
+  provinceId?: string;
+
+  @ApiPropertyOptional({ description: 'Filter berdasarkan ID regency' })
+  @DisplayName('regency ID')
+  @IsOptional()
+  @Type(() => String)
+  @IsString()
+  regencyId?: string;
+
   @ApiPropertyOptional({ description: 'Filter berdasarkan NIK' })
   @DisplayName('NIK')
   @IsOptional()
   @Type(() => String)
   @IsNumberString()
   nik?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter tanggal dibuat awal (YYYY-MM-DD)',
+  })
+  @DisplayName('Start Date')
+  @IsOptional()
+  @IsString()
+  startDate?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter tanggal dibuat akhir (YYYY-MM-DD)',
+  })
+  @DisplayName('End Date')
+  @IsOptional()
+  @IsString()
+  endDate?: string;
 }
 
 export type RequestListSurveyDto = QuerySurveyDto;

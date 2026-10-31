@@ -25,7 +25,7 @@ import { CreateSurveyComplainDto } from './dto/create-survey-complain.dto.js';
 import { QuerySurveyComplainDto } from './dto/query-survey-complain.dto.js';
 import { SearchSurveyByNikDto } from './dto/search-survey-by-nik.dto.js';
 import { UpdateSurveyComplainStatusDto } from './dto/update-survey-complain-status.dto.js';
-import { SurveyResponseDto } from '../survey/dto/response-survey.dto.js';
+import { ComplainSurveyLookupResponseDto } from './dto/response-survey-complain.dto.js';
 import { BasicAuthGuard } from '../../common/guards/basic-auth.guard.js';
 import { CombinedAuthGuard } from '../../common/guards/combine-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
@@ -75,24 +75,22 @@ export class ComplainController {
   @ApiBasicAuth('basic-auth')
   @ApiBody({ type: SearchSurveyByNikDto })
   @ApiOperation({
-    summary: 'Cari survei Pending berdasarkan NIK (data lengkap)',
+    summary: 'Cari survei Pending berdasarkan NIK',
     description:
-      'Endpoint publik untuk halaman "Ajukan Komplain". NIK dikirim lewat request body (bukan query string) ' +
-      'supaya tidak tercatat di access log. Mengembalikan data LENGKAP survei berstatus Pending terbaru milik ' +
-      'NIK yang diberikan (termasuk surveyor, koordinat, dan rincian harga). Survei yang sudah berstatus ' +
-      'OnComplain, OnVerification, OnBudgeting, OnConstruction, atau Completed tidak dapat ditemukan lewat ' +
-      'endpoint ini, karena tidak boleh dikomplain ulang. Dibatasi maksimal 5 permintaan per menit per klien ' +
-      'untuk mencegah penebakan NIK secara massal.',
+      'Mencari survei berstatus Pending terbaru untuk NIK yang diberikan, beserta housingDetails dan ' +
+      'fileDetails-nya (tanpa data surveyor/harga). Dibatasi 5 permintaan/menit per IP.',
   })
-  @ApiResponse({ status: 200, type: SurveyResponseDto })
+  @ApiResponse({ status: 200, type: ComplainSurveyLookupResponseDto })
+  @ApiResponse({ status: 400, description: 'Format NIK tidak valid' })
   @ApiResponse({ status: 401, description: 'Basic Auth tidak valid' })
   @ApiResponse({
     status: 404,
-    description: 'Tidak ditemukan survei berstatus Pending untuk NIK tersebut',
+    description:
+      'Tidak ditemukan survei berstatus Pending untuk NIK tersebut (NIK tidak terdaftar, atau survei miliknya sudah tidak berstatus Pending)',
   })
   @ApiResponse({
     status: 429,
-    description: 'Terlalu banyak permintaan, coba lagi beberapa saat lagi',
+    description: 'Terlalu banyak permintaan dari IP ini, coba lagi beberapa saat lagi',
   })
   searchByNik(@Body() dto: SearchSurveyByNikDto) {
     return this.complainService.searchPendingSurveyByNik(dto.nik);

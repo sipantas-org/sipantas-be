@@ -1,5 +1,6 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module.js';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
@@ -11,7 +12,10 @@ import { DISPLAY_NAME_KEY } from './common/decorators/display-name.decorator.js'
 import { getSwaggerCustomOptions } from './swagger-dev.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Supaya rate limit per-IP mengenali klien asli di belakang proxy.
+  app.set('trust proxy', 1);
 
   const customOptions = getSwaggerCustomOptions();
 

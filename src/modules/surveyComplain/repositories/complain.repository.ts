@@ -133,31 +133,57 @@ export class ComplainRepository {
     };
   }
 
-  /**
-   * Mencari survei berstatus Pending terbaru milik sebuah NIK, dengan data lengkap
-   * (surveyor, koordinat, harga, dsb). Dipakai oleh endpoint publik halaman
-   * "Ajukan Komplain" atas permintaan eksplisit — endpoint ini hanya dilindungi
-   * Basic Auth bersama, jadi perlu diingat datanya tidak lagi minimal.
-   */
+  /** Survei Pending terbaru untuk NIK, beserta housingDetails + fileDetails. */
   async findLatestPendingSurveyByNik(nik: string) {
-    return this.prisma.survey.findFirst({
+    const survey = await this.prisma.survey.findFirst({
       where: { nik, surveyStatus: SurveyStatus.Pending },
       orderBy: { createdAt: 'desc' },
-      include: {
-        province: true,
-        regency: true,
-        district: true,
-        village: true,
-        disaster: true,
-        surveyor: {
-          select: {
-            nama: true,
-            nip: true,
-            phoneNumber: true,
-          },
+      select: {
+        surveyId: true,
+        surveyStatus: true,
+        nik: true,
+        assetName: true,
+        addressDetail: true,
+        authority: true,
+        latitude: true,
+        longitude: true,
+        damageLevel: true,
+        volume: true,
+        volumeUnit: true,
+        disasterId: true,
+        provinceId: true,
+        regencyId: true,
+        districtId: true,
+        villageId: true,
+        createdAt: true,
+        province: { select: { id: true, name: true } },
+        regency: { select: { id: true, name: true } },
+        district: { select: { id: true, name: true } },
+        village: { select: { id: true, name: true } },
+        files: {
+          select: { category: true, filePath: true, fileName: true },
+          orderBy: { createdAt: 'asc' },
         },
       },
     });
+
+    if (!survey) {
+      return null;
+    }
+
+    const { files, ...rest } = survey;
+
+    const housingDetails = await this.prisma.surveyHousingDetail.findMany({
+      where: { surveyId: survey.surveyId },
+      select: {
+        housingDamageAssessmentId: true,
+        totalUnit: true,
+        score: true,
+      },
+      orderBy: { surveyHousingDetailId: 'asc' },
+    });
+
+    return { ...rest, fileDetails: files, housingDetails };
   }
 
   async findActiveBySurveyId(surveyId: number) {

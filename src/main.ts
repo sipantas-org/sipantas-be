@@ -4,6 +4,7 @@ import {
   VersioningType,
 } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module.js';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
@@ -110,7 +111,11 @@ export function configureApp(app: INestApplication) {
 // --- end Vercel deploy ---
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Supaya rate limit per-IP mengenali klien asli di belakang proxy.
+  app.set('trust proxy', 1);
+  
   configureApp(app);
   await app.listen(process.env.PORT ?? 3000);
 }

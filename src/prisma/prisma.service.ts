@@ -10,6 +10,8 @@ export class PrismaService
   constructor() {
     const adapter = new PrismaPg({
       connectionString: process.env.DATABASE_URL,
+      // Vercel (serverless) deployment only: cap the pool so Neon connections don't run out
+      max: 1,
     });
     super({ adapter });
   }

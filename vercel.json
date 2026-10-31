@@ -1,0 +1,9 @@
+{
+  "framework": null,
+  "regions": ["sin1"],
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.js": { "includeFiles": "dist/**" }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+}

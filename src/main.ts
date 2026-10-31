@@ -1,4 +1,8 @@
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+  INestApplication,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module.js';
@@ -11,14 +15,9 @@ import { BadRequestException } from '@nestjs/common';
 import { DISPLAY_NAME_KEY } from './common/decorators/display-name.decorator.js';
 import { getSwaggerCustomOptions } from './swagger-dev.js';
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  // Supaya rate limit per-IP mengenali klien asli di belakang proxy.
-  app.set('trust proxy', 1);
-
+// --- Vercel deploy: exported so src/serverless.ts can reuse it (same setup as local) ---
+export function configureApp(app: INestApplication) {
   const customOptions = getSwaggerCustomOptions();
-
   const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
     .split(',')
     .map((origin) => origin.trim());
@@ -104,10 +103,25 @@ async function bootstrap() {
       'basic-auth',
     )
     .build();
+
   const documentFactory = () => SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('swagger', app, documentFactory, customOptions);
+}
+// --- end Vercel deploy ---
 
+async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Supaya rate limit per-IP mengenali klien asli di belakang proxy.
+  app.set('trust proxy', 1);
+  
+  configureApp(app);
   await app.listen(process.env.PORT ?? 3000);
 }
-await bootstrap();
+
+// --- Vercel deploy: serverless.ts imports this file, so don't listen() there ---
+if (!process.env.VERCEL) {
+  await bootstrap();
+}
+// --- end Vercel deploy ---

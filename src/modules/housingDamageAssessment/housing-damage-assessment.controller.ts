@@ -23,6 +23,8 @@ import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @ApiBearerAuth('access-token')
 @ApiTags('Housing Damage Assessments')
@@ -41,8 +43,11 @@ export class HousingDamageAssessmentController {
     status: HttpStatus.CREATED,
     type: HousingDamageAssessmentResponseDto,
   })
-  create(@Body() dto: CreateHousingDamageAssessmentDto) {
-    return this.housingDamageAssessmentService.create(dto);
+  create(
+    @Body() dto: CreateHousingDamageAssessmentDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.housingDamageAssessmentService.create(dto, user);
   }
 
   @Get()
@@ -78,8 +83,9 @@ export class HousingDamageAssessmentController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateHousingDamageAssessmentDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.housingDamageAssessmentService.update(id, dto);
+    return this.housingDamageAssessmentService.update(id, dto, user);
   }
 
   @Delete(':id')
@@ -91,7 +97,7 @@ export class HousingDamageAssessmentController {
     status: HttpStatus.OK,
     type: HousingDamageAssessmentResponseDto,
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.housingDamageAssessmentService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+    return this.housingDamageAssessmentService.remove(id, user);
   }
 }

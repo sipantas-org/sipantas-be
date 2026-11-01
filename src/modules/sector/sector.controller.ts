@@ -20,6 +20,8 @@ import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
 import { UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @ApiBearerAuth('access-token')
 @Controller('sectors')
@@ -29,8 +31,11 @@ export class SectorController {
   @Post()
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
-  create(@Body() createSectorDto: CreateSectorDto) {
-    return this.sectorService.create(createSectorDto);
+  create(
+    @Body() createSectorDto: CreateSectorDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.sectorService.create(createSectorDto, user);
   }
 
   @Get()
@@ -49,14 +54,15 @@ export class SectorController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateSectorDto: UpdateSectorDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.sectorService.update(id, updateSectorDto);
+    return this.sectorService.update(id, updateSectorDto, user);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.sectorService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+    return this.sectorService.remove(id, user);
   }
 }

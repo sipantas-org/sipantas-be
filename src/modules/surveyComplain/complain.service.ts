@@ -18,12 +18,22 @@ import {
   ComplainResponseDto,
   ComplainSurveyLookupResponseDto,
 } from './dto/response-survey-complain.dto.js';
+import { ActivityHistoryService } from '../activityHistory/activity-history.service.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
+
+// Pelaku aktivitas bisa tidak teridentifikasi (mis. Basic Auth publik).
+function actorFrom(user?: JwtPayload) {
+  if (user?.userType === 'admin') return { idUser: null, idAdmin: user.sub };
+  if (user?.userType === 'surveyor') return { idUser: user.sub, idAdmin: null };
+  return { idUser: null, idAdmin: null };
+}
 
 @Injectable()
 export class ComplainService {
   constructor(
     private readonly complainRepository: ComplainRepository,
     private readonly prisma: PrismaService,
+    private readonly activityHistoryService: ActivityHistoryService,
   ) {}
 
   /**
@@ -31,7 +41,7 @@ export class ComplainService {
    * NIK otomatis diambil dari data survei terkait
    * Berkas pendukung disimpan via ComplainRepository
    */
-  async create(createDto: CreateSurveyComplainDto) {
+  async create(createDto: CreateSurveyComplainDto, user?: JwtPayload) {
     const survey = await this.prisma.survey.findUnique({
       where: { surveyId: createDto.surveyId },
       select: { surveyId: true, nik: true, surveyStatus: true },
@@ -66,6 +76,13 @@ export class ComplainService {
       complainantPhone: createDto.complainantPhone,
       description: createDto.description,
       files: createDto.files,
+    });
+
+    await this.activityHistoryService.record({
+      ...actorFrom(user),
+      relationId: complain.complainId,
+      module: 'Survey Complain - Create',
+      activity: `Submitted complaint for survey #${createDto.surveyId}`,
     });
 
     return plainToInstance(ComplainResponseDto, complain);
@@ -112,7 +129,11 @@ export class ComplainService {
   /**
    * Memperbarui status/action komplain secara atomik via repository transaction
    */
-  async updateStatus(id: number, dto: UpdateSurveyComplainStatusDto) {
+  async updateStatus(
+    id: number,
+    dto: UpdateSurveyComplainStatusDto,
+    user: JwtPayload,
+  ) {
     const complain = await this.findOne(id);
 
     const isResolved = dto.action === ComplainAction.Resolved;
@@ -136,6 +157,13 @@ export class ComplainService {
       action: dto.action,
       responseNotes: dto.description || null,
       surveyUpdate,
+    });
+
+    await this.activityHistoryService.record({
+      ...actorFrom(user),
+      relationId: id,
+      module: 'Survey Complain - Status Update',
+      activity: `Updated complaint status (action: ${dto.action})`,
     });
 
     return plainToInstance(ComplainResponseDto, result);

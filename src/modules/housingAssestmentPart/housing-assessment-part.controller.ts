@@ -20,6 +20,8 @@ import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
 import { UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @ApiBearerAuth('access-token')
 @Controller('housing-assessment-part')
@@ -31,8 +33,11 @@ export class HousingAssessmentPartController {
   @Post()
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
-  create(@Body() createDto: CreateHousingAssessmentPartDto) {
-    return this.housingAssessmentPartService.create(createDto);
+  create(
+    @Body() createDto: CreateHousingAssessmentPartDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.housingAssessmentPartService.create(createDto, user);
   }
 
   @Get()
@@ -51,14 +56,15 @@ export class HousingAssessmentPartController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateHousingAssessmentPartDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.housingAssessmentPartService.update(id, updateDto);
+    return this.housingAssessmentPartService.update(id, updateDto, user);
   }
 
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.housingAssessmentPartService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+    return this.housingAssessmentPartService.remove(id, user);
   }
 }

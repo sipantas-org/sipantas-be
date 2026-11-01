@@ -8,12 +8,17 @@ import { MasterAreaRegencyRepository } from './repositories/master-area-regency.
 import { CreateRegencyDto } from './dto/create-regency.dto.js';
 import { UpdateRegencyDto } from './dto/update-regency.dto.js';
 import { QueryRegencyDto } from './dto/query-regency.dto.js';
+import { ActivityHistoryService } from '../activityHistory/activity-history.service.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @Injectable()
 export class MasterAreaRegencyService {
-  constructor(private readonly repository: MasterAreaRegencyRepository) {}
+  constructor(
+    private readonly repository: MasterAreaRegencyRepository,
+    private readonly activityHistoryService: ActivityHistoryService,
+  ) {}
 
-  async create(createDto: CreateRegencyDto) {
+  async create(createDto: CreateRegencyDto, user: JwtPayload) {
     const existingRegency = await this.repository.findById(createDto.id);
     if (existingRegency) {
       throw new ConflictException(
@@ -30,7 +35,15 @@ export class MasterAreaRegencyService {
       );
     }
 
-    return this.repository.create(createDto);
+    const created = await this.repository.create(createDto);
+
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      module: 'Master Area - Regency',
+      activity: `Created regency '${createDto.id}'`,
+    });
+
+    return created;
   }
 
   async findAll(query: QueryRegencyDto) {
@@ -45,13 +58,29 @@ export class MasterAreaRegencyService {
     return regency;
   }
 
-  async update(id: string, updateDto: UpdateRegencyDto) {
+  async update(id: string, updateDto: UpdateRegencyDto, user: JwtPayload) {
     await this.findOne(id); // Throws 404 if regency not found
-    return this.repository.update(id, updateDto);
+    const updated = await this.repository.update(id, updateDto);
+
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      module: 'Master Area - Regency',
+      activity: `Updated regency '${id}'`,
+    });
+
+    return updated;
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: JwtPayload) {
     await this.findOne(id); // Throws 404 if regency not found
-    return this.repository.delete(id);
+    const deleted = await this.repository.delete(id);
+
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      module: 'Master Area - Regency',
+      activity: `Deleted regency '${id}'`,
+    });
+
+    return deleted;
   }
 }

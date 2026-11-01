@@ -24,6 +24,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 import {
   ApiBearerAuth,
   ApiExtraModels,
@@ -56,8 +58,11 @@ export class MasterAreaProvinceController {
     description: 'Hanya administrator yang boleh menambahkan provinsi',
   })
   @ApiResponse({ status: 409, description: 'Province dengan ID tersebut sudah ada' })
-  create(@Body() createDto: CreateProvinceDto) {
-    return this.provinceService.create(createDto);
+  create(
+    @Body() createDto: CreateProvinceDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.provinceService.create(createDto, user);
   }
 
   @Get()
@@ -120,8 +125,12 @@ export class MasterAreaProvinceController {
     description: 'Hanya administrator yang boleh mengubah provinsi',
   })
   @ApiResponse({ status: 404, description: 'Province tidak ditemukan' })
-  update(@Param('id') id: string, @Body() updateDto: UpdateProvinceDto) {
-    return this.provinceService.update(id, updateDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateProvinceDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.provinceService.update(id, updateDto, user);
   }
 
   @Delete(':id')
@@ -141,7 +150,7 @@ export class MasterAreaProvinceController {
     description: 'Hanya administrator yang boleh menghapus provinsi',
   })
   @ApiResponse({ status: 404, description: 'Province tidak ditemukan' })
-  remove(@Param('id') id: string) {
-    return this.provinceService.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.provinceService.remove(id, user);
   }
 }

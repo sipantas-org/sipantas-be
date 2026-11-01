@@ -22,6 +22,8 @@ import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
 import { UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @ApiBearerAuth('access-token')
 @ApiTags('Loss Assessments')
@@ -38,8 +40,8 @@ export class LossAssessmentController {
     status: HttpStatus.CREATED,
     type: LossAssessmentResponseDto,
   })
-  create(@Body() dto: CreateLossAssessmentDto) {
-    return this.lossAssessmentService.create(dto);
+  create(@Body() dto: CreateLossAssessmentDto, @CurrentUser() user: JwtPayload) {
+    return this.lossAssessmentService.create(dto, user);
   }
 
   @Get()
@@ -75,8 +77,9 @@ export class LossAssessmentController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateLossAssessmentDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.lossAssessmentService.update(id, dto);
+    return this.lossAssessmentService.update(id, dto, user);
   }
 
   @Delete(':id')
@@ -88,7 +91,7 @@ export class LossAssessmentController {
     status: HttpStatus.OK,
     type: LossAssessmentResponseDto,
   })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.lossAssessmentService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+    return this.lossAssessmentService.remove(id, user);
   }
 }

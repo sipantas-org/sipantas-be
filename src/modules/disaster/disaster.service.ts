@@ -6,15 +6,18 @@ import { UpdateDisasterDto } from './dto/update-disaster.dto.js';
 import { QueryDisasterDto } from './dto/query-disaster.dto.js';
 import { plainToInstance } from 'class-transformer';
 import { DisasterResponseDto } from './dto/response-disaster.dto.js';
+import { ActivityHistoryService } from '../activityHistory/activity-history.service.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @Injectable()
 export class DisasterService {
   constructor(
     private readonly disasterRepository: DisasterRepository,
     private readonly prisma: PrismaService,
+    private readonly activityHistoryService: ActivityHistoryService,
   ) {}
 
-  async create(createDisasterDto: CreateDisasterDto) {
+  async create(createDisasterDto: CreateDisasterDto, user: JwtPayload) {
     const [yearStr, monthStr] = createDisasterDto.disasterDate.split('-');
     const year = parseInt(yearStr, 10);
     const month = parseInt(monthStr, 10);
@@ -42,6 +45,13 @@ export class DisasterService {
       disasterDate: startDate,
     });
 
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      relationId: result.disasterId,
+      module: 'Master Data - Disaster',
+      activity: `Created disaster '${disasterCode}'`,
+    });
+
     return plainToInstance(DisasterResponseDto, result, {
       excludeExtraneousValues: true,
     });
@@ -60,7 +70,11 @@ export class DisasterService {
     return disaster;
   }
 
-  async update(id: number, updateDisasterDto: UpdateDisasterDto) {
+  async update(
+    id: number,
+    updateDisasterDto: UpdateDisasterDto,
+    user: JwtPayload,
+  ) {
     await this.findOne(id); // Ensure entity exists before updating
 
     let disasterDate: Date | undefined;
@@ -76,13 +90,29 @@ export class DisasterService {
       ...(disasterDate ? { disasterDate } : {}),
     });
 
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      relationId: id,
+      module: 'Master Data - Disaster',
+      activity: 'Updated disaster',
+    });
+
     return plainToInstance(DisasterResponseDto, result, {
       excludeExtraneousValues: true,
     });
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: JwtPayload) {
     await this.findOne(id); // Ensure entity exists before deleting
-    return this.disasterRepository.delete(id);
+    const deleted = await this.disasterRepository.delete(id);
+
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      relationId: id,
+      module: 'Master Data - Disaster',
+      activity: 'Deleted disaster',
+    });
+
+    return deleted;
   }
 }

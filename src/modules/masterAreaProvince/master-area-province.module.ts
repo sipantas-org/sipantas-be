@@ -3,9 +3,10 @@ import { MasterAreaProvinceService } from './master-area-province.service.js';
 import { MasterAreaProvinceController } from './master-area-province.controller.js';
 import { MasterAreaProvinceRepository } from './repositories/master-area-province.repository.js';
 import { PrismaModule } from '../../prisma/prisma.module.js';
+import { ActivityHistoryModule } from '../activityHistory/activity-history.module.js';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, ActivityHistoryModule],
   controllers: [MasterAreaProvinceController],
   providers: [MasterAreaProvinceService, MasterAreaProvinceRepository],
   exports: [MasterAreaProvinceService],

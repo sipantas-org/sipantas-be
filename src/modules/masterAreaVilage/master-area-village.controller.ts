@@ -25,6 +25,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 import {
   ApiBearerAuth,
   ApiExtraModels,
@@ -62,8 +64,11 @@ export class MasterAreaVillageController {
     description: 'District induk (districtId) tidak ditemukan',
   })
   @ApiResponse({ status: 409, description: 'Village dengan ID tersebut sudah ada' })
-  create(@Body() createDto: CreateVillageDto) {
-    return this.villageService.create(createDto);
+  create(
+    @Body() createDto: CreateVillageDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.villageService.create(createDto, user);
   }
 
   @Get()
@@ -125,8 +130,12 @@ export class MasterAreaVillageController {
     description: 'Hanya administrator yang boleh mengubah village',
   })
   @ApiResponse({ status: 404, description: 'Village tidak ditemukan' })
-  update(@Param('id') id: string, @Body() updateDto: UpdateVillageDto) {
-    return this.villageService.update(id, updateDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateVillageDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.villageService.update(id, updateDto, user);
   }
 
   @Delete(':id')
@@ -145,7 +154,7 @@ export class MasterAreaVillageController {
     description: 'Hanya administrator yang boleh menghapus village',
   })
   @ApiResponse({ status: 404, description: 'Village tidak ditemukan' })
-  remove(@Param('id') id: string) {
-    return this.villageService.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.villageService.remove(id, user);
   }
 }

@@ -15,6 +15,12 @@ export class ActivityHistoryResponseDto {
   module: string;
   activity: string;
 
+  /** Nama pelaku aktivitas (surveyor atau admin). */
+  name: string | null;
+
+  /** Jenis pelaku: Surveyor, Administrator, atau Monitoring. */
+  userType: string | null;
+
   @Transform(({ value }) =>
     value
       ? dayjs(value).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')

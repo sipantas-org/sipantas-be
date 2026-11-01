@@ -47,7 +47,7 @@ export class SurveyController {
     @Body() createSurveyDto: CreateSurveyDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.surveyService.create(createSurveyDto, user);
+    return this.surveyService.create(createSurveyDto, user.sub);
   }
 
   @Get()
@@ -88,7 +88,7 @@ export class SurveyController {
     @Body() updateSurveyDto: UpdateSurveyDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.surveyService.update(id, updateSurveyDto, user);
+    return this.surveyService.update(id, updateSurveyDto, user.sub);
   }
 
   @Patch(':id/status')
@@ -104,27 +104,7 @@ export class SurveyController {
     @Body() updateSurveyStatusDto: UpdateSurveyStatusDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.surveyService.updateStatus(id, updateSurveyStatusDto, user);
-  }
-
-  @Patch(':id/complain')
-  @UseGuards(JwtAuthGuard, SurveyorGuard)
-  @ApiOperation({
-    summary: 'Kirim keluhan / komplain survei',
-    description:
-      'Mengajukan komplain terhadap hasil survei beserta deskripsi dan bukti foto.',
-  })
-  @ApiParam({ name: 'id', description: 'ID Survei', type: Number, example: 1 })
-  doComplain(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateSurveyComplainDto: UpdateSurveyComplainDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.surveyService.updateStatus(
-      id,
-      updateSurveyComplainDto as unknown as UpdateSurveyStatusDto,
-      user,
-    );
+    return this.surveyService.updateStatus(id, updateSurveyStatusDto, user.sub);
   }
 
   @Delete(':id')
@@ -139,6 +119,6 @@ export class SurveyController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.surveyService.remove(id, user);
+    return this.surveyService.remove(id, user.sub);
   }
 }

@@ -145,13 +145,9 @@ export class ComplainService {
       { surveyId: number; surveyStatus: SurveyStatus } | undefined;
 
     if (isResolved) {
-      const targetSurveyStatus =
-        (SurveyStatus as Record<string, SurveyStatus>)['OnInvestigation'] ??
-        SurveyStatus.OnComplain;
-
       surveyUpdate = {
         surveyId: complain.surveyId,
-        surveyStatus: targetSurveyStatus,
+        surveyStatus: SurveyStatus.OnVerification,
       };
     }
 

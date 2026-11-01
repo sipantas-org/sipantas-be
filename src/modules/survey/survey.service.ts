@@ -19,7 +19,6 @@ import {
 } from '../../generated/prisma/enums.js';
 import { QuerySurveyDto } from './dto/query-survey.dto.js';
 import { ActivityHistoryService } from '../activityHistory/activity-history.service.js';
-import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 const DAMAGE_SCORE_THRESHOLDS = {
   HEAVY: 70,
@@ -79,7 +78,7 @@ export class SurveyService {
     };
   }
 
-  async create(dto: CreateSurveyDto, user: JwtPayload) {
+  async create(dto: CreateSurveyDto, userId: number) {
     const {
       disasterId,
       surveyorId,
@@ -132,13 +131,15 @@ export class SurveyService {
       fileDetails,
     });
 
-    await this.activityHistoryService.record({
-      idUser: user.sub,
-      idAdmin: null,
-      relationId: created?.surveyId,
-      module: 'Survey - Create',
-      activity: 'Created new survey',
-    });
+    if (created) {
+      await this.activityHistoryService.record({
+        idUser: userId,
+        idAdmin: null,
+        relationId: created.surveyId,
+        module: 'Survey - Create',
+        activity: 'Create survey',
+      });
+    }
 
     return created;
   }
@@ -155,7 +156,7 @@ export class SurveyService {
     return survey;
   }
 
-  async update(id: number, dto: UpdateSurveyDto, user: JwtPayload) {
+  async update(id: number, dto: UpdateSurveyDto, userId: number) {
     const survey = await this.findOne(id);
 
     const allowedStatuses: SurveyStatus[] = [
@@ -263,17 +264,17 @@ export class SurveyService {
     }
 
     await this.activityHistoryService.record({
-      idUser: user.sub,
+      idUser: userId,
       idAdmin: null,
       relationId: id,
       module: 'Survey - Update',
-      activity: 'Updated survey data',
+      activity: 'Update survey',
     });
 
     return updatedSurvey;
   }
 
-  async updateStatus(id: number, dto: UpdateSurveyStatusDto, user: JwtPayload) {
+  async updateStatus(id: number, dto: UpdateSurveyStatusDto, userId: number) {
     const survey = await this.findOne(id);
     const currentStatus = survey.surveyStatus;
     const targetStatus = dto.surveyStatus;
@@ -316,17 +317,17 @@ export class SurveyService {
     });
 
     await this.activityHistoryService.record({
-      idUser: user.sub,
+      idUser: userId,
       idAdmin: null,
       relationId: id,
-      module: 'Survey - Status Update',
-      activity: `Updated survey status to ${dto.surveyStatus}`,
+      module: 'Survey - Update Status',
+      activity: `Update survey status to ${dto.surveyStatus}`,
     });
 
     return updated;
   }
 
-  async remove(id: number, user: JwtPayload) {
+  async remove(id: number, userId: number) {
     const survey = await this.findOne(id);
     if (survey.surveyStatus !== SurveyStatus.Pending) {
       throw new BadRequestException(
@@ -334,15 +335,13 @@ export class SurveyService {
       );
     }
     const deleted = await this.surveyRepository.delete(id);
-
     await this.activityHistoryService.record({
-      idUser: user.sub,
+      idUser: userId,
       idAdmin: null,
       relationId: id,
       module: 'Survey - Delete',
-      activity: 'Deleted survey',
+      activity: 'Delete survey',
     });
-
     return deleted;
   }
 

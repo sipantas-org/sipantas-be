@@ -3,9 +3,10 @@ import { HousingDamageAssessmentService } from './housing-damage-assessment.serv
 import { HousingDamageAssessmentController } from './housing-damage-assessment.controller.js';
 import { HousingDamageAssessmentRepository } from './repositories/housing-damage-assessment.repository.js';
 import { PrismaModule } from '../../prisma/prisma.module.js';
+import { ActivityHistoryModule } from '../activityHistory/activity-history.module.js';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, ActivityHistoryModule],
   controllers: [HousingDamageAssessmentController],
   providers: [
     HousingDamageAssessmentService,

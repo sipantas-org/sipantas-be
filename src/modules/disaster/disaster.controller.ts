@@ -23,6 +23,8 @@ import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
 import { ApiBasicAuth, ApiBearerAuth } from '@nestjs/swagger';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @ApiBearerAuth('access-token')
 @Controller('disasters')
@@ -33,8 +35,11 @@ export class DisasterController {
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createDisasterDto: CreateDisasterDto) {
-    return this.disasterService.create(createDisasterDto);
+  create(
+    @Body() createDisasterDto: CreateDisasterDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.disasterService.create(createDisasterDto, user);
   }
 
   @Get()
@@ -56,14 +61,15 @@ export class DisasterController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDisasterDto: UpdateDisasterDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.disasterService.update(id, updateDisasterDto);
+    return this.disasterService.update(id, updateDisasterDto, user);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   @AdminRoles(AdminRole.Administrator)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.disasterService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+    return this.disasterService.remove(id, user);
   }
 }

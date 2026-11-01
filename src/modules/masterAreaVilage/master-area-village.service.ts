@@ -8,12 +8,17 @@ import { MasterAreaVillageRepository } from './repositories/master-area-village.
 import { CreateVillageDto } from './dto/create-village.dto.js';
 import { UpdateVillageDto } from './dto/update-village.dto.js';
 import { QueryVillageDto } from './dto/query-village.dto.js';
+import { ActivityHistoryService } from '../activityHistory/activity-history.service.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @Injectable()
 export class MasterAreaVillageService {
-  constructor(private readonly repository: MasterAreaVillageRepository) {}
+  constructor(
+    private readonly repository: MasterAreaVillageRepository,
+    private readonly activityHistoryService: ActivityHistoryService,
+  ) {}
 
-  async create(createDto: CreateVillageDto) {
+  async create(createDto: CreateVillageDto, user: JwtPayload) {
     const existingVillage = await this.repository.findById(createDto.id);
     if (existingVillage) {
       throw new ConflictException(
@@ -30,7 +35,15 @@ export class MasterAreaVillageService {
       );
     }
 
-    return this.repository.create(createDto);
+    const created = await this.repository.create(createDto);
+
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      module: 'Master Area - Village',
+      activity: `Created village '${createDto.id}'`,
+    });
+
+    return created;
   }
 
   async findAll(query: QueryVillageDto) {
@@ -45,13 +58,29 @@ export class MasterAreaVillageService {
     return village;
   }
 
-  async update(id: string, updateDto: UpdateVillageDto) {
+  async update(id: string, updateDto: UpdateVillageDto, user: JwtPayload) {
     await this.findOne(id); // Throws 404 if village not found
-    return this.repository.update(id, updateDto);
+    const updated = await this.repository.update(id, updateDto);
+
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      module: 'Master Area - Village',
+      activity: `Updated village '${id}'`,
+    });
+
+    return updated;
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: JwtPayload) {
     await this.findOne(id); // Throws 404 if village not found
-    return this.repository.delete(id);
+    const deleted = await this.repository.delete(id);
+
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      module: 'Master Area - Village',
+      activity: `Deleted village '${id}'`,
+    });
+
+    return deleted;
   }
 }

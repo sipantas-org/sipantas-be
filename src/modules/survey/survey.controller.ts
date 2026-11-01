@@ -27,6 +27,8 @@ import { QuerySurveyDto } from './dto/query-survey.dto.js';
 import { CombinedAuthGuard } from '../../common/guards/combine-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { SurveyorGuard } from '../../common/guards/surveyor.guard.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @ApiBearerAuth('access-token')
 @ApiTags('surveys')
@@ -41,8 +43,11 @@ export class SurveyController {
     description:
       'Endpoint untuk membuat data survei baru beserta detail penilaian kerusakan fisik, furnitur, dan kerugian.',
   })
-  create(@Body() createSurveyDto: CreateSurveyDto) {
-    return this.surveyService.create(createSurveyDto);
+  create(
+    @Body() createSurveyDto: CreateSurveyDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.surveyService.create(createSurveyDto, user);
   }
 
   @Get()
@@ -81,8 +86,9 @@ export class SurveyController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateSurveyDto: UpdateSurveyDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.surveyService.update(id, updateSurveyDto);
+    return this.surveyService.update(id, updateSurveyDto, user);
   }
 
   @Patch(':id/status')
@@ -96,8 +102,9 @@ export class SurveyController {
   updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateSurveyStatusDto: UpdateSurveyStatusDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.surveyService.updateStatus(id, updateSurveyStatusDto);
+    return this.surveyService.updateStatus(id, updateSurveyStatusDto, user);
   }
 
   @Patch(':id/complain')
@@ -111,10 +118,12 @@ export class SurveyController {
   doComplain(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateSurveyComplainDto: UpdateSurveyComplainDto,
+    @CurrentUser() user: JwtPayload,
   ) {
     return this.surveyService.updateStatus(
       id,
       updateSurveyComplainDto as unknown as UpdateSurveyStatusDto,
+      user,
     );
   }
 
@@ -126,7 +135,10 @@ export class SurveyController {
       'Menghapus data survei beserta seluruh detailnya. Hanya survei dengan status Pending yang diizinkan untuk dihapus.',
   })
   @ApiParam({ name: 'id', description: 'ID Survei', type: Number, example: 1 })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.surveyService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.surveyService.remove(id, user);
   }
 }

@@ -30,6 +30,8 @@ import { BasicAuthGuard } from '../../common/guards/basic-auth.guard.js';
 import { CombinedAuthGuard } from '../../common/guards/combine-auth.guard.js';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { createRateLimitGuard } from '../../common/guards/rate-limit.guard.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 const SearchByNikRateLimitGuard = createRateLimitGuard(5, 60000);
 
@@ -52,8 +54,11 @@ export class ComplainController {
     status: 400,
     description: 'Survei tidak berstatus Pending, atau sudah ada komplain aktif',
   })
-  create(@Body() createDto: CreateSurveyComplainDto) {
-    return this.complainService.create(createDto);
+  create(
+    @Body() createDto: CreateSurveyComplainDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.complainService.create(createDto, user);
   }
 
   @Get()
@@ -134,7 +139,8 @@ export class ComplainController {
   updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateSurveyComplainStatusDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return this.complainService.updateStatus(id, dto);
+    return this.complainService.updateStatus(id, dto, user);
   }
 }

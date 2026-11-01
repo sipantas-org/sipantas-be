@@ -25,6 +25,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 import {
   ApiBearerAuth,
   ApiExtraModels,
@@ -62,8 +64,11 @@ export class MasterAreaDistrictController {
     description: 'Regency induk (regencyId) tidak ditemukan',
   })
   @ApiResponse({ status: 409, description: 'District dengan ID tersebut sudah ada' })
-  create(@Body() createDto: CreateDistrictDto) {
-    return this.districtService.create(createDto);
+  create(
+    @Body() createDto: CreateDistrictDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.districtService.create(createDto, user);
   }
 
   @Get()
@@ -125,8 +130,12 @@ export class MasterAreaDistrictController {
     description: 'Hanya administrator yang boleh mengubah district',
   })
   @ApiResponse({ status: 404, description: 'District tidak ditemukan' })
-  update(@Param('id') id: string, @Body() updateDto: UpdateDistrictDto) {
-    return this.districtService.update(id, updateDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateDistrictDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.districtService.update(id, updateDto, user);
   }
 
   @Delete(':id')
@@ -146,7 +155,7 @@ export class MasterAreaDistrictController {
     description: 'Hanya administrator yang boleh menghapus district',
   })
   @ApiResponse({ status: 404, description: 'District tidak ditemukan' })
-  remove(@Param('id') id: string) {
-    return this.districtService.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.districtService.remove(id, user);
   }
 }

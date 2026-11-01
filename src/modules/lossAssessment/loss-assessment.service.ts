@@ -5,16 +5,28 @@ import { CreateLossAssessmentDto } from './dto/create-loss-assessment.dto.js';
 import { UpdateLossAssessmentDto } from './dto/update-loss-assessment.dto.js';
 import { LossAssessmentResponseDto } from './dto/response-loss-assessment.dto.js';
 import type { LossAssessment } from './entities/loss-assessment.entity.js';
+import { ActivityHistoryService } from '../activityHistory/activity-history.service.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 
 @Injectable()
 export class LossAssessmentService {
-  constructor(private readonly repository: LossAssessmentRepository) {}
+  constructor(
+    private readonly repository: LossAssessmentRepository,
+    private readonly activityHistoryService: ActivityHistoryService,
+  ) {}
 
-  async create(dto: CreateLossAssessmentDto) {
+  async create(dto: CreateLossAssessmentDto, user: JwtPayload) {
     const row = await this.repository.create({
       typeOfLoss: dto.typeOfLoss,
       surveyLossQuestion: dto.surveyLossQuestion,
       lossAssessmentStatus: dto.status,
+    });
+
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      relationId: row.lossAssessmentId,
+      module: 'Master Data - Loss Assessment',
+      activity: 'Created loss assessment',
     });
 
     return this.toResponse(row);
@@ -33,7 +45,7 @@ export class LossAssessmentService {
     return this.toResponse(row);
   }
 
-  async update(id: number, dto: UpdateLossAssessmentDto) {
+  async update(id: number, dto: UpdateLossAssessmentDto, user: JwtPayload) {
     await this.findOne(id);
 
     const row = await this.repository.update(id, {
@@ -42,12 +54,27 @@ export class LossAssessmentService {
       lossAssessmentStatus: dto.status,
     });
 
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      relationId: id,
+      module: 'Master Data - Loss Assessment',
+      activity: 'Updated loss assessment',
+    });
+
     return this.toResponse(row);
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: JwtPayload) {
     await this.findOne(id);
     const row = await this.repository.delete(id);
+
+    await this.activityHistoryService.record({
+      idAdmin: user.sub,
+      relationId: id,
+      module: 'Master Data - Loss Assessment',
+      activity: 'Deleted loss assessment',
+    });
+
     return this.toResponse(row);
   }
 

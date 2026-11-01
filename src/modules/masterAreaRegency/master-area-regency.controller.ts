@@ -24,6 +24,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { AdminRoleGuard } from '../../common/guards/admin-role.guard.js';
 import { AdminRoles } from '../../common/decorators/admin-roles.decorator.js';
 import { AdminRole } from '../../generated/prisma/enums.js';
+import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
+import type { JwtPayload } from '../../common/interfaces/jwt-payload.interface.js';
 import {
   ApiBearerAuth,
   ApiExtraModels,
@@ -61,8 +63,11 @@ export class MasterAreaRegencyController {
     description: 'Province induk (provinceId) tidak ditemukan',
   })
   @ApiResponse({ status: 409, description: 'Regency dengan ID tersebut sudah ada' })
-  create(@Body() createDto: CreateRegencyDto) {
-    return this.regencyService.create(createDto);
+  create(
+    @Body() createDto: CreateRegencyDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.regencyService.create(createDto, user);
   }
 
   @Get()
@@ -124,8 +129,12 @@ export class MasterAreaRegencyController {
     description: 'Hanya administrator yang boleh mengubah regency',
   })
   @ApiResponse({ status: 404, description: 'Regency tidak ditemukan' })
-  update(@Param('id') id: string, @Body() updateDto: UpdateRegencyDto) {
-    return this.regencyService.update(id, updateDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateRegencyDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.regencyService.update(id, updateDto, user);
   }
 
   @Delete(':id')
@@ -145,7 +154,7 @@ export class MasterAreaRegencyController {
     description: 'Hanya administrator yang boleh menghapus regency',
   })
   @ApiResponse({ status: 404, description: 'Regency tidak ditemukan' })
-  remove(@Param('id') id: string) {
-    return this.regencyService.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.regencyService.remove(id, user);
   }
 }

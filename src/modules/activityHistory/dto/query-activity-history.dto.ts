@@ -63,6 +63,16 @@ export class RequestListActivityDto extends QueryDefaultDto {
   @IsInt()
   userId?: number;
 
+  @ApiPropertyOptional({
+    description:
+      'Filter berdasarkan relationId (mis. surveyId, complainId, sectorId — tergantung modul)',
+  })
+  @DisplayName('Relation ID')
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  relationId?: number;
+
   @ApiPropertyOptional({ description: 'Pencarian deskripsi aktivitas' })
   @IsOptional()
   @IsString()

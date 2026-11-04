@@ -7,7 +7,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { DisasterStatus } from '../../../generated/prisma/enums.js';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { DisplayName } from '../../../common/decorators/display-name.decorator.js';
 
 export class CreateDisasterDto {

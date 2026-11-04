@@ -94,8 +94,19 @@ export class ComplainService {
       await this.complainRepository.findLatestPendingSurveyByNik(nik);
 
     if (!survey) {
+      throw new NotFoundException('Tidak ditemukan survei untuk NIK tersebut.');
+    }
+
+    if (
+      survey.surveyStatus == SurveyStatus.OnComplain ||
+      survey.surveyStatus == SurveyStatus.OnVerification
+    ) {
+      throw new NotFoundException('Komplain untuk survei sedang dalam proses.');
+    }
+
+    if (survey.surveyStatus != SurveyStatus.Pending) {
       throw new NotFoundException(
-        'Tidak ditemukan survei berstatus Pending untuk NIK tersebut.',
+        'Tidak bisa melakukan pengajuan komplain untuk survei ini.',
       );
     }
 

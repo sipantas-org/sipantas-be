@@ -136,7 +136,7 @@ export class ComplainRepository {
   /** Survei Pending terbaru untuk NIK, beserta housingDetails + fileDetails. */
   async findLatestPendingSurveyByNik(nik: string) {
     const survey = await this.prisma.survey.findFirst({
-      where: { nik, surveyStatus: SurveyStatus.Pending },
+      where: { nik },
       orderBy: { createdAt: 'desc' },
       select: {
         surveyId: true,
